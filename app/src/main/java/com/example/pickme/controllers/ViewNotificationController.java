@@ -8,5 +8,6 @@ package com.example.pickme.controllers;
  * Allow organizers to send notifications to entrants
  **/
 
-public class NotificationViewModel {
+public class ViewNotificationController {
+
 }
