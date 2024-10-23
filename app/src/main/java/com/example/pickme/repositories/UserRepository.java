@@ -40,7 +40,7 @@ public class UserRepository {
 
     // Update a user
     public void updateUser(User user) {
-        usersRef.document(user.getUserId()).set(user);
+        usersRef.document(user.getuserID()).set(user);
     }
 
     // Delete a user by ID
