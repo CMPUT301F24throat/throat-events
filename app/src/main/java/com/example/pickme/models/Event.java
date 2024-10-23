@@ -1,5 +1,7 @@
 package com.example.pickme.models;
 
+import java.util.Date;
+
 /**
  * Represents an event created by an organizer
  * Responsibilities:
@@ -8,4 +10,15 @@ package com.example.pickme.models;
  **/
 
 public class Event {
+    private String eventId;
+    private String organizerId;
+    private String eventTitle;
+    private String eventDescription;
+    private String eventLocation;
+    private String eventDate;
+    private String qrCodeHash;
+    private String eventPosterUrl;
+    private boolean geoLocationRequired;
+    private Integer maxEntrants; // Optional field
+    private Date createdAt;
 }
