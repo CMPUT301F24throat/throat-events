@@ -23,7 +23,7 @@ public class UserRepository {
     public void addUser(User user, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {
                     DocumentReference newUserRef = usersRef.document();
-                    user.setUserId(newUserRef.getId());
+                    user.setUserID(newUserRef.getId());
                     transaction.set(newUserRef, user);
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
@@ -40,7 +40,7 @@ public class UserRepository {
 
     // Update a user
     public void updateUser(User user) {
-        usersRef.document(user.getuserID()).set(user);
+        usersRef.document(user.getUserID()).set(user);
     }
 
     // Delete a user by ID
