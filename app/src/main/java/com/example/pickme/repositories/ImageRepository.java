@@ -1,5 +1,8 @@
 package com.example.pickme.repositories;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 /**
  * Handles image uploads and metadata storage
  * Responsibilities:
@@ -10,4 +13,6 @@ package com.example.pickme.repositories;
  **/
 
 public class ImageRepository {
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference imageRef = db.collection("images");
 }
