@@ -1,5 +1,8 @@
 package com.example.pickme.repositories;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 /**
  * Handles interactions with the events collection
  * Responsibilities:
@@ -11,4 +14,6 @@ package com.example.pickme.repositories;
  **/
 
 public class EventRepository {
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference eventsRef = db.collection("events");
 }
