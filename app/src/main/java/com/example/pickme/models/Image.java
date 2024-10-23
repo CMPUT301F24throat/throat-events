@@ -17,5 +17,39 @@ public class Image {
     private ImageType type;
     private String imageAssociation;
     private String uploaderId;
-    private Date createdAt;
+    private final Date createdAt;
+    private Date updatedAt;
+
+    public Image() {
+        this.createdAt = new Date();
+    }
+
+    public Image(String imageUrl, ImageType type, String imageAssociation, String uploaderId) {
+        this.imageUrl = imageUrl;
+        this.type = type;
+        this.imageAssociation = imageAssociation;
+        this.uploaderId = uploaderId;
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+        this.updatedAt = new Date();
+    }
+
+    public void setType(ImageType type) {
+        this.type = type;
+        this.updatedAt = new Date();
+    }
+
+    public void setImageAssociation(String imageAssociation) {
+        this.imageAssociation = imageAssociation;
+        this.updatedAt = new Date();
+    }
+
+    public void setUploaderId(String uploaderId) {
+        this.uploaderId = uploaderId;
+        this.updatedAt = new Date();
+    }
 }
