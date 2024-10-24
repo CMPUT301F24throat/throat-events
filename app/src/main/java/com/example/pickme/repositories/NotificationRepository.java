@@ -1,5 +1,8 @@
 package com.example.pickme.repositories;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 /**
  * Handles interactions with the notifications collection
  * Responsibilities:
@@ -10,4 +13,6 @@ package com.example.pickme.repositories;
  **/
 
 public class NotificationRepository {
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference notificationsRef = db.collection("notifications");
 }

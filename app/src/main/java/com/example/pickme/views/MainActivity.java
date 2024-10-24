@@ -9,6 +9,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Entry point of the app, responsible for authentication and navigation
@@ -18,6 +20,8 @@ import com.example.pickme.R;
  **/
 
 public class MainActivity extends AppCompatActivity {
+
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,5 +33,10 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this);
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
     }
 }
