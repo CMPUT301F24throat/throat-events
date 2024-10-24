@@ -1,139 +1,186 @@
 package com.example.pickme.models;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import com.google.firebase.Timestamp;
 
 /**
- * Represents a user in the app
+ * Class that represents a user in the app
  * Responsibilities:
- * Acts as a blueprint for the user object stored in the users collection
+ * Models a user in the users collection
  **/
 
-public final class User {
+public class User {
 
-    // Basic Profile Information
+    // User Profile Information
     private String userID; // Unique string for all users, for easy identification.
-    private String userName; // Input username string for all users.
+    private String firstName;
+    private String lastName;
     private String emailAddress;
     private String contactNumber;
-    private String profilePictureID; // Finds URL to profile picture.
-    private LocalDateTime createdAt;
+    private String profilePictureURL;
 
-    // Preferences & Account Type
+    // User Preferences & Permissions
+    private String deviceID; // Attaches on device to user
     private boolean isAdmin;
-    private boolean enableGeoLocation;
-    // private String[] deviceID = {"123", "22131"};
+    private boolean notificationEnabled;
+    private boolean geoLocationEnabled;
 
-    public static class NotificationPreferences {
-        private boolean eventNotifications;
-        private boolean organizerNotifications;
-        private boolean adminNotifications;
-    }
+   // User Profile Timestamps
+    private final Timestamp createdAt;
+    private Timestamp updatedAt;
 
+    // Timestamp Function
     public User() {
-        // Firebase framework will go here
+        this.createdAt = Timestamp.now();
     }
 
-    public User(String userID, String userName, String emailAddress, String contactNumber, String profilePictureID, LocalDateTime createdAt, boolean isAdmin, boolean enableGeoLocation, String[] deviceID, boolean notificationPreferences) {
-        this.userID = userID;
-        this.userName = userName;
+    // Constructor
+    public User(String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureURL, boolean isAdmin, String deviceID, boolean notificationEnabled, boolean geoLocationEnabled) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.contactNumber = contactNumber;
-        this.profilePictureID = profilePictureID;
-        this.createdAt = createdAt;
+        this.profilePictureURL = profilePictureURL;
+        this.deviceID = deviceID;
         this.isAdmin = isAdmin;
-        this.enableGeoLocation = enableGeoLocation;
-        // this.notificationPreferences = ();
-        // this.deviceIDs.add(deviceID);
+        this.notificationEnabled = notificationEnabled;
+        this.geoLocationEnabled = geoLocationEnabled;
+        this.createdAt = Timestamp.now();
+        this.updatedAt = Timestamp.now();
     }
 
-    // Getters
+    //---------- Get/Set User Profile Information --------------------
     public String getUserID() {
         return userID;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+        this.updatedAt = Timestamp.now();
     }
 
     public String getEmailAddress() {
         return emailAddress;
     }
 
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+        this.updatedAt = Timestamp.now();
+    }
+
     public String getContactNumber() {
         return contactNumber;
     }
 
-    public String getProfilePictureID() {
-        return profilePictureID;
+    public void setContactNumber(String phoneNumber) {
+        this.contactNumber = phoneNumber;
+        this.updatedAt = Timestamp.now();
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getProfilePictureUrl() {
+        return profilePictureURL;
+    }
+
+    public void setProfilePictureURL(String profilePictureUrl) {
+        this.profilePictureURL = profilePictureURL;
+        this.updatedAt = Timestamp.now();
+    }
+
+    //---------- Get/Set User Preferences & Permissions --------------------
+    public String isDeviceID() {
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+        this.updatedAt = Timestamp.now();
     }
 
     public boolean isAdmin() {
         return isAdmin;
     }
 
-    public boolean isEnableGeoLocation() {
-        return enableGeoLocation;
-    }
-
-    // getter for deviceIDS
-
-    // getter for notification preferences
-
-    // Setters
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
-
-    public void setUserName(String userName) {
-        if (userName.isEmpty()) {
-            throw new IllegalArgumentException("Username is empty");
-        }
-        this.userName = userName;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        if (!emailAddress.contains("@")) {
-            throw new IllegalArgumentException("Invalid input.");
-        }
-        this.emailAddress = emailAddress;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        if (contactNumber.isEmpty()) {
-            throw new IllegalArgumentException("Invalid input.");
-        }
-        this.contactNumber = contactNumber;
-    }
-
-    public void setProfilePictureID(String profilePictureID) {
-        this.profilePictureID = profilePictureID;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public void setAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
+        this.updatedAt = Timestamp.now();
     }
 
-    public void setEnableGeoLocation(boolean enableGeoLocation) {
-        this.enableGeoLocation = enableGeoLocation;
+    public boolean isNotificationEnabled() {
+        return notificationEnabled;
     }
 
-    // set for notification preferences
+    public void setNotificationEnabled(boolean notificationEnabled) {
+        this.notificationEnabled = notificationEnabled;
+        this.updatedAt = Timestamp.now();
+    }
 
-    // set for deviceIDs
+    public boolean isGeoLocationEnabled() {
+        return geoLocationEnabled;
+    }
 
-    // Grabs hashCode for userID which is their unique code
-    @Override
-    public int hashCode() {
-        return Objects.hash(userID);
+    public void setGeoLocationEnabled(boolean geoLocationEnabled) {
+        this.geoLocationEnabled = geoLocationEnabled;
+        this.updatedAt = Timestamp.now();
+    }
+
+    //---------- Get/Set User Profile Timestamps --------------------
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    //---------- Validate User Information --------------------
+    public boolean validateFirstName(String firstName) {
+        return firstName != null && firstName.matches("[A-Za-z]+");
+    }
+
+    public boolean validateLastName(String lastName) {
+        return lastName != null && lastName.matches("[A-Za-z]+");
+    }
+
+    public boolean validateEmailAddress(String emailAddress) {
+        String[] validEmailAddressDomains = {".com", ".ca", ".net", ".org", ".kr", ".co", ".uk", "ir", ".ch"};
+
+        if (emailAddress == null || emailAddress.contains("@")) {
+            return false;
+        }
+
+        for (String emailAddressDomain : validEmailAddressDomains) {
+            if (!emailAddress.endsWith(emailAddressDomain)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean validateContactInformation(String contactNumber) {
+        return contactNumber != null && contactNumber.matches("\\+?[0-9\\-\\(\\) ]{7,15}");
+    }
+
+    public boolean validateUserInformation() {
+        return validateFirstName(firstName) && validateLastName(lastName) &&
+                validateEmailAddress(emailAddress) && validateContactInformation(contactNumber);
+    }
+
+    //---------- Information Transformations --------------------
+
+    @Override // Grabs user's full name
+    public String toString() {
+        return (firstName + " " + lastName);
     }
 }
-
