@@ -3,9 +3,16 @@ package com.example.pickme.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import com.example.pickme.models.Enums.NotificationType;
+import com.example.pickme.utils.TimestampUtil;
+import com.google.firebase.Timestamp;
+
+import java.time.LocalDateTime;
+
 /**
  * Represents notifications sent to users (entrants/organizers/admins)
  * Responsibilities:
+ * Models a notification in the notifications collection
  * Captures notification messages in the notifications collection
  * and tracks whether a notification has been read
  **/
