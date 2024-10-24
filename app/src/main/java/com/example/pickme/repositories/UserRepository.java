@@ -9,18 +9,28 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 /**
- * Handles all interactions with the users collection in Firestore
+ * Handles interactions with the users collection
+ * @author sophiecabungcal
+ * @version 1.0
  * Responsibilities:
  * CRUD operations for user data
- **/
-
+ */
 public class UserRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference usersRef = db.collection("users");
 
-    // Create a new user
-    public void addUser(User user, OnCompleteListener<DocumentReference> onCompleteListener) {
-        usersRef.add(user).addOnCompleteListener(onCompleteListener);
+    // Create a new user with auto-generated ID
+    public void addUser(User user, OnCompleteListener<Object> onCompleteListener) {
+        db.runTransaction(transaction -> {
+                    DocumentReference newUserRef = usersRef.document();
+                    user.setUserId(newUserRef.getId());
+                    transaction.set(newUserRef, user);
+                    return null;
+                }).addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Transaction failed: " + e.getMessage());
+                });
     }
 
     // Read a user by ID

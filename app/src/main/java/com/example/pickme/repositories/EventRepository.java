@@ -10,21 +10,28 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the events collection
+ * @author sophiecabungcal
+ * @version 1.0
  * Responsibilities:
  * CRUD operations for event data
- * Fetch event data based on eventId
- * Create new events and update existing events
- * Manage the event's waiting list (add/remove users)
- * Handle event posters (Firebase Storage) and geolocation requirements
- **/
-
+ */
 public class EventRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference eventsRef = db.collection("events");
+    private final WaitingListRepository waitingListRepository = new WaitingListRepository();
 
     // Create a new event
-    public void addEvent(Event event, OnCompleteListener<DocumentReference> onCompleteListener) {
-        eventsRef.add(event).addOnCompleteListener(onCompleteListener);
+    public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+        db.runTransaction(transaction -> {
+                    DocumentReference newEventRef = eventsRef.document();
+                    event.setEventId(newEventRef.getId());
+                    transaction.set(newEventRef, event);
+                    return null;
+                }).addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Transaction failed: " + e.getMessage());
+                });
     }
 
     // Read an event by ID
