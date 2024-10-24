@@ -6,6 +6,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the events collection
@@ -34,5 +35,15 @@ public class EventRepository {
     // Update an event
     public void updateEvent(Event event) {
         eventsRef.document(event.getEventId()).set(event);
+    }
+
+    // Delete an event by ID
+    public void deleteEvent(String eventId) {
+        eventsRef.document(eventId).delete();
+    }
+
+    // Read all events by organizer user ID
+    public void getEventsByOrganizerUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(onCompleteListener);
     }
 }

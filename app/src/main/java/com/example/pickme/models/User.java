@@ -14,7 +14,7 @@ public class User {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private String profilePictureUrl; // Optional field
+    private String profilePicImageId; // Optional field
     private boolean isAdmin;
     private String deviceId;
     private boolean notificationEnabled;
@@ -26,12 +26,12 @@ public class User {
         this.createdAt = Timestamp.now();
     }
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
+    public User(String firstName, String lastName, String email, String phoneNumber, String profilePicImageId, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.profilePictureUrl = profilePictureUrl;
+        this.profilePicImageId = profilePicImageId;
         this.isAdmin = isAdmin;
         this.deviceId = deviceId;
         this.notificationEnabled = notificationEnabled;
@@ -80,13 +80,13 @@ public class User {
         return phoneNumber;
     }
 
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
+    public void setprofilePicImageId(String profilePictureUrl) {
+        this.profilePicImageId = profilePictureUrl;
         this.updatedAt = Timestamp.now();
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
+    public String getprofilePicImageId() {
+        return profilePicImageId;
     }
 
     public void setAdmin(boolean admin) {

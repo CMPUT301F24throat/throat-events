@@ -15,4 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ImageRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference imageRef = db.collection("images");
+
+    // Create a new image
+
 }
