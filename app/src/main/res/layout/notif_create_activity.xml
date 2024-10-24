@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background1">
+
+
+    <ImageButton
+        android:id="@+id/back_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="41dp"
+        android:layout_marginTop="56dp"
+        android:background="@color/background1"
+        android:contentDescription="Back"
+        android:src="@drawable/img"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Send a Notification"
+        android:textSize="28sp"
+        android:textColor="@color/text1"
+
+        android:layout_marginStart="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/back_arrow"
+        app:layout_constraintStart_toEndOf="@id/back_arrow"
+        app:layout_constraintTop_toTopOf="@id/back_arrow" />
+
+    <TextView
+        android:id="@+id/recipientsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Recipients:"
+        android:textSize="16sp"
+        android:textColor="@color/text2"
+
+        app:layout_constraintTop_toBottomOf="@id/back_arrow"
+        app:layout_constraintStart_toStartOf="@id/back_arrow"
+        android:layout_marginTop="30dp"
+        />
+
+    <Spinner
+        android:id="@+id/dropdown_menu"
+        android:layout_width="160dp"
+        android:layout_height="35dp"
+        android:background="@android:drawable/editbox_background"
+        android:backgroundTint="@color/dialogBG1"
+
+        app:layout_constraintBottom_toBottomOf="@id/recipientsText"
+        app:layout_constraintStart_toEndOf="@id/recipientsText"
+        app:layout_constraintTop_toTopOf="@id/recipientsText"
+
+        android:layout_marginStart="10dp"
+        />
+
+    <EditText
+        android:id="@+id/messageBorder"
+        android:layout_width="340dp"
+        android:layout_height="104dp"
+        android:background="@android:drawable/editbox_background"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dropdown_menu"
+
+        android:clickable="false"
+        />
+
+    <EditText
+        android:id="@+id/messageEditText"
+        android:layout_width="336dp"
+        android:layout_height="100dp"
+
+        android:background="@android:drawable/editbox_background"
+        android:backgroundTint="@color/background1"
+        android:hint="Write your message..."
+        android:textAlignment="gravity"
+        android:gravity="start|top"
+
+        android:textColorHint="@color/text3"
+        app:layout_constraintBottom_toBottomOf="@id/messageBorder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/messageBorder"
+        />
+
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/buttonDefault"
+
+        android:text="Send"
+        android:textColor="@color/text1"
+        android:textSize="20dp"
+
+        app:layout_constraintStart_toStartOf="@id/messageBorder"
+        app:layout_constraintEnd_toEndOf="@id/messageBorder"
+        app:layout_constraintTop_toBottomOf="@id/messageBorder"
+        android:layout_marginTop="20dp"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,8 @@
 package com.example.pickme.models;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 import com.example.pickme.models.Enums.NotificationType;
 import com.example.pickme.utils.TimestampUtil;
 import com.google.firebase.Timestamp;
@@ -15,71 +18,89 @@ import java.time.LocalDateTime;
  **/
 
 public class Notification {
-    private String notificationId;
-    private String receiverId;
-    private String senderId;
-    private NotificationType type;
-    private Timestamp readAt;
-    private final Timestamp createdAt;
-    private Timestamp updatedAt;
+    private String notificationID;
+    private String message;
 
-    public Notification() {
-        this.createdAt = Timestamp.now();
+    private boolean read;
+    private LocalDateTime dateTime;
+
+    private User sentFrom;
+    private ArrayList<User> sendTo;
+    private SendLevel level;
+
+    public Notification(){
+        this.read = false;
     }
 
-    public Notification(String receiverId, String senderId, NotificationType type) {
-        this.receiverId = receiverId;
-        this.senderId = senderId;
-        this.type = type;
-        this.createdAt = Timestamp.now();
-        this.updatedAt = Timestamp.now();
+    //---------- Message --------------------
+    public String getMessage() {
+        return message;
     }
 
-    public String getNotificationId() {
-        return notificationId;
+    public boolean setMessage(String message) {
+        if(message.length() > 300 || message.isEmpty()) return false;
+
+        this.message = message;
+        return true;
     }
 
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
-        this.updatedAt = Timestamp.now();
+    //---------- Read --------------------
+    public boolean isRead() {
+        return read;
     }
 
-    public String getReceiverId() {
-        return receiverId;
+    public void markRead() {
+        this.read = true;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-        this.updatedAt = Timestamp.now();
+    public void markUnread(){
+        this.read = false;
     }
 
-    public String getSenderId() {
-        return senderId;
+    //---------- DateTime --------------------
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setType(NotificationType type) {
-        this.type = type;
-        this.updatedAt = Timestamp.now();
+    public void setDateTimeNow() {
+        this.dateTime = LocalDateTime.now();
     }
 
-    public NotificationType getType() {
-        return type;
+    //---------- SentFrom --------------------
+    public User getSentFrom() {
+        return sentFrom;
     }
 
-    public void setReadAt(LocalDateTime readAt) {
-        this.readAt = TimestampUtil.toTimestamp(readAt);
-        this.updatedAt = Timestamp.now();
+    public void setSentFrom(User sentFrom) {
+        this.sentFrom = sentFrom;
     }
 
-    public Timestamp getReadAt() {
-        return readAt;
+    //---------- SendTo --------------------
+    public ArrayList<User> getSendTo() {
+        return sendTo;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
+    public void setSendTo(ArrayList<User> sendTo){
+        if(this.level != SendLevel.Specific) return;
+
+        this.sendTo = sendTo;
     }
 
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
+    //---------- Level --------------------
+    public SendLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(SendLevel level) {
+        this.level = level;
+    }
+
+    public enum SendLevel{
+        Specific,
+        Entrants,
+        Users,
+        Organizers,
+        Admins,
+        All
     }
 }
