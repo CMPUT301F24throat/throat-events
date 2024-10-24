@@ -10,20 +10,27 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the notifications collection
+ * @author sophiecabungcal
+ * @version 1.0
  * Responsibilities:
  * CRUD operations for notification data
- * Send and retrieve notifications
- * Update notification read status
- * Track which users have been notified
- **/
-
+ */
 public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
 
     // Create a new notification
-    public void addNotification(Notification notification, OnCompleteListener<DocumentReference> onCompleteListener) {
-        notificationsRef.add(notification).addOnCompleteListener(onCompleteListener);
+    public void addNotification(Notification notification, OnCompleteListener<Object> onCompleteListener) {
+        db.runTransaction(transaction -> {
+                    DocumentReference newNotificationRef = notificationsRef.document();
+                    notification.setNotificationId(newNotificationRef.getId());
+                    transaction.set(newNotificationRef, notification);
+                    return null;
+                }).addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Transaction failed: " + e.getMessage());
+                });
     }
 
     // Read a notification by ID

@@ -3,20 +3,11 @@ package com.example.pickme.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import com.example.pickme.models.Enums.NotificationType;
-import com.example.pickme.utils.TimestampUtil;
-import com.google.firebase.Timestamp;
-
-import java.time.LocalDateTime;
-
 /**
- * Represents notifications sent to users (entrants/organizers/admins)
- * Responsibilities:
- * Models a notification in the notifications collection
- * Captures notification messages in the notifications collection
- * and tracks whether a notification has been read
- **/
-
+ * Represents a notification alert created by a user
+ * @author Omar-Kattan-1
+ * @version 1.0
+ */
 public class Notification {
     private String notificationID;
     private String message;
@@ -30,6 +21,14 @@ public class Notification {
 
     public Notification(){
         this.read = false;
+    }
+
+    public void setNotificationId(String notificationID) {
+        this.notificationID = notificationID;
+    }
+
+    public String getNotificationId() {
+        return notificationID;
     }
 
     //---------- Message --------------------
