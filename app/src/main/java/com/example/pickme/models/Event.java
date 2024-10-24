@@ -15,12 +15,13 @@ import java.time.LocalDateTime;
 public class Event {
     private String eventId;
     private String organizerId;
+    private String facilityId;
     private String eventTitle;
     private String eventDescription;
-    private String eventLocation;
     private Timestamp eventDate;
-    private String qrCodeHash;
-    private String eventPosterUrl;
+    private String promoQrCodeId;
+    private String waitingListQrCodeId;
+    private String posterImageId;
     private boolean geoLocationRequired;
     private Integer maxEntrants; // Optional field
     private final Timestamp createdAt;
@@ -30,14 +31,15 @@ public class Event {
         this.createdAt = Timestamp.now();
     }
 
-    public Event(String organizerId, String eventTitle, String eventDescription, String eventLocation, LocalDateTime eventDate, String qrCodeHash, String eventPosterUrl, boolean geoLocationRequired, Integer maxEntrants) {
+    public Event(String organizerId, String facilityId, String eventTitle, String eventDescription, String eventLocation, LocalDateTime eventDate, String promoQrCodeId, String waitingListQrCodeId, String posterImageId, boolean geoLocationRequired, Integer maxEntrants) {
         this.organizerId = organizerId;
+        this.facilityId = facilityId;
         this.eventTitle = eventTitle;
         this.eventDescription = eventDescription;
-        this.eventLocation = eventLocation;
         this.eventDate = TimestampUtil.toTimestamp(eventDate);
-        this.qrCodeHash = qrCodeHash;
-        this.eventPosterUrl = eventPosterUrl;
+        this.promoQrCodeId = promoQrCodeId;
+        this.waitingListQrCodeId = waitingListQrCodeId;
+        this.posterImageId = posterImageId;
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
         this.createdAt = Timestamp.now();
@@ -75,13 +77,13 @@ public class Event {
         return eventDescription;
     }
 
-    public void setEventLocation(String eventLocation) {
-        this.eventLocation = eventLocation;
+    public void setFacilityId(String facilityId) {
+        this.facilityId = facilityId;
         this.updatedAt = Timestamp.now();
     }
 
-    public String getEventLocation() {
-        return eventLocation;
+    public String getFacilityId() {
+        return facilityId;
     }
 
     public void setEventDate(LocalDateTime eventDate) {
@@ -93,22 +95,31 @@ public class Event {
         return eventDate;
     }
 
-    public void setQrCodeHash(String qrCodeHash) {
-        this.qrCodeHash = qrCodeHash;
+    public void setPromoQrCodeId(String promoQrCodeId) {
+        this.promoQrCodeId = promoQrCodeId;
         this.updatedAt = Timestamp.now();
     }
 
-    public String getQrCodeHash() {
-        return qrCodeHash;
+    public String getPromoQrCodeId() {
+        return promoQrCodeId;
     }
 
-    public void setEventPosterUrl(String eventPosterUrl) {
-        this.eventPosterUrl = eventPosterUrl;
+    public void setWaitingListQrCodeId(String waitingListQrCodeId) {
+        this.waitingListQrCodeId = waitingListQrCodeId;
         this.updatedAt = Timestamp.now();
     }
 
-    public String getEventPosterUrl() {
-        return eventPosterUrl;
+    public String getWaitingListQrCodeId() {
+        return waitingListQrCodeId;
+    }
+
+    public void setPosterImageId(String posterImageId) {
+        this.posterImageId = posterImageId;
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getPosterImageId() {
+        return posterImageId;
     }
 
     public void setGeoLocationRequired(boolean geoLocationRequired) {
