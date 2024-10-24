@@ -11,6 +11,7 @@ import java.util.ArrayList;
  **/
 
 public class Notification {
+    private String notificationID;
     private String message;
 
     private boolean read;
