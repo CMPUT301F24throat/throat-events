@@ -1,135 +1,139 @@
 package com.example.pickme.models;
 
-import com.google.firebase.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Represents a user in the app
  * Responsibilities:
- * Models a user in the users collection
+ * Acts as a blueprint for the user object stored in the users collection
  **/
 
-public class User {
-    private String userId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phoneNumber;
-    private String profilePictureUrl; // Optional field
+public final class User {
+
+    // Basic Profile Information
+    private String userID; // Unique string for all users, for easy identification.
+    private String userName; // Input username string for all users.
+    private String emailAddress;
+    private String contactNumber;
+    private String profilePictureID; // Finds URL to profile picture.
+    private LocalDateTime createdAt;
+
+    // Preferences & Account Type
     private boolean isAdmin;
-    private String deviceId;
-    private boolean notificationEnabled;
-    private boolean geoLocationEnabled;
-    private final Timestamp createdAt;
-    private Timestamp updatedAt;
+    private boolean enableGeoLocation;
+    // private String[] deviceID = {"123", "22131"};
+
+    public static class NotificationPreferences {
+        private boolean eventNotifications;
+        private boolean organizerNotifications;
+        private boolean adminNotifications;
+    }
 
     public User() {
-        this.createdAt = Timestamp.now();
+        // Firebase framework will go here
     }
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.profilePictureUrl = profilePictureUrl;
+    public User(String userID, String userName, String emailAddress, String contactNumber, String profilePictureID, LocalDateTime createdAt, boolean isAdmin, boolean enableGeoLocation, String[] deviceID, boolean notificationPreferences) {
+        this.userID = userID;
+        this.userName = userName;
+        this.emailAddress = emailAddress;
+        this.contactNumber = contactNumber;
+        this.profilePictureID = profilePictureID;
+        this.createdAt = createdAt;
         this.isAdmin = isAdmin;
-        this.deviceId = deviceId;
-        this.notificationEnabled = notificationEnabled;
-        this.geoLocationEnabled = geoLocationEnabled;
-        this.createdAt = Timestamp.now();
-        this.updatedAt = Timestamp.now();
+        this.enableGeoLocation = enableGeoLocation;
+        // this.notificationPreferences = ();
+        // this.deviceIDs.add(deviceID);
     }
 
-    public String getUserId() {
-        return userId;
+    // Getters
+    public String getUserID() {
+        return userID;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-        this.updatedAt = Timestamp.now();
+    public String getUserName() {
+        return userName;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-        this.updatedAt = Timestamp.now();
+    public String getContactNumber() {
+        return contactNumber;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getProfilePictureID() {
+        return profilePictureID;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-        this.updatedAt = Timestamp.now();
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-        this.updatedAt = Timestamp.now();
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-        this.updatedAt = Timestamp.now();
-    }
-
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
-        this.updatedAt = Timestamp.now();
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public boolean isAdmin() {
         return isAdmin;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-        this.updatedAt = Timestamp.now();
+    public boolean isEnableGeoLocation() {
+        return enableGeoLocation;
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    // getter for deviceIDS
+
+    // getter for notification preferences
+
+    // Setters
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
-    public void setNotificationEnabled(boolean notificationEnabled) {
-        this.notificationEnabled = notificationEnabled;
-        this.updatedAt = Timestamp.now();
+    public void setUserName(String userName) {
+        if (userName.isEmpty()) {
+            throw new IllegalArgumentException("Username is empty");
+        }
+        this.userName = userName;
     }
 
-    public boolean isNotificationEnabled() {
-        return notificationEnabled;
+    public void setEmailAddress(String emailAddress) {
+        if (!emailAddress.contains("@")) {
+            throw new IllegalArgumentException("Invalid input.");
+        }
+        this.emailAddress = emailAddress;
     }
 
-    public void setGeoLocationEnabled(boolean geoLocationEnabled) {
-        this.geoLocationEnabled = geoLocationEnabled;
-        this.updatedAt = Timestamp.now();
+    public void setContactNumber(String contactNumber) {
+        if (contactNumber.isEmpty()) {
+            throw new IllegalArgumentException("Invalid input.");
+        }
+        this.contactNumber = contactNumber;
     }
 
-    public boolean isGeoLocationEnabled() {
-        return geoLocationEnabled;
+    public void setProfilePictureID(String profilePictureID) {
+        this.profilePictureID = profilePictureID;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public void setEnableGeoLocation(boolean enableGeoLocation) {
+        this.enableGeoLocation = enableGeoLocation;
+    }
+
+    // set for notification preferences
+
+    // set for deviceIDs
+
+    // Grabs hashCode for userID which is their unique code
+    @Override
+    public int hashCode() {
+        return Objects.hash(userID);
     }
 }
+
