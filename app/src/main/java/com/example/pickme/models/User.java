@@ -1,11 +1,11 @@
 package com.example.pickme.models;
 
-import java.util.Date;
+import com.google.firebase.Timestamp;
 
 /**
  * Represents a user in the app
  * Responsibilities:
- * Acts as a blueprint for the user object stored in the users collection
+ * Models a user in the users collection
  **/
 
 public class User {
@@ -19,15 +19,14 @@ public class User {
     private String deviceId;
     private boolean notificationEnabled;
     private boolean geoLocationEnabled;
-    private final Date createdAt;
-    private Date updatedAt;
+    private final Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public User() {
-        this.createdAt = new Date();
+        this.createdAt = Timestamp.now();
     }
 
-    public User(String userId, String firstName, String lastName, String email, String phoneNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
-        this.userId = userId;
+    public User(String firstName, String lastName, String email, String phoneNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -37,52 +36,100 @@ public class User {
         this.deviceId = deviceId;
         this.notificationEnabled = notificationEnabled;
         this.geoLocationEnabled = geoLocationEnabled;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
+        this.createdAt = Timestamp.now();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getFirstName() {
+        return firstName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public void setEmail(String email) {
         this.email = email;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
     }
 
     public void setAdmin(boolean admin) {
         isAdmin = admin;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
     }
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getDeviceId() {
+        return deviceId;
     }
 
     public void setNotificationEnabled(boolean notificationEnabled) {
         this.notificationEnabled = notificationEnabled;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public boolean isNotificationEnabled() {
+        return notificationEnabled;
     }
 
     public void setGeoLocationEnabled(boolean geoLocationEnabled) {
         this.geoLocationEnabled = geoLocationEnabled;
-        this.updatedAt = new Date();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public boolean isGeoLocationEnabled() {
+        return geoLocationEnabled;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
     }
 }

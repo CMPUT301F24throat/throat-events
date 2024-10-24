@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase
         FirebaseApp.initializeApp(this);
-
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
     }
