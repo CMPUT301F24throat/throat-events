@@ -42,8 +42,7 @@ public class ImageRepository {
         });
     }
 
-    // TODO: fix nesting due to concurrency issues,
-    //  separate methods for user/event uploads (once grabbing user/event id's becomes available)
+    // TODO: fix nesting due to concurrency issues
     /**
      * Uploads an event poster URI to FirebaseStorage,
      * then stores the image information to Firestore DB.
