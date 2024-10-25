@@ -36,6 +36,18 @@ public class ImageRepository {
 
     // authentication
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    public ImageRepository() {
+        // temporary anonymous auth
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d("ImageRepository", "AUTH: Successful authentication");
+                }
+            }
+        });
+    }
 
     // TODO: not sure how images work yet; need to figure out how to store them in Firebase Storage
 
