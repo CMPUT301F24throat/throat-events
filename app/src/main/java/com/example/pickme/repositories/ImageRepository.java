@@ -45,8 +45,11 @@ public class ImageRepository {
     // TODO: fix nesting due to concurrency issues,
     //  separate methods for user/event uploads (once grabbing user/event id's becomes available)
     /**
-     * Uploads an image URI to FirebaseStorage, then stores the image information to Firestore DB
+     * Uploads an event poster URI to FirebaseStorage,
+     * then stores the image information to Firestore DB.
      * @param imgUri The image URI to upload (e.g. one obtained from an image picker)
+     * @param u The user object (uploader)
+     * @param e The event object (event poster)
      */
     public void upload(@NotNull Uri imgUri, @NotNull User u, Event e) {
         // creating document first to generate unique id
