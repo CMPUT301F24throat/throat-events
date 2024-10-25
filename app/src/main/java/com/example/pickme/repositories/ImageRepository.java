@@ -76,4 +76,7 @@ public class ImageRepository {
                 });
             });
     }
+
+    public void download() {
+    }
 }
