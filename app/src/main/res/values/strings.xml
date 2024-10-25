@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">PickMe</string>
+    <string name="add_name">Add name</string>
+    <string name="todo">TODO</string>
+    <string name="add_email_address">Add email address</string>
+    <string name="add_contact_number">Add contact number</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.example.pickme.models;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.Timestamp;
 
 /**
@@ -11,36 +13,39 @@ import com.google.firebase.Timestamp;
 public class User {
 
     // User Profile Information
-    private String userID; // Unique string for all users, for easy identification.
-    private String firstName;
-    private String lastName;
-    private String emailAddress;
-    private String contactNumber;
-    private String profilePictureURL;
+    private String userId; // Unique string for user, for easy identification.
+    private String firstName; // First name of user
+    private String lastName; // Last name of user
+    private String emailAddress; // Email address of user
+    private String contactNumber; // Contact number of user
+    private String profilePictureUrl; // Customizable user profile picture
 
     // User Preferences & Permissions
-    private String deviceID; // Attaches on device to user
-    private boolean isAdmin;
-    private boolean notificationEnabled;
-    private boolean geoLocationEnabled;
+    private String deviceId; // Attaches on device to user
+    protected boolean isAdmin; // Permission to allow user admin status
+    private boolean notificationEnabled; // Permission to allow notifications
+    private boolean geoLocationEnabled; // Permission to track user's location
 
    // User Profile Timestamps
-    private final Timestamp createdAt;
-    private Timestamp updatedAt;
+    private final Timestamp createdAt; // When was the account created
+    private Timestamp updatedAt; // When was the profile last updated
 
     // Timestamp Function
-    public User() {
+    public User(String userId) {
+        this.userId = userId;
+        this.isAdmin = false;
         this.createdAt = Timestamp.now();
     }
 
     // Constructor
-    public User(String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureURL, boolean isAdmin, String deviceID, boolean notificationEnabled, boolean geoLocationEnabled) {
+    public User(String userId, String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
+        this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.contactNumber = contactNumber;
-        this.profilePictureURL = profilePictureURL;
-        this.deviceID = deviceID;
+        this.profilePictureUrl = profilePictureUrl;
+        this.deviceId = deviceId;
         this.isAdmin = isAdmin;
         this.notificationEnabled = notificationEnabled;
         this.geoLocationEnabled = geoLocationEnabled;
@@ -49,8 +54,12 @@ public class User {
     }
 
     //---------- Get/Set User Profile Information --------------------
-    public String getUserID() {
-        return userID;
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getFirstName() {
@@ -90,21 +99,21 @@ public class User {
     }
 
     public String getProfilePictureUrl() {
-        return profilePictureURL;
+        return profilePictureUrl;
     }
 
-    public void setProfilePictureURL(String profilePictureUrl) {
-        this.profilePictureURL = profilePictureURL;
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
         this.updatedAt = Timestamp.now();
     }
 
     //---------- Get/Set User Preferences & Permissions --------------------
-    public String isDeviceID() {
-        return deviceID;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setDeviceID(String deviceID) {
-        this.deviceID = deviceID;
+    public void setDeviceId(String deviceIDd) {
+        this.deviceId = deviceId;
         this.updatedAt = Timestamp.now();
     }
 
@@ -169,7 +178,7 @@ public class User {
     }
 
     public boolean validateContactInformation(String contactNumber) {
-        return contactNumber != null && contactNumber.matches("\\+?[0-9\\-\\(\\) ]{7,15}");
+        return contactNumber != null && contactNumber.matches("\\+?[0-9\\-() ]{7,15}");
     }
 
     public boolean validateUserInformation() {
@@ -178,7 +187,7 @@ public class User {
     }
 
     //---------- Information Transformations --------------------
-
+    @NonNull
     @Override // Grabs user's full name
     public String toString() {
         return (firstName + " " + lastName);
