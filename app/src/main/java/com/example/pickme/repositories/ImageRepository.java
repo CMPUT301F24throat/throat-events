@@ -105,4 +105,7 @@ public class ImageRepository {
 
     public void download() {
     }
+
+    public void delete() {
+    }
 }
