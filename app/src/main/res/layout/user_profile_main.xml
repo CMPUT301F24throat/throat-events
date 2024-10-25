@@ -5,79 +5,90 @@
     android:id = "@+id/profile_activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey">
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="160dp"
-        android:text="Button"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="520dp" />
-
-    <EditText
-        android:id="@+id/editTextTextEmailAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="321dp" />
-
-    <EditText
-        android:id="@+id/editTextPhone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:ems="10"
-        android:inputType="phone"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextEmailAddress"
-        tools:layout_editor_absoluteX="41dp" />
+    android:background="@color/background1" >
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        app:civ_border_color="#FF000000"
-        app:civ_border_width="2dp"
-        tools:layout_editor_absoluteX="160dp"
-        tools:layout_editor_absoluteY="127dp"
-        tools:srcCompat="@drawable/ic_launcher_background" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="186dp"
-        android:layout_height="176dp"
-        tools:layout_editor_absoluteX="112dp"
-        tools:layout_editor_absoluteY="84dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:id="@+id/profilePicture"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginStart="89dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="90dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile_picture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileBackButton" />
 
     <Button
-        android:id="@+id/backButton"
+        android:id="@+id/profileBackButton"
         android:layout_width="136dp"
         android:layout_height="71dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:background="#00EBEBEB"
+        android:fontFamily="sans-serif"
         android:text="Profile"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textStyle="bold"
         android:visibility="visible"
         app:icon="?attr/homeAsUpIndicator"
-        app:rippleColor="@color/white"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Profile" />
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="53dp"
-        android:layout_height="46dp"
-        android:background="#0F0E0E"
-        android:textColorLink="@color/black"
-        app:icon="@android:drawable/ic_menu_edit"
-        tools:layout_editor_absoluteX="297dp"
-        tools:layout_editor_absoluteY="29dp" />
+    <ImageButton
+        android:id="@+id/profileEditButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="20dp"
+        android:contentDescription="@string/todo"
+        android:elevation="4dp"
+        android:padding="20dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/profileNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/add_name"
+        android:textColor="@color/text3"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="582dp" />
+
+    <TextView
+        android:id="@+id/profileEmailAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/add_email_address"
+        android:textColor="@color/text3"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="494dp" />
+
+    <TextView
+        android:id="@+id/profileContactNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/add_contact_number"
+        android:textColor="@color/text3"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="409dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
