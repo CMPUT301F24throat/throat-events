@@ -4,13 +4,17 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.pickme.models.Enums.ImageType;
+import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
+import com.example.pickme.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Handles interactions with the images collection
@@ -44,7 +48,7 @@ public class ImageRepository {
      * Uploads an image URI to FirebaseStorage, then stores the image information to Firestore DB
      * @param imgUri The image URI to upload (e.g. one obtained from an image picker)
      */
-    public void upload(Uri imgUri) {
+    public void upload(@NotNull Uri imgUri, @NotNull User u, Event e) {
         // creating document first to generate unique id
         DocumentReference imgDoc = imgCollection.document();
 
@@ -61,12 +65,21 @@ public class ImageRepository {
                 imgRef.getDownloadUrl().addOnSuccessListener(uri -> {
 
                     // ... and create a new image object to store to DB
-                    // TODO: Change fields to user/event getter methods
-                    Image img = new Image(
-                            uri.toString(),
-                            ImageType.PROFILE_PICTURE,
-                            "user",
-                            "1234");
+                    Image img = new Image();
+                    img.setImageUrl(uri.toString());
+                    img.setUploaderId(u.getUserId());
+
+                    // check for event object
+                    if (e == null) {
+                        // if null is passed, the image is a profile picture
+                        img.setType(ImageType.PROFILE_PICTURE);
+                        img.setImageAssociation(u.getUserId());
+                    } else {
+                        // and if there's an associated event, it's an event poster
+                        img.setType(ImageType.EVENT_POSTER);
+                        img.setImageAssociation(e.getEventId());
+                    }
+
 
                     // db store
                     imgDoc
@@ -75,6 +88,16 @@ public class ImageRepository {
                                 Log.d("ImageRepository","DB: Upload successful"));
                 });
             });
+    }
+
+    /**
+     * Uploads a profile image URI to FirebaseStorage,
+     * then stores the image information to Firestore DB.
+     * @param imgUri The image URI to upload (e.g. one obtained from an image picker)
+     * @param u The user object (uploader/subject)
+     */
+    public void upload(Uri imgUri, User u) {
+        upload(imgUri, u, null);
     }
 
     public void download() {
