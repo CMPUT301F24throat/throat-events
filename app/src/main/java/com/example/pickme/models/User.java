@@ -1,7 +1,6 @@
 package com.example.pickme.models;
 
 import androidx.annotation.NonNull;
-
 import com.google.firebase.Timestamp;
 
 /**
@@ -37,7 +36,7 @@ public class User {
         this.createdAt = Timestamp.now();
     }
 
-    // Constructor
+    // Constructors
     public User(String userId, String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
         this.userId = userId;
         this.firstName = firstName;
