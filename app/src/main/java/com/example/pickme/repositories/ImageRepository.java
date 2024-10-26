@@ -114,6 +114,16 @@ public class ImageRepository {
     }
 
     public void download() {
+    /**
+     * Callback interface required for accessing asynchronous query data. <br>
+     * <i>onQuerySuccess(String imageUrl)</i> to access the imageUrl <br>
+     * <i>onQueryEmpty()</i> to handle empty queries
+     */
+    public interface queryCallback {
+        void onQuerySuccess(String imageUrl);
+        void onQueryEmpty();
+    }
+
     }
 
     public void delete() {
