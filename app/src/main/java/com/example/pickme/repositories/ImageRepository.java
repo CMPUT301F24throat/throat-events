@@ -113,7 +113,6 @@ public class ImageRepository {
         upload(u, null, imgUri);
     }
 
-    public void download() {
     /**
      * Callback interface required for accessing asynchronous query data. <br>
      * <i>onQuerySuccess(String imageUrl)</i> to access the imageUrl <br>
@@ -124,6 +123,78 @@ public class ImageRepository {
         void onQueryEmpty();
     }
 
+    /**
+     * Download an event poster from Firestore db.
+     * <br>
+     * <b>Requires the callback included in ImageRepository to access the query data.</b>
+     * @param u The user matching to uploaderId
+     * @param e The event matching to imageAssociation
+     * @param callback <i>new ImageRepository.queryCallback</i>
+     */
+    public void download(@NotNull User u, Event e, @NotNull queryCallback callback) {
+        if (e == null) {
+            Query profileImg = imgCollection
+                    .where(Filter.and(
+                            Filter.equalTo("imageType", "PROFILE_PICTURE"),
+                            Filter.equalTo("uploaderId", u.getUserId()),
+                            Filter.equalTo("imageAssociation", u.getUserId())));
+
+            profileImg.get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                QuerySnapshot queryRes = task.getResult();
+                                if (!queryRes.isEmpty()) {
+                                    String url = (String) queryRes.getDocuments().get(0).get("imageUrl");
+                                    callback.onQuerySuccess(url);
+                                    Log.d(TAG, "DB: Query successful, sent to callback imageUrl");
+                                } else {
+                                    Log.d(TAG, "DB: Query returned empty");
+                                    callback.onQueryEmpty();
+                                }
+                            }
+                        }
+                    });
+        } else {
+            Query eventPoster = imgCollection
+                    .where(Filter.and(
+                            Filter.equalTo("imageType", "EVENT_POSTER"),
+                            Filter.equalTo("uploaderId", u.getUserId()),
+                            Filter.equalTo("imageAssociation", e.getEventId())));
+
+            eventPoster
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                QuerySnapshot queryRes = task.getResult();
+                                if (!queryRes.isEmpty()) {
+                                    String url = (String) queryRes.getDocuments().get(0).get("imageUrl");
+                                    callback.onQuerySuccess(url);
+                                    Log.d(TAG, "DB: Query successful, sent to callback imageUrl");
+                                } else {
+                                    Log.d(TAG, "DB: Query returned empty");
+                                    callback.onQueryEmpty();
+                                }
+
+                            }
+                        }
+                    });
+        }
+    }
+
+    /**
+     * Download a profile picture from Firestore db.
+     * <br>
+     * <b>Requires the callback included in ImageRepository to access the query data.</b>
+     * @param u The user matching to uploaderId and imageAssociation
+     * @param callback ImageRepository.queryCallback with onQuerySuccess overload
+     *
+     */
+    public void download(@NotNull User u, @NotNull queryCallback callback) {
+        download(u, null, callback);
     }
 
     public void delete() {
