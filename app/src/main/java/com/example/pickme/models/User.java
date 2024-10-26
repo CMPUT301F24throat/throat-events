@@ -35,6 +35,8 @@ public class User {
     // the date/time the user was last updated [non-nullable]
     private Timestamp updatedAt;
 
+    private static User user;
+
     public User() {
         this.createdAt = Timestamp.now();
     }
@@ -148,5 +150,13 @@ public class User {
 
     public Timestamp getUpdatedAt() {
         return updatedAt;
+    }
+
+    public static void setInstance(User u){
+        User.user = u;
+    }
+
+    public static User getInstance(){
+        return User.user;
     }
 }
