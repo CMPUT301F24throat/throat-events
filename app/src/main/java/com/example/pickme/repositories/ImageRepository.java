@@ -46,7 +46,7 @@ public class ImageRepository {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signInAnonymously().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Log.d("ImageRepository", "AUTH: Successful authentication");
+                Log.d(TAG, "AUTH: Successful authentication");
             }
         });
     }
@@ -55,11 +55,12 @@ public class ImageRepository {
     /**
      * Uploads an event poster URI to FirebaseStorage,
      * then stores the image information to Firestore DB.
+     *
+     * @param u      The user object (uploader)
+     * @param e      The event object (event poster)
      * @param imgUri The image URI to upload (e.g. one obtained from an image picker)
-     * @param u The user object (uploader)
-     * @param e The event object (event poster)
      */
-    public void upload(@NotNull Uri imgUri, @NotNull User u, Event e) {
+    public void upload(@NotNull User u, Event e, @NotNull Uri imgUri) {
         // creating document first to generate unique id
         DocumentReference imgDoc = imgCollection.document();
 
@@ -70,7 +71,7 @@ public class ImageRepository {
         imgRef
             .putFile(imgUri)
             .addOnSuccessListener(taskSnapshot -> {
-                Log.d("ImageRepository", "STORAGE: URI " + imgUri + " upload successful");
+                Log.d(TAG, "STORAGE: URI " + imgUri + " upload successful");
 
                 // now get the image download url...
                 imgRef.getDownloadUrl().addOnSuccessListener(uri -> {
@@ -96,7 +97,7 @@ public class ImageRepository {
                     imgDoc
                         .set(img.getUploadPackage())
                         .addOnSuccessListener(unused ->
-                                Log.d("ImageRepository","DB: Upload successful"));
+                                Log.d(TAG,"DB: Upload successful"));
                 });
             });
     }
@@ -104,11 +105,12 @@ public class ImageRepository {
     /**
      * Uploads a profile image URI to FirebaseStorage,
      * then stores the image information to Firestore DB.
+     *
+     * @param u      The user object (uploader/subject)
      * @param imgUri The image URI to upload (e.g. one obtained from an image picker)
-     * @param u The user object (uploader/subject)
      */
-    public void upload(Uri imgUri, User u) {
-        upload(imgUri, u, null);
+    public void upload(@NotNull User u, @NotNull Uri imgUri) {
+        upload(u, null, imgUri);
     }
 
     public void download() {
