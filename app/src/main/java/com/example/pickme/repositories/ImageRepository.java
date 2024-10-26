@@ -3,14 +3,21 @@ package com.example.pickme.repositories;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.pickme.models.Enums.ImageType;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -19,7 +26,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Handles interactions with the images collection
  * @author sophiecabungcal
- * @version 1.0
+ * @author etdong
+ * @version 1.1
  * Responsibilities:
  * CRUD operations for image data
  */
