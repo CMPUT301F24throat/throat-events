@@ -98,6 +98,7 @@ public class Image {
         temp.put("createdAt", getCreatedAt());
         temp.put("imageType", getType());
         temp.put("imageUrl", getImageUrl());
+        temp.put("imageAssociation", getImageAssociation());
         temp.put("uploaderId", getUploaderId());
 
         return temp;
