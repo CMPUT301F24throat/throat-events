@@ -26,15 +26,16 @@
         android:id="@+id/loadingText3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
+        android:fontFamily="sans-serif"
         android:text="Let's sign up!"
         android:textColor="@color/text2"
-        android:textSize="20sp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.324"
+        app:layout_constraintVertical_bias="0.314"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -47,28 +48,28 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.167"
+        app:layout_constraintHorizontal_bias="0.165"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.416"
+        app:layout_constraintVertical_bias="0.377"
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/loadingUserLastName"
+        android:id="@+id/loadingUserFirstName"
         android:layout_width="260dp"
         android:layout_height="35dp"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="44dp"
         android:background="@color/cardview_dark_background"
         android:fontFamily="sans-serif-black"
         android:paddingLeft="@android:dimen/app_icon_size"
         android:paddingEnd="@android:dimen/app_icon_size"
-        android:text="Doe"
+        android:text="John"
         android:textAlignment="textStart"
         android:textColor="@color/text3"
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="512dp" />
+        tools:layout_editor_absoluteY="377dp" />
 
     <TextView
         android:id="@+id/loadingLastNameText"
@@ -80,27 +81,47 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.158"
+        app:layout_constraintHorizontal_bias="0.159"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.542"
+        app:layout_constraintVertical_bias="0.503"
         tools:ignore="MissingConstraints" />
 
+    <Button
+        android:id="@+id/loadingSubmitButton"
+        android:layout_width="345dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="82dp"
+        android:layout_marginEnd="83dp"
+        android:backgroundTint="@color/buttonDefault"
+        android:fontFamily="sans-serif"
+        android:text="Submit"
+        android:textAlignment="center"
+        android:textColor="@color/text1"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="546dp" />
+
     <TextView
-        android:id="@+id/loadingUserFirstName"
+        android:id="@+id/loadingUserLastName"
         android:layout_width="260dp"
         android:layout_height="35dp"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="44dp"
         android:background="@color/cardview_dark_background"
         android:fontFamily="sans-serif-black"
         android:paddingLeft="@android:dimen/app_icon_size"
         android:paddingEnd="@android:dimen/app_icon_size"
-        android:text="John"
+        android:text="Doe"
         android:textAlignment="textStart"
         android:textColor="@color/text3"
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="410dp" />
+        tools:layout_editor_absoluteY="479dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
