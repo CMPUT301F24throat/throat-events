@@ -197,6 +197,89 @@ public class ImageRepository {
         download(u, null, callback);
     }
 
-    public void delete() {
+
+    /**
+     * Delete an event poster from Firestore db.
+     * @param u The user matching to uploaderId
+     * @param e The event matching to imageAssociation
+     */
+    public void delete(@NotNull User u, Event e) {
+        if (e == null) {
+            Query profileImg = imgCollection
+                    .where(Filter.and(
+                            Filter.equalTo("imageType", "PROFILE_PICTURE"),
+                            Filter.equalTo("uploaderId", u.getUserId()),
+                            Filter.equalTo("imageAssociation", u.getUserId())));
+
+            profileImg.get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                QuerySnapshot queryRes = task.getResult();
+                                if (!queryRes.isEmpty()) {
+                                    DocumentReference doc = queryRes
+                                            .getDocuments()
+                                            .get(0)
+                                            .getReference();
+                                    Log.d(TAG, "DB: Query successful, deleting document " + doc.getId());
+                                    doc.delete()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Log.d(TAG, "DB: Deletion successful");
+                                                    }
+                                                }
+                                            });
+                                } else {
+                                    Log.d(TAG, "DB: Query returned empty, no deletion occurred");
+                                }
+                            }
+                        }
+                    });
+        } else {
+            Query eventPoster = imgCollection
+                    .where(Filter.and(
+                            Filter.equalTo("imageType", "EVENT_POSTER"),
+                            Filter.equalTo("uploaderId", u.getUserId()),
+                            Filter.equalTo("imageAssociation", e.getEventId())));
+
+            eventPoster
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            QuerySnapshot queryRes = task.getResult();
+                            if (!queryRes.isEmpty()) {
+                                DocumentReference doc = queryRes
+                                        .getDocuments()
+                                        .get(0)
+                                        .getReference();
+                                Log.d(TAG, "DB: Query successful, deleting document " + doc.getId());
+                                doc.delete()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d(TAG, "DB: Deletion successful");
+                                                }
+                                            }
+                                        });
+                            } else {
+                                Log.d(TAG, "DB: Query returned empty, no deletion occurred");
+                            }
+                        }
+                    });
+        }
     }
+
+    /**
+     * Delete a profile picture from Firestore db.
+     * @param u The user matching to uploaderId and imageAssociation
+     */
+    public void delete(@NotNull User u) {
+        delete(u, null);
+    }
+
 }
