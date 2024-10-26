@@ -10,6 +10,7 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -222,14 +223,21 @@ public class ImageRepository {
                                             .getDocuments()
                                             .get(0)
                                             .getReference();
-                                    Log.d(TAG, "DB: Query successful, deleting document " + doc.getId());
+                                    String imageId = doc.getId();
+                                    Log.d(TAG, "DB: Query successful");
+                                    Log.d(TAG, "STORAGE: Deleting file " + imageId);
+                                    imgStorage.child(imageId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.d(TAG, "STORAGE: File " + imageId + " deleted");
+                                        }
+                                    });
+                                    Log.d(TAG, "DB: Deleting document " + imageId);
                                     doc.delete()
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Log.d(TAG, "DB: Deletion successful");
-                                                    }
+                                                public void onSuccess(Void unused) {
+                                                    Log.d(TAG, "DB: Document " + imageId + " deleted");
                                                 }
                                             });
                                 } else {
@@ -256,14 +264,21 @@ public class ImageRepository {
                                         .getDocuments()
                                         .get(0)
                                         .getReference();
-                                Log.d(TAG, "DB: Query successful, deleting document " + doc.getId());
+                                String imageId = doc.getId();
+                                Log.d(TAG, "DB: Query successful");
+                                Log.d(TAG, "STORAGE: Deleting file " + imageId);
+                                imgStorage.child(imageId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d(TAG, "STORAGE: File " + imageId + " deleted");
+                                    }
+                                });
+                                Log.d(TAG, "DB: Deleting document " + imageId);
                                 doc.delete()
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Log.d(TAG, "DB: Deletion successful");
-                                                }
+                                            public void onSuccess(Void unused) {
+                                                Log.d(TAG, "DB: Document " + imageId + " deleted");
                                             }
                                         });
                             } else {
