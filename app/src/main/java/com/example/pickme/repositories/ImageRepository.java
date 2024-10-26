@@ -12,6 +12,7 @@ import com.example.pickme.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,8 +47,9 @@ public class ImageRepository {
     public ImageRepository() {
         // temporary anonymous auth
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.signInAnonymously().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+        auth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
                 Log.d(TAG, "AUTH: Successful authentication");
             }
         });
@@ -71,35 +74,40 @@ public class ImageRepository {
         // storing the image in firebasestorage
         imgRef
             .putFile(imgUri)
-            .addOnSuccessListener(taskSnapshot -> {
-                Log.d(TAG, "STORAGE: URI " + imgUri + " upload successful");
+            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Log.d(TAG, "STORAGE: URI " + imgUri + " upload successful");
 
-                // now get the image download url...
-                imgRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    // now get the image download url...
+                    imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // ... and create a new image object to store to DB
+                            Image img = new Image();
+                            img.setImageUrl(uri.toString());
+                            img.setUploaderId(u.getUserId());
 
-                    // ... and create a new image object to store to DB
-                    Image img = new Image();
-                    img.setImageUrl(uri.toString());
-                    img.setUploaderId(u.getUserId());
-
-                    // check for event object
-                    if (e == null) {
-                        // if null is passed, the image is a profile picture
-                        img.setType(ImageType.PROFILE_PICTURE);
-                        img.setImageAssociation(u.getUserId());
-                    } else {
-                        // and if there's an associated event, it's an event poster
-                        img.setType(ImageType.EVENT_POSTER);
-                        img.setImageAssociation(e.getEventId());
-                    }
+                            // check for event object
+                            if (e == null) {
+                                // if null is passed, the image is a profile picture
+                                img.setType(ImageType.PROFILE_PICTURE);
+                                img.setImageAssociation(u.getUserId());
+                            } else {
+                                // and if there's an associated event, it's an event poster
+                                img.setType(ImageType.EVENT_POSTER);
+                                img.setImageAssociation(e.getEventId());
+                            }
 
 
-                    // db store
-                    imgDoc
-                        .set(img.getUploadPackage())
-                        .addOnSuccessListener(unused ->
-                                Log.d(TAG,"DB: Upload successful"));
-                });
+                            // db store
+                            imgDoc
+                                    .set(img.getUploadPackage())
+                                    .addOnSuccessListener(unused ->
+                                            Log.d(TAG, "DB: Upload successful"));
+                        }
+                    });
+                }
             });
     }
 
