@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * CRUD operations for image data
  */
 public class ImageRepository {
+    private final String TAG = "ImageRepository";
     // image storage
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final StorageReference imgStorage = storage.getReference();
