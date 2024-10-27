@@ -17,6 +17,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Firebase fireStore db; 
     private UserRepository userRepository;
 
     @Override
