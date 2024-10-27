@@ -1,5 +1,7 @@
 package com.example.pickme.views;
 
+import androidx.fragment.app.Fragment;
+
 /**
  * Displays the details of an event
  * Responsibilities:
@@ -8,5 +10,5 @@ package com.example.pickme.views;
  * Allow users to join or leave the event's waiting list
  **/
 
-public class EventDetailsFragment {
+public class EventDetailsFragment extends Fragment {
 }
