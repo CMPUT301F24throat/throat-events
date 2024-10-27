@@ -5,7 +5,7 @@ import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.Timestamp;
 
 /**
- * Class that represents, validates, and stores a user in the app
+ * Class that can represent, validate, and stores a user in the app
  * Responsibilities:
  * - Models a user in the users collection.
  * - Validates user data to ensure formats match.
