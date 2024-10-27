@@ -1,7 +1,6 @@
 package com.example.pickme.models;
 
 import androidx.annotation.NonNull;
-
 import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.Timestamp;
 
@@ -12,7 +11,6 @@ import com.google.firebase.Timestamp;
  * - Validates user data to ensure formats match.
  * - Tracks user activity status and manages admin status.
  * - Contains full name string format.
- * - Uses an audit log for easy debugging.
  **/
 
 public class User {
@@ -35,9 +33,10 @@ public class User {
     private boolean notificationEnabled; // Permission to allow notifications
     private boolean geoLocationEnabled; // Permission to track user's location
 
-    // User Profile Timestamps
+    // User Timestamps
     private final Timestamp createdAt; // When was the account created
     private Timestamp updatedAt; // When was the profile last updated
+    private static User user; // Tracks the active user throughout the app's lifecycle
 
     // Timestamp Function
     public User(UserRepository userRepository, String userId) {
@@ -172,6 +171,14 @@ public class User {
         return updatedAt;
     }
 
+    public static User getInstance() {
+        return User.user;
+    }
+
+    public static void setInstance(User newUser) {
+        User.user = newUser;
+    }
+
     //---------- Validate User Information --------------------
     public boolean validateFirstName(String firstName) {
         return firstName != null && firstName.matches("[A-Za-z]+");
@@ -184,16 +191,16 @@ public class User {
     public boolean validateEmailAddress(String emailAddress) {
         String[] validEmailAddressDomains = {".com", ".ca", ".net", ".org", ".kr", ".co", ".uk", "ir", ".ch"};
 
-        if (emailAddress == null || emailAddress.contains("@")) {
+        if (emailAddress == null || !emailAddress.contains("@")) {
             return false;
         }
 
         for (String emailAddressDomain : validEmailAddressDomains) {
-            if (!emailAddress.endsWith(emailAddressDomain)) {
-                return false;
+            if (emailAddress.endsWith(emailAddressDomain)) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public boolean validateContactInformation(String contactNumber) {

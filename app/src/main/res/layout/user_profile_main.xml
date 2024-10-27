@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow"
             android:background="@null"
-            android:contentDescription="return" />
+            android:contentDescription="@string/returnText" />
 
         <TextView
             android:id="@+id/profileBackButton"
