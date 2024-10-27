@@ -60,7 +60,7 @@ public class User {
         this.notificationEnabled = notificationEnabled;
         this.geoLocationEnabled = geoLocationEnabled;
         this.createdAt = Timestamp.now();
-        this.updatedAt = Timestamp.now();
+        this.updatedAt = this.createdAt;
     }
 
     //---------- Get/Set User Profile Information --------------------
