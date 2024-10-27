@@ -86,6 +86,8 @@
         android:gravity="start|top"
 
         android:textColorHint="@color/text3"
+        android:textColor="@color/text1"
+
         app:layout_constraintBottom_toBottomOf="@id/messageBorder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

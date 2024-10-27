@@ -1,7 +1,12 @@
 package com.example.pickme.repositories;
 
+import android.util.Log;
+
 import com.example.pickme.models.Notification;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -18,6 +23,17 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
+
+    public NotificationRepository() {
+        // temporary anonymous auth
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                Log.d("AUTH", "AUTH: Successful authentication");
+            }
+        });
+    }
 
     // Create a new notification
     public void addNotification(Notification notification, OnCompleteListener<Object> onCompleteListener) {

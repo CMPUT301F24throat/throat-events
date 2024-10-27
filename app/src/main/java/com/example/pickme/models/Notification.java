@@ -1,6 +1,6 @@
 package com.example.pickme.models;
 
-import java.time.LocalDateTime;
+import com.google.firebase.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -13,7 +13,7 @@ public class Notification {
     private String message;
 
     private boolean read;
-    private LocalDateTime dateTime;
+    private Timestamp timestamp;
 
     private User sentFrom;
     private ArrayList<User> sendTo;
@@ -23,6 +23,7 @@ public class Notification {
         this.read = false;
     }
 
+    //--------- Notification ID -------------
     public void setNotificationId(String notificationID) {
         this.notificationID = notificationID;
     }
@@ -57,12 +58,12 @@ public class Notification {
     }
 
     //---------- DateTime --------------------
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
     public void setDateTimeNow() {
-        this.dateTime = LocalDateTime.now();
+        this.timestamp = Timestamp.now();
     }
 
     //---------- SentFrom --------------------

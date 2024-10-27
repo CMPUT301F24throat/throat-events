@@ -1,6 +1,9 @@
 package com.example.pickme.views;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
+import com.example.pickme.controllers.CreateNotificationController;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -38,5 +42,14 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
+
+        Button switchButton = findViewById(R.id.switchButton);
+        switchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, CreateNotificationController.class);
+                startActivity(intent);
+            }
+        });
     }
 }
