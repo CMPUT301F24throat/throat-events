@@ -3,6 +3,8 @@ package com.example.pickme.models;
 import com.example.pickme.models.Enums.ImageType;
 import com.google.firebase.Timestamp;
 
+import java.util.HashMap;
+
 /**
  * Represents an image uploaded by the user
  * @author sophiecabungcal
@@ -89,5 +91,16 @@ public class Image {
 
     public Timestamp getUpdatedAt() {
         return updatedAt;
+    }
+
+    public HashMap<String, Object> getUploadPackage() {
+        HashMap<String, Object> temp = new HashMap<>();
+        temp.put("createdAt", getCreatedAt());
+        temp.put("imageType", getType());
+        temp.put("imageUrl", getImageUrl());
+        temp.put("imageAssociation", getImageAssociation());
+        temp.put("uploaderId", getUploaderId());
+
+        return temp;
     }
 }
