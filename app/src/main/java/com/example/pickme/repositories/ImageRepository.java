@@ -16,6 +16,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -25,6 +26,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Handles interactions with the images collection
@@ -53,6 +56,26 @@ public class ImageRepository {
                 Log.d(TAG, "AUTH: Successful authentication");
             }
         });
+    }
+
+    /**
+     * Callback interface required for accessing asynchronous query data. <br>
+     * <i>onQuerySuccess(String imageUrl)</i> to access the imageUrl <br>
+     * <i>onQueryEmpty()</i> to handle empty queries
+     */
+    public interface queryCallback {
+        void onQuerySuccess(String imageUrl);
+        void onQueryEmpty();
+    }
+
+    /**
+     * Callback interface specifically for accessing the entire collection. <br>
+     * <i>onQuerySuccess(String imageUrl)</i> to access the list of docs <br>
+     * <i>onQueryEmpty()</i> to handle empty queries
+     */
+    public interface collectionCallback {
+        void onQuerySuccess(List<DocumentSnapshot> docs);
+        void onQueryEmpty();
     }
 
     // TODO: fix nesting due to concurrency issues
@@ -120,16 +143,6 @@ public class ImageRepository {
      */
     public void upload(@NotNull User u, @NotNull Uri imgUri) {
         upload(u, null, imgUri);
-    }
-
-    /**
-     * Callback interface required for accessing asynchronous query data. <br>
-     * <i>onQuerySuccess(String imageUrl)</i> to access the imageUrl <br>
-     * <i>onQueryEmpty()</i> to handle empty queries
-     */
-    public interface queryCallback {
-        void onQuerySuccess(String imageUrl);
-        void onQueryEmpty();
     }
 
     /**
@@ -303,6 +316,26 @@ public class ImageRepository {
      */
     public void delete(@NotNull User u) {
         delete(u, null);
+    }
+
+    public void getAllImages(collectionCallback callback) {
+        imgCollection.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot queryRes = task.getResult();
+                            if (!queryRes.isEmpty()) {
+                                List<DocumentSnapshot> docs = queryRes.getDocuments();
+                                callback.onQuerySuccess(docs);
+                                Log.d(TAG, "DB: Query successful, sent to callback docs");
+                            } else {
+                                Log.d(TAG, "DB: Query returned empty");
+                                callback.onQueryEmpty();
+                            }
+                        }
+                    }
+                });
     }
 
 }
