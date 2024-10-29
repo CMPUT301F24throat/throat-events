@@ -89,7 +89,47 @@ public class ImageRepository {
      * @param i The image object to upload
      * @param uri The image URI to be attached
      */
-    public void upload(@NotNull Image i, @NotNull Uri uri) {
+    public void upload(@NonNull Image i, @NonNull Uri uri) {
+
+        String uploaderId = i.getUploaderId();
+        String imageAssociation = i.getImageAssociation();
+        String imageType = i.getImageType().toString();
+
+        // check for an already existing image of the same type
+        Query query = imgCollection
+                .where(Filter.and(
+                        Filter.equalTo("imageType", imageType),
+                        Filter.equalTo("uploaderId", uploaderId),
+                        Filter.equalTo("imageAssociation", imageAssociation)
+                ));
+
+        query.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            // if existing image of the same type is found, update it
+                            QuerySnapshot queryRes = task.getResult();
+                            if (!queryRes.isEmpty()) {
+                                Log.d(TAG, "upload: DB query successful, updating");
+                                update(queryRes, uploaderId, uri);
+
+                            } else {
+                                Log.d(TAG, "upload: DB query returned empty, uploading");
+                                uploadNew(i, uri);
+                            }
+                        }
+                    }
+                });
+    }
+
+    /**
+     * upload() helper function for uploading new images
+     * @param i The image object to upload
+     * @param uri The image URI to be attached
+     */
+    private void uploadNew(@NonNull Image i, @NonNull Uri uri) {
+
         String uploaderId = i.getUploaderId();
 
         // creating document first to generate unique id
@@ -103,30 +143,74 @@ public class ImageRepository {
         imgRef
                 .putFile(uri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Log.d(TAG, "STORAGE: URI " + uri + " upload successful");
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d(TAG, String.format("upload: File %s upload successful", imageId));
 
-                    // now get the image download url...
-                    imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            // db store
-                            i.setImageUrl(uri.toString());
-                            db.runTransaction(new Transaction.Function<Image>() {
-                                @Override
-                                public Image apply(@NonNull Transaction transaction) {
-                                    transaction.set(imgDoc, i);
-                                    return i;
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<Image>() {
-                                @Override
-                                public void onSuccess(Image image) {
-                                    Log.d(TAG, "DB: Image " + imgDoc.getId() + " upload successful");
-                                }
-                            });
-                        }
-                    });
+                        // now get the image download url
+                        imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                // db store
+                                i.setImageUrl(uri.toString());
+                                db.runTransaction(new Transaction.Function<Image>() {
+                                    @Override
+                                    public Image apply(@NonNull Transaction transaction) {
+                                        transaction.set(imgDoc, i);
+                                        return i;
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<Image>() {
+                                    @Override
+                                    public void onSuccess(Image image) {
+                                        Log.d(TAG, String.format("upload: Document %s upload successful", imageId));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+    }
+
+    /**
+     * upload() helper function to update existing images
+     * @param queryRes The query result to update
+     * @param uploaderId The uploaderId of the existing images
+     * @param uri The uri to update with
+     */
+    private void update(QuerySnapshot queryRes, String uploaderId, Uri uri) {
+
+        DocumentReference doc = queryRes
+                .getDocuments()
+                .get(0)
+                .getReference();
+
+        String imageId = doc.getId();
+        StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
+
+        // update storage file
+        imgRef
+            .putFile(uri)
+            .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, String.format("update: File %s updated", imageId));
+
+                        // update document
+                        imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                // db store
+                                doc.update("imageUrl", uri)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.d(TAG, String.format("update: Document %s updated", imageId));
+                                        }
+                                    });
+                            }
+                        });
+                    }
                 }
             });
     }
