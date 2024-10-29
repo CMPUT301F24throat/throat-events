@@ -318,20 +318,37 @@ public class ImageRepository {
 
     }
 
-    public void getAllImages(collectionCallback callback) {
-        imgCollection.get()
+    /**
+     * Gets every image URL stored in Firebase DB and puts it into the passed gridView object
+     * @param context The activity in which the gallery resides
+     * @param gallery The gridView you want to show the images
+     */
+    public void getAllImages(@NonNull Context context, @NonNull GridView gallery) {
+        // querying images collection for everything
+        imgCollection
+                .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            Log.d(TAG, "DB: Query all successful");
                             QuerySnapshot queryRes = task.getResult();
                             if (!queryRes.isEmpty()) {
+                                // acquired list of image documents
                                 List<DocumentSnapshot> docs = queryRes.getDocuments();
-                                callback.onQuerySuccess(docs);
-                                Log.d(TAG, "DB: Query successful, sent to callback docs");
+
+                                // extracting list of image urls
+                                ArrayList<String> imageUrls = new ArrayList<>();
+                                for (DocumentSnapshot doc : docs) {
+                                    String url = (String) doc.get("imageUrl");
+                                    imageUrls.add(url);
+                                }
+                                // clearing and resetting adapter
+                                gallery.setAdapter(null);
+                                GalleryAdapter adapter = new GalleryAdapter(context, imageUrls);
+                                gallery.setAdapter(adapter);
                             } else {
-                                Log.d(TAG, "DB: Query returned empty");
-                                callback.onQueryEmpty();
+                                Log.d(TAG, "DB: Query all returned empty");
                             }
                         }
                     }
