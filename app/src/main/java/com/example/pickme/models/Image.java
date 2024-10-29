@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Represents an image uploaded by the user
  * @author sophiecabungcal, etdong
- * @version 1.0
+ * @version 1.1
  */
 public class Image {
 
@@ -149,6 +149,7 @@ public class Image {
      * <br>
      * <b>Requires the callback included in ImageRepository to access the query data.</b>
      * @param callback <i>new ImageRepository.queryCallback</i>
+     * @see ImageRepository.queryCallback
      */
     public void download(ImageRepository.queryCallback callback) {
         ir.download(this, callback);
@@ -156,6 +157,7 @@ public class Image {
 
     /**
      * Delete the image from Firestore DB with query matching this image class.
+     * @see ImageRepository
      */
     public void delete() {
         ir.delete(this);
