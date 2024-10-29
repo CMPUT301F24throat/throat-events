@@ -214,7 +214,7 @@ public class ImageRepository {
      * @param callback <i>new ImageQuery()</i>
      * @see com.example.pickme.utils.ImageQuery
      */
-    public void download(Image i, queryCallback callback) {
+    public void download(@NonNull Image i, @NonNull ImageQuery callback) {
 
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
@@ -237,12 +237,13 @@ public class ImageRepository {
                                         .getDocuments()
                                         .get(0)
                                         .getData();
+                                assert data != null;
                                 Image queriedImage = new Image(data);
-                                callback.onQuerySuccess(queriedImage);
-                                Log.d(TAG, "DB: Query successful, sent Image to callback");
+                                callback.onSuccess(queriedImage);
+                                Log.d(TAG, "download: Query successful, sent Image to callback");
                             } else {
-                                Log.d(TAG, "DB: Query returned empty");
-                                callback.onQueryEmpty();
+                                Log.d(TAG, "download: Query returned empty");
+                                callback.onEmpty();
                             }
                         }
                     }
