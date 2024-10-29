@@ -3,6 +3,7 @@ package com.example.pickme.views;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -15,18 +16,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
+import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.ImageRepository;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.ImageQuery;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class Example_ImageUpload extends AppCompatActivity {
 
     //region Attributes
 
     String TAG = "Example_ImageUpload";
-    private FirebaseFirestore db;
+    private final FirebaseAuth auth = FirebaseAuth.getInstance();
 
-    User user1 = new User();
+    UserRepository ur = new UserRepository();
+    User user1 = new User(ur, auth.getUid());
     Event event1 = new Event();
     //endregion
 
@@ -38,19 +43,10 @@ public class Example_ImageUpload extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                 // callback is invoked after the user selects a media item or closes the photo picker
                 if (uri != null) {
-                    ImageRepository ir = new ImageRepository();
-                    ir.download(user1, new ImageRepository.queryCallback() {
-                        @Override
-                        public void onQuerySuccess(String imageUrl) {
-                            // if an image of this type already exists, remove it
-                            ir.delete(user1);
-                        }
 
-                        @Override
-                        public void onQueryEmpty() {
-                        }
-                    });
-                    ir.upload(user1, uri);
+                    Image image = new Image(user1.getUserId(), user1.getUserId());
+                    image.upload(uri);
+
                     Toast.makeText(
                             Example_ImageUpload.this,
                             "Profile picture uploaded for user: " + user1.getUserId(),
@@ -67,18 +63,10 @@ public class Example_ImageUpload extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                 // callback is invoked after the user selects a media item or closes the photo picker
                 if (uri != null) {
-                    ImageRepository ir = new ImageRepository();
-                    ir.download(user1, event1, new ImageRepository.queryCallback() {
-                        @Override
-                        public void onQuerySuccess(String imageUrl) {
-                            ir.delete(user1, event1);
-                        }
 
-                        @Override
-                        public void onQueryEmpty() {
-                        }
-                    });
-                    ir.upload(user1, event1, uri);
+                    Image image = new Image(user1.getUserId(), event1.getEventId());
+                    image.upload(uri);
+
                     Toast.makeText(
                             Example_ImageUpload.this,
                             "Event poster uploaded for event: " + event1.getEventId(),
@@ -100,7 +88,6 @@ public class Example_ImageUpload extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.imageupload_example);
 
-        user1.setUserId("1234_user_test");
         event1.setEventId("1234_event_test");
 
         // uploads
@@ -124,30 +111,28 @@ public class Example_ImageUpload extends AppCompatActivity {
 
         Button downloadPfpButton = findViewById(R.id.downloadPfpButton);
         downloadPfpButton.setOnClickListener(view -> {
-            ImageRepository ir = new ImageRepository();
-
             // clears the imageview
             imageView.setImageResource(0);
 
             // download method requires a callback to access asynchronous query data
-            ir.download(user1, new ImageRepository.queryCallback() {
+            Image image = new Image(user1.getUserId(), user1.getUserId());
+            image.download(new ImageQuery() {
                 @Override
-                public void onQuerySuccess(String imageUrl) {
-                    // using glide to show image on imageView; subject to change
+                public void onSuccess(Image image) {
                     Glide.with(view)
-                            .load(imageUrl)
+                            .load(image.getImageUrl())
                             .into(imageView);
                 }
 
                 @Override
-                public void onQueryEmpty() {
-                    // show a toast when the query is empty
+                public void onEmpty() {
                     Toast.makeText(
                             Example_ImageUpload.this,
                             "Cannot find profile picture for user: " + user1.getUserId(),
                             Toast.LENGTH_SHORT).show();
                 }
             });
+
         });
 
         Button downloadEPButton = findViewById(R.id.downloadEPButton);
@@ -157,16 +142,17 @@ public class Example_ImageUpload extends AppCompatActivity {
             // clears the imageview
             imageView.setImageResource(0);
 
-            ir.download(user1, event1, new ImageRepository.queryCallback() {
+            Image image = new Image(user1.getUserId(), event1.getEventId());
+            image.download(new ImageQuery() {
                 @Override
-                public void onQuerySuccess(String imageUrl) {
+                public void onSuccess(Image image) {
                     Glide.with(view)
-                            .load(imageUrl)
+                            .load(image.getImageUrl())
                             .into(imageView);
                 }
 
                 @Override
-                public void onQueryEmpty() {
+                public void onEmpty() {
                     Toast.makeText(
                             Example_ImageUpload.this,
                             "Cannot find event poster for event: " + event1.getEventId(),
@@ -178,17 +164,25 @@ public class Example_ImageUpload extends AppCompatActivity {
         // deletes
         Button deletePfpButton = findViewById(R.id.deletePfpButton);
         deletePfpButton.setOnClickListener(view -> {
-            ImageRepository ir = new ImageRepository();
-            // deletion also checks for empty query but just logs to Logcat instead of toasting
-            ir.delete(user1);
+            Image image = new Image(user1.getUserId(), user1.getUserId());
+            image.delete();
         });
 
         Button deleteEPButton = findViewById(R.id.deleteEPButton);
         deleteEPButton.setOnClickListener(view -> {
-            ImageRepository ir = new ImageRepository();
-            ir.delete(user1, event1);
+            Image image = new Image(user1.getUserId(), event1.getEventId());
+            image.delete();
         });
 
+        // get all in gallery
+        Button getAllButton = findViewById(R.id.getAllButton);
+        GridView gridView = findViewById(R.id.imageGridView);
+
+
+        getAllButton.setOnClickListener(view -> {
+            ImageRepository ir = new ImageRepository();
+            ir.getAllImages(this ,gridView);
+        });
 
     }
 }
