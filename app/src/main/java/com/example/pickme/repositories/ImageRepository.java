@@ -5,10 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.pickme.models.Enums.ImageType;
-import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
-import com.example.pickme.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -21,6 +18,7 @@ import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -28,6 +26,7 @@ import com.google.firebase.storage.UploadTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Handles interactions with the images collection
@@ -39,6 +38,11 @@ import java.util.List;
  */
 public class ImageRepository {
     private final String TAG = "ImageRepository";
+
+    // authentication
+    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final String auth_uid = auth.getUid();
+
     // image storage
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final StorageReference imgStorage = storage.getReference();
@@ -49,11 +53,10 @@ public class ImageRepository {
 
     public ImageRepository() {
         // temporary anonymous auth
-        FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                Log.d(TAG, "AUTH: Successful authentication");
+                Log.d(TAG, "AUTH: uid " + auth_uid + " successful authentication");
             }
         });
     }
@@ -64,7 +67,7 @@ public class ImageRepository {
      * <i>onQueryEmpty()</i> to handle empty queries
      */
     public interface queryCallback {
-        void onQuerySuccess(String imageUrl);
+        void onQuerySuccess(Image image);
         void onQueryEmpty();
     }
 
@@ -79,55 +82,49 @@ public class ImageRepository {
     }
 
     // TODO: fix nesting due to concurrency issues
-    /**
-     * Uploads an event poster URI to FirebaseStorage,
+     /**
+     * Uploads an image with attached URI to FirebaseStorage,
      * then stores the image information to Firestore DB.
      *
-     * @param u      The user object (uploader)
-     * @param e      The event object (event poster)
-     * @param imgUri The image URI to upload (e.g. one obtained from an image picker)
+     * @param i The image object to upload
+     * @param uri The image URI to be attached
      */
-    public void upload(@NotNull User u, Event e, @NotNull Uri imgUri) {
+    public void upload(@NotNull Image i, @NotNull Uri uri) {
+        String uploaderId = i.getUploaderId();
+
         // creating document first to generate unique id
         DocumentReference imgDoc = imgCollection.document();
+        String imageId = imgDoc.getId();
 
         // setting child storage reference to the unique id
-        StorageReference imgRef = imgStorage.child(imgDoc.getId());
+        StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
 
         // storing the image in firebasestorage
         imgRef
-            .putFile(imgUri)
-            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                .putFile(uri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Log.d(TAG, "STORAGE: URI " + imgUri + " upload successful");
+                    Log.d(TAG, "STORAGE: URI " + uri + " upload successful");
 
                     // now get the image download url...
                     imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            // ... and create a new image object to store to DB
-                            Image img = new Image();
-                            img.setImageUrl(uri.toString());
-                            img.setUploaderId(u.getUserId());
-
-                            // check for event object
-                            if (e == null) {
-                                // if null is passed, the image is a profile picture
-                                img.setType(ImageType.PROFILE_PICTURE);
-                                img.setImageAssociation(u.getUserId());
-                            } else {
-                                // and if there's an associated event, it's an event poster
-                                img.setType(ImageType.EVENT_POSTER);
-                                img.setImageAssociation(e.getEventId());
-                            }
-
-
                             // db store
-                            imgDoc
-                                    .set(img.getUploadPackage())
-                                    .addOnSuccessListener(unused ->
-                                            Log.d(TAG, "DB: Upload successful"));
+                            i.setImageUrl(uri.toString());
+                            db.runTransaction(new Transaction.Function<Image>() {
+                                @Override
+                                public Image apply(@NonNull Transaction transaction) {
+                                    transaction.set(imgDoc, i);
+                                    return i;
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<Image>() {
+                                @Override
+                                public void onSuccess(Image image) {
+                                    Log.d(TAG, "DB: Image " + imgDoc.getId() + " upload successful");
+                                }
+                            });
                         }
                     });
                 }
@@ -135,160 +132,85 @@ public class ImageRepository {
     }
 
     /**
-     * Uploads a profile image URI to FirebaseStorage,
-     * then stores the image information to Firestore DB.
-     *
-     * @param u      The user object (uploader/subject)
-     * @param imgUri The image URI to upload (e.g. one obtained from an image picker)
-     */
-    public void upload(@NotNull User u, @NotNull Uri imgUri) {
-        upload(u, null, imgUri);
-    }
-
-    /**
-     * Download an event poster from Firestore db.
+     * Download an image from Firestore db.
      * <br>
      * <b>Requires the callback included in ImageRepository to access the query data.</b>
-     * @param u The user matching to uploaderId
-     * @param e The event matching to imageAssociation
+     * @param i Image object to download to
      * @param callback <i>new ImageRepository.queryCallback</i>
      */
-    public void download(@NotNull User u, Event e, @NotNull queryCallback callback) {
-        if (e == null) {
-            Query profileImg = imgCollection
-                    .where(Filter.and(
-                            Filter.equalTo("imageType", "PROFILE_PICTURE"),
-                            Filter.equalTo("uploaderId", u.getUserId()),
-                            Filter.equalTo("imageAssociation", u.getUserId())));
+    public void download(Image i, queryCallback callback) {
 
-            profileImg.get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                QuerySnapshot queryRes = task.getResult();
-                                if (!queryRes.isEmpty()) {
-                                    String url = (String) queryRes.getDocuments().get(0).get("imageUrl");
-                                    callback.onQuerySuccess(url);
-                                    Log.d(TAG, "DB: Query successful, sent to callback imageUrl");
-                                } else {
-                                    Log.d(TAG, "DB: Query returned empty");
-                                    callback.onQueryEmpty();
-                                }
+        String uploaderId = i.getUploaderId();
+        String imageAssociation = i.getImageAssociation();
+        String imageType = i.getImageType().toString();
+
+        Query query = imgCollection
+                .where(Filter.and(
+                        Filter.equalTo("imageType", imageType),
+                        Filter.equalTo("uploaderId", uploaderId),
+                        Filter.equalTo("imageAssociation", imageAssociation)));
+
+        query.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot queryRes = task.getResult();
+                            if (!queryRes.isEmpty()) {
+                                Map<String, Object> data = queryRes
+                                        .getDocuments()
+                                        .get(0)
+                                        .getData();
+                                Image queriedImage = new Image(data);
+                                callback.onQuerySuccess(queriedImage);
+                                Log.d(TAG, "DB: Query successful, sent Image to callback");
+                            } else {
+                                Log.d(TAG, "DB: Query returned empty");
+                                callback.onQueryEmpty();
                             }
                         }
-                    });
-        } else {
-            Query eventPoster = imgCollection
-                    .where(Filter.and(
-                            Filter.equalTo("imageType", "EVENT_POSTER"),
-                            Filter.equalTo("uploaderId", u.getUserId()),
-                            Filter.equalTo("imageAssociation", e.getEventId())));
-
-            eventPoster
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                QuerySnapshot queryRes = task.getResult();
-                                if (!queryRes.isEmpty()) {
-                                    String url = (String) queryRes.getDocuments().get(0).get("imageUrl");
-                                    callback.onQuerySuccess(url);
-                                    Log.d(TAG, "DB: Query successful, sent to callback imageUrl");
-                                } else {
-                                    Log.d(TAG, "DB: Query returned empty");
-                                    callback.onQueryEmpty();
-                                }
-
-                            }
-                        }
-                    });
-        }
+                    }
+                });
     }
 
     /**
-     * Download a profile picture from Firestore db.
-     * <br>
-     * <b>Requires the callback included in ImageRepository to access the query data.</b>
-     * @param u The user matching to uploaderId and imageAssociation
-     * @param callback ImageRepository.queryCallback with onQuerySuccess overload
-     *
+     * Delete an image from Firestore db.
+     * @param i Image object to be deleted
      */
-    public void download(@NotNull User u, @NotNull queryCallback callback) {
-        download(u, null, callback);
-    }
+    public void delete(Image i) {
 
+        String uploaderId = i.getUploaderId();
+        String imageAssociation = i.getImageAssociation();
+        String imageType = i.getImageType().toString();
 
-    /**
-     * Delete an event poster from Firestore db.
-     * @param u The user matching to uploaderId
-     * @param e The event matching to imageAssociation
-     */
-    public void delete(@NotNull User u, Event e) {
-        if (e == null) {
-            Query profileImg = imgCollection
-                    .where(Filter.and(
-                            Filter.equalTo("imageType", "PROFILE_PICTURE"),
-                            Filter.equalTo("uploaderId", u.getUserId()),
-                            Filter.equalTo("imageAssociation", u.getUserId())));
+        Query query = imgCollection
+                .where(Filter.and(
+                        Filter.equalTo("imageType", imageType),
+                        Filter.equalTo("uploaderId", uploaderId),
+                        Filter.equalTo("imageAssociation", imageAssociation)
+                ));
 
-            profileImg.get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                QuerySnapshot queryRes = task.getResult();
-                                if (!queryRes.isEmpty()) {
-                                    DocumentReference doc = queryRes
-                                            .getDocuments()
-                                            .get(0)
-                                            .getReference();
-                                    String imageId = doc.getId();
-                                    Log.d(TAG, "DB: Query successful");
-                                    Log.d(TAG, "STORAGE: Deleting file " + imageId);
-                                    imgStorage.child(imageId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            Log.d(TAG, "STORAGE: File " + imageId + " deleted");
-                                        }
-                                    });
-                                    Log.d(TAG, "DB: Deleting document " + imageId);
-                                    doc.delete()
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
-                                                    Log.d(TAG, "DB: Document " + imageId + " deleted");
-                                                }
-                                            });
-                                } else {
-                                    Log.d(TAG, "DB: Query returned empty, no deletion occurred");
-                                }
-                            }
-                        }
-                    });
-        } else {
-            Query eventPoster = imgCollection
-                    .where(Filter.and(
-                            Filter.equalTo("imageType", "EVENT_POSTER"),
-                            Filter.equalTo("uploaderId", u.getUserId()),
-                            Filter.equalTo("imageAssociation", e.getEventId())));
-
-            eventPoster
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+        query.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
                             QuerySnapshot queryRes = task.getResult();
                             if (!queryRes.isEmpty()) {
                                 DocumentReference doc = queryRes
                                         .getDocuments()
                                         .get(0)
                                         .getReference();
+
                                 String imageId = doc.getId();
+
                                 Log.d(TAG, "DB: Query successful");
                                 Log.d(TAG, "STORAGE: Deleting file " + imageId);
-                                imgStorage.child(imageId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                imgStorage
+                                        .child(uploaderId)
+                                        .child(imageId)
+                                        .delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Log.d(TAG, "STORAGE: File " + imageId + " deleted");
@@ -306,16 +228,9 @@ public class ImageRepository {
                                 Log.d(TAG, "DB: Query returned empty, no deletion occurred");
                             }
                         }
-                    });
-        }
-    }
+                    }
+                });
 
-    /**
-     * Delete a profile picture from Firestore db.
-     * @param u The user matching to uploaderId and imageAssociation
-     */
-    public void delete(@NotNull User u) {
-        delete(u, null);
     }
 
     public void getAllImages(collectionCallback callback) {
