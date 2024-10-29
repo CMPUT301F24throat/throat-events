@@ -20,23 +20,23 @@ public class User {
 
     // User Profile Information
     private String userId; // Unique string for user, for easy identification.
-    private String firstName; // First name of user
-    private String lastName; // Last name of user
-    private String emailAddress; // Email address of user
-    private String contactNumber; // Contact number of user
-    private String profilePictureUrl = defaultProfilePictureUrl; // Customizable user profile picture
-    private boolean isOnline; // Checks if the user is currently online
+    private String firstName; // First name of user.
+    private String lastName; // Last name of user.
+    private String emailAddress; // Email address of user.
+    private String contactNumber; // Contact number of user.
+    private String profilePictureUrl = defaultProfilePictureUrl; // Customizable user profile picture.
+    private boolean isOnline; // Checks if the user is currently online.
 
     // User Preferences & Permissions
     private String deviceId; // Attaches on device to user
-    protected boolean isAdmin; // Permission to allow user admin status
-    private boolean notificationEnabled; // Permission to allow notifications
-    private boolean geoLocationEnabled; // Permission to track user's location
+    protected boolean isAdmin; // Permission to allow user admin status.
+    private boolean notificationEnabled; // Permission to allow notifications.
+    private boolean geoLocationEnabled; // Permission to track user's location.
 
     // User Timestamps
-    private final Timestamp createdAt; // When was the account created
-    private Timestamp updatedAt; // When was the profile last updated
-    private static User user; // Tracks the active user throughout the app's lifecycle
+    private final Timestamp createdAt; // When was the account created.
+    private Timestamp updatedAt; // When was the profile last updated.
+    private static User user; // Tracks the active user throughout the app's lifecycle.
 
     // Timestamp Function
     public User(UserRepository userRepository, String userId) {
@@ -171,20 +171,20 @@ public class User {
         return updatedAt;
     }
 
-    public static User getInstance() {
+    public static synchronized User getInstance() {
         return User.user;
     }
 
-    public static void setInstance(User newUser) {
+    public static synchronized void setInstance(User newUser) {
         User.user = newUser;
     }
 
     //---------- Validate User Information --------------------
-    public boolean validateFirstName(String firstName) {
+    public static boolean validateFirstName(String firstName) {
         return firstName != null && firstName.matches("[A-Za-z]+");
     }
 
-    public boolean validateLastName(String lastName) {
+    public static boolean validateLastName(String lastName) {
         return lastName != null && lastName.matches("[A-Za-z]+");
     }
 
@@ -213,9 +213,18 @@ public class User {
     }
 
     //---------- Information Transformations --------------------
+
     @NonNull
     public String fullName(String firstName, String lastName) {
-      return (firstName + " " + lastName);
+        // Function to concatenate the user's full name.
+        return (firstName + " " + lastName);
+    }
+
+    public void signup(String newFirstName, String newLastName) {
+        // Function that sets a user's first and last name as its required to "signup".
+        setFirstName(newFirstName);
+        setLastName(newLastName);
+        this.updatedAt = Timestamp.now();
     }
 
 }
