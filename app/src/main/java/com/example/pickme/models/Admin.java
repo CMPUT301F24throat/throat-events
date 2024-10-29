@@ -1,5 +1,7 @@
 package com.example.pickme.models;
 
+import com.example.pickme.repositories.UserRepository;
+
 /**
  * Class that represents an admin in the app
  * Responsibilities:
@@ -8,7 +10,7 @@ package com.example.pickme.models;
 
 public class Admin extends User {
 
-    public Admin(String userId) {
-        super(userId);
+    public Admin(UserRepository userRepository, String userId) {
+        super(userRepository, userId);
     }
 }
