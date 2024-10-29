@@ -14,35 +14,37 @@ import com.example.pickme.R;
 
 import java.util.ArrayList;
 
-public class ImageArrayAdapter extends ArrayAdapter<String> {
-    private final Context context;
+/**
+ * Custom adapter for images in GridViews using Glide
+ * @author etdong
+ * @version 1.0
+ */
+public class GalleryAdapter extends ArrayAdapter<String> {
 
+    private final Context context;
+    private final LayoutInflater inflater;
     private final ArrayList<String> imageUrls;
 
-    public ImageArrayAdapter(Context context, ArrayList<String> imageUrls) {
+    public GalleryAdapter(Context context, ArrayList<String> imageUrls) {
         super(context, R.layout.image_gallery_item, imageUrls);
 
         this.context = context;
         this.imageUrls = imageUrls;
+        inflater = LayoutInflater.from(context);
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        View view;
-
-        if (convertView == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.image_gallery_item, parent, false);
-        } else {
-            view = convertView;
+        if (null == convertView) {
+            convertView = inflater.inflate(R.layout.image_gallery_item, parent, false);
         }
 
-        ImageView img = view.findViewById(R.id.gallery_imageview);
-        Glide.with(context)
+        Glide
+                .with(context)
                 .load(imageUrls.get(position))
-                .into(img);
+                .into((ImageView) convertView);
 
-        return view;
+        return convertView;
     }
-
 }
