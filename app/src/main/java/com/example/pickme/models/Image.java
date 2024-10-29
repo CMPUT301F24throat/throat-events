@@ -39,7 +39,7 @@ public class Image {
     private Timestamp updatedAt;
 
     // ImageRepository instance for Firebase interaction
-    private final ImageRepository ir = new ImageRepository();
+    private ImageRepository ir;
 
     //endregion
 
@@ -50,7 +50,8 @@ public class Image {
      * @param imageAssociation The association ID, either the user ID for a profile picture
      *                         or an event ID for an event poster
      */
-    public Image(String userId, String imageAssociation) {
+    public Image(@NonNull String userId, @NonNull String imageAssociation) {
+        this.ir = new ImageRepository();
         this.uploaderId = userId;
         this.imageAssociation = imageAssociation;
         this.imageType = userId.equals(imageAssociation) ?
