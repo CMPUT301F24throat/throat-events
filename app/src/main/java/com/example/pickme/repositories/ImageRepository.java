@@ -32,7 +32,7 @@ import java.util.Map;
  * Handles interactions with the images collection
  * @author sophiecabungcal
  * @author etdong
- * @version 1.1
+ * @version 1.2
  * Responsibilities:
  * CRUD operations for image data
  */
@@ -62,9 +62,9 @@ public class ImageRepository {
     }
 
     /**
-     * Callback interface required for accessing asynchronous query data. <br>
-     * <i>onQuerySuccess(String imageUrl)</i> to access the imageUrl <br>
-     * <i>onQueryEmpty()</i> to handle empty queries
+     * Callback interface required for accessing asynchronous query data.
+     * @Overload <b>onQuerySuccess(Image image)</b> to access the queried image
+     * @Overload <b>onQueryEmpty()</b> to handle empty queries
      */
     public interface queryCallback {
         void onQuerySuccess(Image image);
@@ -72,9 +72,9 @@ public class ImageRepository {
     }
 
     /**
-     * Callback interface specifically for accessing the entire collection. <br>
-     * <i>onQuerySuccess(String imageUrl)</i> to access the list of docs <br>
-     * <i>onQueryEmpty()</i> to handle empty queries
+     * Callback interface specifically for accessing the entire collection.
+     * @Overload <b>onQuerySuccess(List<DocumentSnapshot> docs)</b> to access the list of docs
+     * @Overload <b>onQueryEmpty()</b> to handle empty queries
      */
     public interface collectionCallback {
         void onQuerySuccess(List<DocumentSnapshot> docs);
@@ -136,7 +136,8 @@ public class ImageRepository {
      * <br>
      * <b>Requires the callback included in ImageRepository to access the query data.</b>
      * @param i Image object to download to
-     * @param callback <i>new ImageRepository.queryCallback</i>
+     * @param callback <i>new ImageRepository.queryCallback()</i>
+     * @see ImageRepository.queryCallback
      */
     public void download(Image i, queryCallback callback) {
 
