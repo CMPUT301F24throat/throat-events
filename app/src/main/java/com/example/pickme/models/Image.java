@@ -2,8 +2,11 @@ package com.example.pickme.models;
 
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import com.example.pickme.models.Enums.ImageType;
 import com.example.pickme.repositories.ImageRepository;
+import com.example.pickme.utils.ImageQuery;
 import com.google.firebase.Timestamp;
 
 import java.util.Map;
@@ -128,40 +131,29 @@ public class Image {
      *
      * @param imageUri The image URI to be attached; obtained from gallery picker
      */
-    public void upload(Uri imageUri) {
-        Image temp = this;
-        ir.download(this, new ImageRepository.queryCallback() {
-            @Override
-            public void onQuerySuccess(Image image) {
-                ir.delete(temp);
-            }
-
-            @Override
-            public void onQueryEmpty() {
-                // do nothing
-            }
-        });
+    public void upload(@NonNull Uri imageUri) {
         ir.upload(this, imageUri);
     }
 
     /**
      * Download the image from Firestore DB with query matching this image class.
      * <br>
-     * <b>Requires the callback included in ImageRepository to access the query data.</b>
-     * @param callback <i>new ImageRepository.queryCallback</i>
-     * @see ImageRepository.queryCallback
+     * <b>Requires the ImageQuery callback to access the query data.</b>
+     * @param callback <i>new ImageQuery()</i>
+     * @see com.example.pickme.utils.ImageQuery
      */
-    public void download(ImageRepository.queryCallback callback) {
+    public void download(@NonNull ImageQuery callback) {
         ir.download(this, callback);
     }
 
     /**
      * Delete the image from Firestore DB with query matching this image class.
-     * @see ImageRepository
      */
     public void delete() {
         ir.delete(this);
     }
 
     //endregion
+
+
 }
