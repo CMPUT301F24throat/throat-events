@@ -14,6 +14,7 @@ firebaseInappmessaging = "21.0.1"
 
 firebaseFirestore = "24.0.0"
 firebaseStorage = "21.0.1"
+mediationTestSuite = "3.0.0"
 
 [libraries]
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
@@ -31,6 +32,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
+mediation-test-suite = { group = "com.google.android.ads", name = "mediation-test-suite", version.ref = "mediationTestSuite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
