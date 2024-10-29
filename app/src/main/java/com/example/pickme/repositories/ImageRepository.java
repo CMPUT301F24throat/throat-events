@@ -1,11 +1,15 @@
 package com.example.pickme.repositories;
 
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 
 import com.example.pickme.models.Image;
+import com.example.pickme.utils.GalleryAdapter;
+import com.example.pickme.utils.ImageQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -23,22 +27,22 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import org.jetbrains.annotations.NotNull;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Handles interactions with the images collection
- * @author sophiecabungcal
- * @author etdong
- * @version 1.2
+ * Handles interactions with the images collection <br>
  * Responsibilities:
  * CRUD operations for image data
+ * @author sophiecabungcal
+ * @author etdong
+ * @version 1.3
  */
 public class ImageRepository {
     private final String TAG = "ImageRepository";
 
+    //region Firebase initialization
     // authentication
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private final String auth_uid = auth.getUid();
@@ -51,6 +55,12 @@ public class ImageRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference imgCollection = db.collection("images");
 
+    //endregion
+
+    //region Constructors
+    /**
+     * Constructs a new ImageRepository for image CRUD operations.
+     */
     public ImageRepository() {
         // temporary anonymous auth
         auth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
@@ -60,30 +70,11 @@ public class ImageRepository {
             }
         });
     }
+    //endregion
 
-    /**
-     * Callback interface required for accessing asynchronous query data.
-     * @Overload <b>onQuerySuccess(Image image)</b> to access the queried image
-     * @Overload <b>onQueryEmpty()</b> to handle empty queries
-     */
-    public interface queryCallback {
-        void onQuerySuccess(Image image);
-        void onQueryEmpty();
-    }
-
-    /**
-     * Callback interface specifically for accessing the entire collection.
-     * @Overload <b>onQuerySuccess(List<DocumentSnapshot> docs)</b> to access the list of docs
-     * @Overload <b>onQueryEmpty()</b> to handle empty queries
-     */
-    public interface collectionCallback {
-        void onQuerySuccess(List<DocumentSnapshot> docs);
-        void onQueryEmpty();
-    }
-
-    // TODO: fix nesting due to concurrency issues
+    //region Class methods
      /**
-     * Uploads an image with attached URI to FirebaseStorage,
+     * Uploads a new image or updates an existing one with attached URI to FirebaseStorage,
      * then stores the image information to Firestore DB.
      *
      * @param i The image object to upload
@@ -218,10 +209,10 @@ public class ImageRepository {
     /**
      * Download an image from Firestore db.
      * <br>
-     * <b>Requires the callback included in ImageRepository to access the query data.</b>
+     * <b>Requires the ImageQuery callback to access the query data.</b>
      * @param i Image object to download to
-     * @param callback <i>new ImageRepository.queryCallback()</i>
-     * @see ImageRepository.queryCallback
+     * @param callback <i>new ImageQuery()</i>
+     * @see com.example.pickme.utils.ImageQuery
      */
     public void download(Image i, queryCallback callback) {
 
@@ -262,7 +253,7 @@ public class ImageRepository {
      * Delete an image from Firestore db.
      * @param i Image object to be deleted
      */
-    public void delete(Image i) {
+    public void delete(@NonNull Image i) {
 
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
@@ -289,28 +280,36 @@ public class ImageRepository {
 
                                 String imageId = doc.getId();
 
-                                Log.d(TAG, "DB: Query successful");
-                                Log.d(TAG, "STORAGE: Deleting file " + imageId);
+                                Log.d(TAG, "delete: Query successful");
+                                Log.d(TAG, String.format("delete: Deleting file %s", imageId));
                                 imgStorage
                                         .child(uploaderId)
                                         .child(imageId)
                                         .delete()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Log.d(TAG, "STORAGE: File " + imageId + " deleted");
-                                    }
-                                });
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d(TAG, String.format("delete: File %s deleted", imageId));
+                                                } else {
+                                                    Log.d(TAG, String.format("delete: File %s deletion failed!", imageId));
+                                                }
+                                            }
+                                        });
                                 Log.d(TAG, "DB: Deleting document " + imageId);
                                 doc.delete()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
-                                            public void onSuccess(Void unused) {
-                                                Log.d(TAG, "DB: Document " + imageId + " deleted");
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d(TAG, String.format("delete: Document %s deleted", imageId));
+                                                } else {
+                                                    Log.d(TAG, String.format("delete: Document %s deletion failed!", imageId));
+                                                }
                                             }
                                         });
                             } else {
-                                Log.d(TAG, "DB: Query returned empty, no deletion occurred");
+                                Log.d(TAG, "delete: Query returned empty, no deletion occurred");
                             }
                         }
                     }
@@ -354,5 +353,6 @@ public class ImageRepository {
                     }
                 });
     }
+    //endregion
 
 }
