@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     userVerification(userId);
                 }
             } else {
-                loadSignUpFragment(new SignUpFragment());
+                loadSignUpFragment(new UserSignUpFragment());
             }
         });
     }
@@ -96,12 +96,12 @@ public class MainActivity extends AppCompatActivity {
                 // [Incomplete Method]: Load the main content fragment or proceed to main app functionality
                 System.out.println("Whoopsies, did an oopsies");
             } else {
-                loadSignUpFragment(new SignUpFragment());
+                loadSignUpFragment(new UserSignUpFragment());
             }
         });
     }
 
-    private void loadSignUpFragment(SignUpFragment fragment) {
+    private void loadSignUpFragment(UserSignUpFragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.user_signup_activity, fragment)
                 .addToBackStack(null)

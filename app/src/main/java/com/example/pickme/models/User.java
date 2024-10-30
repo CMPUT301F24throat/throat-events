@@ -5,7 +5,11 @@ import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.Timestamp;
 
 /**
- * Class that can represent, validate, and stores a user in the app
+ * Class that can represent, validate, and stores a user in the app.
+ *
+ * @author Kenneth (aesoji)
+ * @version 1.1
+ *
  * Responsibilities:
  * - Models a user in the users collection.
  * - Validates user data to ensure formats match.
@@ -188,7 +192,7 @@ public class User {
         return lastName != null && lastName.matches("[A-Za-z]+");
     }
 
-    public boolean validateEmailAddress(String emailAddress) {
+    public static boolean validateEmailAddress(String emailAddress) {
         String[] validEmailAddressDomains = {".com", ".ca", ".net", ".org", ".kr", ".co", ".uk", "ir", ".ch"};
 
         if (emailAddress == null || !emailAddress.contains("@")) {
@@ -203,7 +207,7 @@ public class User {
         return false;
     }
 
-    public boolean validateContactInformation(String contactNumber) {
+    public static boolean validateContactInformation(String contactNumber) {
         return contactNumber != null && contactNumber.matches("\\+?[0-9\\-() ]{7,15}");
     }
 
