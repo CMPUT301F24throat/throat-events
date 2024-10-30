@@ -10,10 +10,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the users collection
+ *
  * @author sophiecabungcal
  * @version 1.0
+ *
  * Responsibilities:
- * CRUD operations for user data
+ * - CRUD operations for user data
  */
 
 public class UserRepository {

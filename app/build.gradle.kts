@@ -47,8 +47,13 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
     implementation(libs.glide)
-    implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
-    implementation("com.google.firebase:firebase-firestore:24.0.0")
+    implementation(libs.google.firebase.auth)
+    implementation(libs.play.services.auth)
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation(libs.firebase.firestore.v2460)
+    implementation(platform(libs.firebase.bom.v3351))
+    implementation(libs.appcompat.v161)
+    implementation(libs.firebase.firestore.v2511)
     implementation(libs.circleimageview)
 
 }

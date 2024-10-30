@@ -33,33 +33,34 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
-public class SignUpFragment extends Fragment {
+public class UserSignUpFragment extends Fragment {
 
     private EditText firstNameEditText, lastNameEditText;
     private UserRepository userRepository;
     private FirebaseAuth auth;
 
     /**
-     * Initialization of SignUpFragment.java and its First and Last Name input fields.
+     * Initialization of SignUpFragment.java and its first and last Name input fields.
      * Triggers the user creation process.
      *
      * @param inflater           The LayoutInflater used to inflate any views in the fragment.
      * @param container          The parent view that this fragment's UI is attached to.
      * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
      *
-     * @return The root View for the fragment's UI.
+     * @return The root View.
      */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.user_signup_activity, container, false);
 
-        userRepository = new UserRepository(); // Initialization of UserRepository
-        firstNameEditText = view.findViewById(R.id.signupFirstNameEdit); // Initialization of an editable first name text.
-        lastNameEditText = view.findViewById(R.id.signupLastNameEdit); // Initialization of an editable last name text.
-        Button submitButton = view.findViewById(R.id.signupSubmitButton); // Initialization of a submit button.
+        // Initialization of Views and Data
+        userRepository = new UserRepository();
+        firstNameEditText = view.findViewById(R.id.signupFirstNameEdit);
+        lastNameEditText = view.findViewById(R.id.signupLastNameEdit);
+        Button submitButton = view.findViewById(R.id.signupSubmitButton);
 
-        submitButton.setOnClickListener(v -> createUser()); // Submit button listener.
+        submitButton.setOnClickListener(v -> createUser()); // Listens for the Submit Button.
 
         return view;
     }
