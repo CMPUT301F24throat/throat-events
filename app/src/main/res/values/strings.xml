@@ -6,4 +6,5 @@
     <string name="add_contact_number">Add contact number</string>
     <string name="default_profile_picture_url">https://example.com/default_profile_picture.png</string>
     <string name="returnText">return</string>
+    <string name="share">Share</string>
 </resources>
