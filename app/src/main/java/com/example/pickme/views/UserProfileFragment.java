@@ -7,4 +7,8 @@ package com.example.pickme.views;
  * Allow users to upload or change profile pictures
  **/
 public class UserProfileFragment {
+
+
+
 }
+
