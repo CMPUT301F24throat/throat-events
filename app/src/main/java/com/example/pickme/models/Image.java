@@ -154,6 +154,14 @@ public class Image {
         ir.delete(this);
     }
 
+    /**
+     * Generates a random image from the uploader ID.
+     */
+    public void generate() {
+        Uri url = Uri.parse(String.format("https://www.gravatar.com/avatar/%s?s=55&d=identicon&r=PG", this.uploaderId));
+        ir.uploadUrl(this, url);
+    }
+
     //endregion
 
 
