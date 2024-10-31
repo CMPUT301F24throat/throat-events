@@ -31,12 +31,12 @@ import java.util.Map;
  * CRUD operations for image data
  * @author sophiecabungcal
  * @author etdong
- * @version 1.3
+ * @version 1.4
  */
 public class ImageRepository {
     private final String TAG = "ImageRepository";
 
-    //region Firebase initialization
+    //region Attributes
     // authentication
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private final String auth_uid = auth.getUid();
@@ -48,6 +48,14 @@ public class ImageRepository {
     // database access
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference imgCollection = db.collection("images");
+
+    /**
+     * Callback for handling duplicate checking
+     */
+    private interface duplicateCallback {
+        void hasDuplicate(DocumentReference doc);
+        void noDuplicate();
+    }
 
     //endregion
 
@@ -64,15 +72,14 @@ public class ImageRepository {
     //endregion
 
     //region Class methods
-     /**
-     * Uploads a new image or updates an existing one with attached URI to FirebaseStorage,
-     * then stores the image information to Firestore DB.
-     *
-     * @param i The image object to upload
-     * @param uri The image URI to be attached
-     */
-    public void upload(@NonNull Image i, @NonNull Uri uri) {
 
+    /**
+     * Checks Firestore DB for image duplicates and
+     * calls back to duplicateCallback based on result.
+     * @param i Image object to check duplicates for
+     * @param callback The duplicateCallback for conditional handling
+     */
+    private void checkDuplicates(Image i, duplicateCallback callback) {
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
         String imageType = i.getImageType().toString();
@@ -91,23 +98,47 @@ public class ImageRepository {
                         // if existing image of the same type is found, update it
                         QuerySnapshot queryRes = task.getResult();
                         if (!queryRes.isEmpty()) {
-                            Log.d(TAG, "upload: DB query successful, updating");
-                            update(queryRes, uploaderId, uri);
-
+                            Log.d(TAG, "checkDuplicates: DB query successful, duplicate found");
+                            DocumentReference doc = queryRes
+                                    .getDocuments()
+                                    .get(0)
+                                    .getReference();
+                            callback.hasDuplicate(doc);
                         } else {
-                            Log.d(TAG, "upload: DB query returned empty, uploading");
-                            uploadNew(i, uri);
+                            Log.d(TAG, "checkDuplicates: DB query returned empty, no duplicates found");
+                            callback.noDuplicate();
                         }
                     }
                 });
     }
 
-    /**
-     * upload() helper function for uploading new images
+     /**
+     * Uploads a new image or updates an existing one with attached URI to FirebaseStorage,
+     * then stores the image information to Firestore DB.
+     *
      * @param i The image object to upload
      * @param uri The image URI to be attached
      */
-    private void uploadNew(@NonNull Image i, @NonNull Uri uri) {
+    public void upload(@NonNull Image i, @NonNull Uri uri) {
+        checkDuplicates(i, new duplicateCallback() {
+            @Override
+            public void hasDuplicate(DocumentReference doc) {
+                update(doc, i.getUploaderId(), uri);
+            }
+
+            @Override
+            public void noDuplicate() {
+                uploadFile(i, uri);
+            }
+        });
+    }
+
+    /**
+     * upload() helper function for uploading new image files
+     * @param i The image object to upload
+     * @param uri The image URI to be attached
+     */
+    private void uploadFile(@NonNull Image i, @NonNull Uri uri) {
 
         String uploaderId = i.getUploaderId();
 
@@ -141,17 +172,45 @@ public class ImageRepository {
     }
 
     /**
+     * Uploads an image URL to Firestore DB. Used for generated images.
+     * @param i Image object of which the URL being uploaded is associated with
+     * @param imageUrl The URL to upload
+     */
+    public void uploadUrl(@NonNull Image i, Uri imageUrl) {
+        i.setImageUrl(imageUrl.toString());
+        checkDuplicates(i, new duplicateCallback() {
+            @Override
+            public void hasDuplicate(DocumentReference doc) {
+                String imageId = doc.getId();
+                doc.update("imageUrl", imageUrl)
+                        .addOnSuccessListener(unused ->
+                                Log.d(TAG, String.format("update: Document %s updated", imageId))
+                        );
+            }
+
+            @Override
+            public void noDuplicate() {
+                DocumentReference imgDoc = imgCollection.document();
+                String imageId = imgDoc.getId();
+                db
+                        .runTransaction(transaction -> {
+                            transaction.set(imgDoc, i);
+                            return i;
+                        })
+                        .addOnSuccessListener(image ->
+                                Log.d(TAG, String.format("uploadUrl: Document %s upload successful", imageId))
+                        );
+            }
+        });
+    }
+
+    /**
      * upload() helper function to update existing images
-     * @param queryRes The query result to update
+     * @param doc The document reference from the query result to update
      * @param uploaderId The uploaderId of the existing images
      * @param uri The uri to update with
      */
-    private void update(QuerySnapshot queryRes, String uploaderId, Uri uri) {
-
-        DocumentReference doc = queryRes
-                .getDocuments()
-                .get(0)
-                .getReference();
+    private void update(DocumentReference doc, String uploaderId, Uri uri) {
 
         String imageId = doc.getId();
         StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
