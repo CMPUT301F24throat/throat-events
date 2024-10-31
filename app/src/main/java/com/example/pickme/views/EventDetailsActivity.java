@@ -11,17 +11,17 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
-import com.example.pickme.databinding.ActivityEventDetailsBinding;
+import com.example.pickme.databinding.EventEventdetailsBinding;
 import com.example.pickme.models.Event;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
-    private ActivityEventDetailsBinding binding;
+    private EventEventdetailsBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        binding = ActivityEventDetailsBinding.inflate(getLayoutInflater());
+        binding = EventEventdetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

@@ -17,9 +17,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
-import com.example.pickme.databinding.ActivityEventCreationBinding;
+import com.example.pickme.databinding.EventEventcreationBinding;
 import com.example.pickme.models.Event;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -30,14 +29,14 @@ import java.util.Random;
 import java.util.UUID;
 
 public class EventCreationActivity extends AppCompatActivity {
-    private ActivityEventCreationBinding binding;
+    private EventEventcreationBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        binding = ActivityEventCreationBinding.inflate(getLayoutInflater());
+        binding = EventEventcreationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -132,7 +131,6 @@ public class EventCreationActivity extends AppCompatActivity {
         String date = binding.date.getText().toString() + ", " + binding.startTime.getText().toString() + " - " + binding.endTime.getText().toString();
 
         Event event = new Event(
-                Timestamp.now(),
                 "123456789",
                 "1234567890",
                 "1234567890123",
@@ -146,7 +144,8 @@ public class EventCreationActivity extends AppCompatActivity {
                 binding.winners.getText().toString(),
                 true,
                 Integer.parseInt(binding.entrants.getText().toString()),
-                Timestamp.now()
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
         );
 
         pushEventToFirestore(event);
