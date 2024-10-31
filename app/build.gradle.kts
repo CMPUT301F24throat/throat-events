@@ -47,4 +47,10 @@ dependencies {
 
     implementation(libs.firebase.bom)
     implementation(libs.firebase.firestore)
+    implementation (libs.firebase.storage)
+
+    //noinspection GradleDependency
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor (libs.compiler)
+
 }
