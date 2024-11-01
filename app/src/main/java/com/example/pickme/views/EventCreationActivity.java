@@ -50,6 +50,7 @@ public class EventCreationActivity extends AppCompatActivity {
         binding.date.setOnClickListener(view -> pickDate());
         binding.startTime.setOnClickListener(view -> pickTime(true));
         binding.endTime.setOnClickListener(view -> pickTime(false));
+        binding.back.setOnClickListener(view -> finish());
 
         binding.create.setOnClickListener(view -> {
             if (validateInputs()) {
