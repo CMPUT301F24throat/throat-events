@@ -59,6 +59,12 @@ public class Image {
         this.updatedAt = Timestamp.now();
     }
 
+    /**
+     * Firebase .toObject constructor
+     */
+    private Image() {
+        this.createdAt = Timestamp.now();
+    }
     //endregion
 
     //region Setters
