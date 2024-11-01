@@ -23,7 +23,6 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Handles interactions with the images collection <br>
@@ -238,20 +237,18 @@ public class ImageRepository {
      * Download an image from Firestore db.
      * <br>
      * <b>Requires the ImageQuery callback to access the query data.</b>
-     * @param i Image object to download to
+     * @param i Image object with download info
      * @param callback <i>new ImageQuery()</i>
      * @see com.example.pickme.utils.ImageQuery
      */
     public void download(@NonNull Image i, @NonNull ImageQuery callback) {
 
-        String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
         String imageType = i.getImageType().toString();
 
         Query query = imgCollection
                 .where(Filter.and(
                         Filter.equalTo("imageType", imageType),
-                        Filter.equalTo("uploaderId", uploaderId),
                         Filter.equalTo("imageAssociation", imageAssociation)));
 
         query.get()
