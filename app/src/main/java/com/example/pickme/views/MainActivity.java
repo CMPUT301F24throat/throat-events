@@ -15,9 +15,16 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Entry point of the app, responsible for authentication and navigation
+ * Responsibilities:
+ * Handle user authentication
+ * Navigate between fragments and manage user sessions
+ **/
+
 public class MainActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db; 
+    private FirebaseFirestore db;
     private UserRepository userRepository;
 
     @Override
