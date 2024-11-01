@@ -259,12 +259,10 @@ public class ImageRepository {
                     if (querySnapshotTask.isSuccessful()) {
                         QuerySnapshot queryRes = querySnapshotTask.getResult();
                         if (!queryRes.isEmpty()) {
-                            Map<String, Object> data = queryRes
+                            Image queriedImage = queryRes
                                     .getDocuments()
                                     .get(0)
-                                    .getData();
-                            assert data != null;
-                            Image queriedImage = new Image(data);
+                                    .toObject(Image.class);
                             callback.onSuccess(queriedImage);
                             Log.d(TAG, "download: Query successful, sent Image to callback");
                         } else {

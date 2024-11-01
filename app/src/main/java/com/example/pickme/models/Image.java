@@ -9,8 +9,6 @@ import com.example.pickme.repositories.ImageRepository;
 import com.example.pickme.utils.ImageQuery;
 import com.google.firebase.Timestamp;
 
-import java.util.Map;
-
 /**
  * Represents an image uploaded by the user
  * @author sophiecabungcal, etdong
@@ -61,18 +59,6 @@ public class Image {
         this.updatedAt = Timestamp.now();
     }
 
-    /**
-     * Constructs an image from a hashmap of data (usually obtained from queries)
-     * @param data The hashmap of data
-     */
-    public Image(Map<String, Object> data) {
-        this.uploaderId = (String) data.get("uploaderId");
-        this.imageType = ImageType.valueOf((String) data.get("imageType"));
-        this.imageUrl = (String) data.get("imageUrl");
-        this.imageAssociation = (String) data.get("imageAssociation");
-        this.createdAt = (Timestamp) data.get("createdAt");
-        this.updatedAt = (Timestamp) data.get("updatedAt");
-    }
     //endregion
 
     //region Setters
