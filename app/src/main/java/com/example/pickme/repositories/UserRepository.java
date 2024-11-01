@@ -1,5 +1,7 @@
 package com.example.pickme.repositories;
 
+import android.util.Log;
+
 import com.example.pickme.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -7,6 +9,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * Handles interactions with the users collection
@@ -22,16 +25,20 @@ public class UserRepository {
 
     // Create a new user with auto-generated ID
     public void addUser(User user, OnCompleteListener<Object> onCompleteListener) {
-        db.runTransaction(transaction -> {
-                    DocumentReference newUserRef = usersRef.document();
-                    user.setUserId(newUserRef.getId());
-                    transaction.set(newUserRef, user);
-                    return null;
-                }).addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Transaction failed: " + e.getMessage());
-                });
+
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener((task) -> {
+            db.runTransaction(transaction -> {
+                DocumentReference newUserRef = usersRef.document();
+                user.setUserId(newUserRef.getId());
+                user.setRegToken(task.getResult());
+
+                return null;
+            }).addOnCompleteListener(onCompleteListener)
+            .addOnFailureListener(e -> {
+                Log.i("ERROR", "Transaction failed: " + e.getMessage());
+            });
+
+        });
     }
 
     // Read a user by ID

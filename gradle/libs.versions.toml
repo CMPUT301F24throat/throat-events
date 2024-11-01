@@ -2,6 +2,7 @@
 agp = "8.7.1"
 circleimageview = "3.1.0"
 firebaseBom = "33.5.0"
+firebaseMessaging = "24.0.3"
 glide = "4.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -14,11 +15,14 @@ firebaseInappmessaging = "21.0.1"
 
 firebaseFirestore = "24.0.0"
 firebaseStorage = "21.0.1"
+playServicesAuth = "20.6.0"
+playServicesBase = "18.0.1"
 
 [libraries]
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -31,6 +35,8 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

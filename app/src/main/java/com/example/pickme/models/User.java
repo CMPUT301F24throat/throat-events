@@ -29,6 +29,7 @@ public class User {
 
     // User Preferences & Permissions
     private String deviceId; // Attaches on device to user
+    private String regToken; //firebase token for notification sending
     protected boolean isAdmin; // Permission to allow user admin status
     private boolean notificationEnabled; // Permission to allow notifications
     private boolean geoLocationEnabled; // Permission to track user's location
@@ -138,6 +139,12 @@ public class User {
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
         this.updatedAt = Timestamp.now();
+    }
+
+    public String getRegToken() { return regToken; }
+
+    public void setRegToken(String token) {
+        this.regToken = token;
     }
 
     public boolean isAdmin() {

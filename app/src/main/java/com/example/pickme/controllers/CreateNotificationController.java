@@ -73,46 +73,46 @@ public class CreateNotificationController extends AppCompatActivity {
                     return;
                 }
 
-                db.collection("users")
-                    .limit(1)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if(task.isSuccessful() && !task.getResult().isEmpty()){
-                            user = task.getResult().getDocuments().get(0).toObject(User.class);
-
-                            notification.setSentFrom(user);
-
-                            notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
-
-                            notification.setDateTimeNow();
-
-                            NotificationRepository repo = new NotificationRepository();
-                            OnCompleteListener<Object> listener = new OnCompleteListener<Object>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Object> task) {
-                                    Log.i("MYTAG", "Notification added");
-                                }
-                            };
-
-                            repo.addNotification(notification, listener);
-                        }
-                    });
-
-//                notification.setSentFrom(user);
+//                db.collection("users")
+//                    .limit(1)
+//                    .get()
+//                    .addOnCompleteListener(task -> {
+//                        if(task.isSuccessful() && !task.getResult().isEmpty()){
+//                            user = task.getResult().getDocuments().get(0).toObject(User.class);
 //
-//                notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
+//                            notification.setSentFrom(user);
 //
-//                notification.setDateTimeNow();
+//                            notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
 //
-//                NotificationRepository repo = new NotificationRepository();
-//                OnCompleteListener<Object> listener = new OnCompleteListener<Object>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Object> task) {
-//                        Log.i("MYTAG", "Notification added");
-//                    }
-//                };
+//                            notification.setDateTimeNow();
 //
-//                repo.addNotification(notification, listener);
+//                            NotificationRepository repo = new NotificationRepository();
+//                            OnCompleteListener<Object> listener = new OnCompleteListener<Object>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Object> task) {
+//                                    Log.i("MYTAG", "Notification added");
+//                                }
+//                            };
+//
+//                            repo.addNotification(notification, listener);
+//                        }
+//                    });
+
+                notification.setSentFrom(new User());
+
+                notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
+
+                notification.setDateTimeNow();
+
+                NotificationRepository repo = new NotificationRepository();
+                OnCompleteListener<Object> listener = new OnCompleteListener<Object>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Object> task) {
+                        Log.i("MYTAG", "Notification added");
+                    }
+                };
+
+                repo.addNotification(notification, listener);
                 getOnBackPressedDispatcher().onBackPressed();
             }
         });
