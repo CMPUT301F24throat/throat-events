@@ -1,8 +1,7 @@
 package com.example.pickme.views;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.os.Handler;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,8 +10,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
-import com.example.pickme.databinding.ActivityMainBinding;
+import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Entry point of the app, responsible for authentication and navigation
@@ -23,35 +24,62 @@ import com.google.firebase.FirebaseApp;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    private FirebaseFirestore db;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        setContentView(R.layout.activity_main);
 
         // Initialize Firebase
         FirebaseApp.initializeApp(this);
 
-        binding.createEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, EventCreationActivity.class));
-            }
-        });
+        // Initialize UserRepository instance
+        userRepository = new UserRepository();
 
-        binding.viewEvents.setOnClickListener(new View.OnClickListener() {
+        // Hide the action bar
+        androidx.appcompat.app.ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.hide();
+        }
+
+        // Set a delay to check user existence
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, EventsListActivity.class));
+            public void run() {
+                String currentUserId = "someUserId"; // Replace with the actual logic to get current user ID
+                checkUserExists(currentUserId);
+            }
+        }, 4000);
+
+        // Handle window insets
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    private void checkUserExists(String userId) {
+        userRepository.getUserById(userId, task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot document = task.getResult();
+                //loadFragment(new EventViewModel());
+            } else {
+                // Handle the error or case where the user does not exist
+                loadFragment(new SignUpFragment());
             }
         });
     }
+
+    private void loadFragment(SignUpFragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.user_signup_activity, fragment) // Ensure this is the correct container ID
+                .addToBackStack(null)
+                .commit();
+    }
+
 }
