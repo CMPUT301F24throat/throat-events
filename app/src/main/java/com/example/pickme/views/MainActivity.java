@@ -1,4 +1,4 @@
-package com.example.pickme.activities;
+package com.example.pickme.views;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,9 +11,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
 import com.example.pickme.repositories.UserRepository;
-import com.example.pickme.views.SignUpFragment;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 
