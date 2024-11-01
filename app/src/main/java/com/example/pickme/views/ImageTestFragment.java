@@ -122,6 +122,16 @@ public class ImageTestFragment extends Fragment {
         // downloads
         ImageView imageView = view.findViewById(R.id.imageView);
 
+        Button generateButton = view.findViewById(R.id.generatePfpButton);
+        generateButton.setOnClickListener(view1 -> {
+            Image image = new Image(user1.getUserId(), user1.getUserId());
+            image.generate();
+            Glide.with(view)
+                    .load(image.getImageUrl())
+                    .into(imageView);
+        });
+
+
         Button downloadPfpButton = view.findViewById(R.id.downloadPfpButton);
         downloadPfpButton.setOnClickListener(view1 -> {
             // clears the imageview

@@ -30,6 +30,12 @@
             android:text="Upload PFP" />
 
         <Button
+            android:id="@+id/generatePfpButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Generate PFP" />
+
+        <Button
             android:id="@+id/uploadEPButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
