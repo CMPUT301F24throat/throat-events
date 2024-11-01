@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PickMe"
         tools:targetApi="31">
+        <activity android:name=".views.Example_ImageUpload" />
         <activity
             android:name=".views.EventsListActivity"
             android:exported="false" />
