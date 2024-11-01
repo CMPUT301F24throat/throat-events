@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 //loadFragment(new EventViewModel());
             } else {
                 // Handle the error or case where the user does not exist
-//                loadFragment(new SignUpFragment());
+                loadFragment(new SignUpFragment());
             }
         });
     }
