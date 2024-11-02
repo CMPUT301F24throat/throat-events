@@ -5,7 +5,6 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,14 +18,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.pickme.R;
 import com.example.pickme.databinding.EventEventcreationBinding;
 import com.example.pickme.models.Event;
+import com.example.pickme.models.Image;
+import com.example.pickme.utils.ImageQuery;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Random;
-import java.util.UUID;
 
 public class EventCreationActivity extends AppCompatActivity {
     private EventEventcreationBinding binding;
@@ -50,6 +48,7 @@ public class EventCreationActivity extends AppCompatActivity {
         binding.date.setOnClickListener(view -> pickDate());
         binding.startTime.setOnClickListener(view -> pickTime(true));
         binding.endTime.setOnClickListener(view -> pickTime(false));
+        binding.back.setOnClickListener(view -> finish());
 
         binding.create.setOnClickListener(view -> {
             if (validateInputs()) {
@@ -110,17 +109,19 @@ public class EventCreationActivity extends AppCompatActivity {
 
     // Upload image to Firebase Storage and get the download URL
     private void uploadImageToFirebase(Uri imageUri) {
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference("event_posters/" + UUID.randomUUID().toString());
-        storageReference.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl()
-                        .addOnSuccessListener(uri -> {
-                            posterUrl = uri.toString(); // Save download URL
-                            createEventInFirestore(); // Call method to create event after getting the URL
-                        }))
-                .addOnFailureListener(e -> {
-                    Log.e("FirebaseUpload", "Upload failed", e);
-                    Toast.makeText(this, "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        Image image = new Image("1234567890", "123456789");
+        image.upload(imageUri);
+        image.download(new ImageQuery() {
+            @Override
+            public void onSuccess(Image image) {
+                posterUrl = image.getImageUrl();
+            }
+
+            @Override
+            public void onEmpty() {
+            }
+        });
+        createEventInFirestore();
     }
 
     private void createEventInFirestore() {
