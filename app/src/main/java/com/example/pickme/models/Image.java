@@ -125,7 +125,7 @@ public class Image {
      * @param imageUri The image URI to be attached; obtained from gallery picker
      */
     public void upload(@NonNull Uri imageUri) {
-        ir.upload(this, imageUri);
+        ir.upload(this, event1, imageUri);
     }
 
     /**
@@ -143,7 +143,7 @@ public class Image {
      * Delete the image from Firestore DB with query matching this image class.
      */
     public void delete() {
-        ir.delete(this);
+        ir.delete(this, event1);
     }
 
     /**
