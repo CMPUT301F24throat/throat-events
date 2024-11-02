@@ -1,5 +1,6 @@
 package com.example.pickme.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -8,11 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.example.pickme.R;
 import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
@@ -66,20 +67,21 @@ public class MainActivity extends AppCompatActivity {
     private void checkUserExists(String userId) {
         userRepository.getUserById(userId, task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                DocumentSnapshot document = task.getResult();
-                //loadFragment(new EventViewModel());
+                // User exists, start HomeActivity
+                Intent intent = new Intent(MainActivity.this, HomeFragment.class);
+                startActivity(intent);
+                finish(); // Optional: close MainActivity so the user can't return with the back button
             } else {
-                // Handle the error or case where the user does not exist
+                // User does not exist, load SignUpFragment
                 loadFragment(new SignUpFragment());
             }
         });
     }
 
-    private void loadFragment(SignUpFragment fragment) {
+    private void loadFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.user_signup_activity, fragment) // Ensure this is the correct container ID
+                .replace(R.id.user_signup_activity, fragment) // Ensure this ID matches your layout
                 .addToBackStack(null)
                 .commit();
     }
-
 }

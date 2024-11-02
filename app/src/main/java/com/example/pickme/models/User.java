@@ -16,7 +16,7 @@ import com.google.firebase.Timestamp;
 public class User {
 
     private static final String defaultProfilePictureUrl = "default_profile_picture_url";
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     // User Profile Information
     private String userId; // Unique string for user, for easy identification.
@@ -34,7 +34,7 @@ public class User {
     private boolean geoLocationEnabled; // Permission to track user's location
 
     // User Timestamps
-    private final Timestamp createdAt; // When was the account created
+    private Timestamp createdAt; // When was the account created
     private Timestamp updatedAt; // When was the profile last updated
     private static User user; // Tracks the active user throughout the app's lifecycle
 
@@ -61,6 +61,10 @@ public class User {
         this.geoLocationEnabled = geoLocationEnabled;
         this.createdAt = Timestamp.now();
         this.updatedAt = this.createdAt;
+    }
+
+    public User() {
+        
     }
 
     //---------- Get/Set User Profile Information --------------------
