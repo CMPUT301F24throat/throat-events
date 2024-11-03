@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".views.ImageTestFragment"
+    android:background="@color/white">
 
 
     <ImageView
@@ -26,6 +28,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload PFP" />
+
+        <Button
+            android:id="@+id/generatePfpButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Generate PFP" />
 
         <Button
             android:id="@+id/uploadEPButton"
@@ -90,5 +98,6 @@
         android:numColumns="3"
         app:layout_constraintTop_toBottomOf="@+id/getAllButton">
     </GridView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

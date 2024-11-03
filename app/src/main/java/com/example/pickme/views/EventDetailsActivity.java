@@ -13,6 +13,8 @@ import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.databinding.EventEventdetailsBinding;
 import com.example.pickme.models.Event;
+import com.example.pickme.models.Image;
+import com.example.pickme.utils.ImageQuery;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
@@ -32,6 +34,20 @@ public class EventDetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Event event = (Event) intent.getSerializableExtra("selectedEvent");
 
+        Image image = new Image("1234567890", "123456789");
+        image.download(new ImageQuery() {
+            @Override
+            public void onSuccess(Image image) {
+                Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.eventFlyer);
+            }
+
+            @Override
+            public void onEmpty() {
+
+            }
+        });
+
+
         // Set the data to the UI elements
         if (event != null) {
             binding.title.setText(event.getEventTitle());
@@ -40,7 +56,18 @@ public class EventDetailsActivity extends AppCompatActivity {
             binding.winners.setText(event.getMaxWinners()+" Winners");
             binding.entrants.setText(event.getEventDate()+" Entrants");
             // Load the poster image using an image loading library (e.g., Glide)
-            Glide.with(this).load(event.getPosterImageId()).into(binding.eventFlyer);
+            Image image1 = new Image("123456789", "1234567890");
+            image1.download(new ImageQuery() {
+                @Override
+                public void onSuccess(Image image) {
+                    Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.eventFlyer);
+                }
+
+                @Override
+                public void onEmpty() {
+
+                }
+            });
         }
     }
 }
