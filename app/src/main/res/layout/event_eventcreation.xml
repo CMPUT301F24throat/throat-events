@@ -234,10 +234,10 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="start"
+                    android:gravity="top|start"
                     android:padding="15dp"
                     android:hint="Description"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:textColorHint="@color/text3"
                     android:textColor="@color/text1"
                     android:textSize="14sp"

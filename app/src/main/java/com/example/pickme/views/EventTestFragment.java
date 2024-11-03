@@ -33,8 +33,8 @@ public class EventTestFragment extends Fragment {
         // Initialize Firebase
         FirebaseApp.initializeApp(view.getContext());
 
-        binding.createEvent.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventCreationActivity2));
+        binding.createEvent.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventCreationFragment));
 
-        binding.viewEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventDetailsActivity));
+        binding.viewEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventListFragment));
     }
 }

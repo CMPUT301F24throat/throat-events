@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/ic_button_bg_main"
     android:padding="15dp"
+    android:layout_marginTop="15dp"
     android:id="@+id/parent"
     android:backgroundTint="@color/border"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -25,7 +26,7 @@
         android:src="@drawable/ic_clock"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
-        android:layout_marginTop="15dp"/>
+        android:layout_marginTop="10dp"/>
 
     <TextView
         android:id="@+id/time"

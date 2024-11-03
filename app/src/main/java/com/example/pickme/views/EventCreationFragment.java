@@ -1,64 +1,69 @@
 package com.example.pickme.views;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
-import com.example.pickme.R;
+import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventEventcreationBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.utils.ImageQuery;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Random;
 
-public class EventCreationActivity extends AppCompatActivity {
+public class EventCreationFragment extends Fragment {
     private EventEventcreationBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        binding = EventEventcreationBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+    private EventViewModel eventViewModel = new EventViewModel();
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = EventEventcreationBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         setCurrentDateTime();
 
-        binding.addImage.setOnClickListener(view -> openGallery());
-        binding.date.setOnClickListener(view -> pickDate());
-        binding.startTime.setOnClickListener(view -> pickTime(true));
-        binding.endTime.setOnClickListener(view -> pickTime(false));
-        binding.back.setOnClickListener(view -> finish());
+        binding.addImage.setOnClickListener(listener -> openGallery());
+        binding.date.setOnClickListener(listener -> pickDate());
+        binding.startTime.setOnClickListener(listener -> pickTime(true));
+        binding.endTime.setOnClickListener(listener -> pickTime(false));
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
 
-        binding.create.setOnClickListener(view -> {
+        binding.create.setOnClickListener(listener -> {
             if (validateInputs()) {
                 if (selectedImageUri != null) {
                     uploadImageToFirebase(selectedImageUri);
                 } else {
-                    Toast.makeText(this, "Please select an image", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -153,16 +158,17 @@ public class EventCreationActivity extends AppCompatActivity {
     }
 
     private void pushEventToFirestore(Event event) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("events")
-                .add(event)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Event Created Successfully!", Toast.LENGTH_SHORT).show();
-                    finish(); // Finish the activity
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show()
-                );
+        eventViewModel.addEvent(event, new OnCompleteListener<Object>() {
+            @Override
+            public void onComplete(Task<Object> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(requireView()).navigateUp();
+                } else {
+                    Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private String generateRandomQrCodeId(int length) {
@@ -178,7 +184,7 @@ public class EventCreationActivity extends AppCompatActivity {
     private void pickDate() {
         Calendar calendar = Calendar.getInstance();
 
-        DatePickerDialog datePicker = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+        DatePickerDialog datePicker = new DatePickerDialog(requireActivity(), (view, year, month, dayOfMonth) -> {
             calendar.set(year, month, dayOfMonth);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
@@ -192,7 +198,7 @@ public class EventCreationActivity extends AppCompatActivity {
 
     private void pickTime(boolean b){
         Calendar calendar = Calendar.getInstance();
-        TimePickerDialog timePicker = new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
+        TimePickerDialog timePicker = new TimePickerDialog(requireActivity(), (timeView, hourOfDay, minute) -> {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
 
