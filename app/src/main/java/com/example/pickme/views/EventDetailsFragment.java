@@ -47,12 +47,13 @@ public class EventDetailsFragment extends Fragment {
 
             }
         });
-        
+
         // Set the data to the UI elements
         if (event != null) {
             binding.title.setText(event.getEventTitle());
             binding.description.setText(event.getEventDescription());
             binding.date.setText(event.getEventDate());
+            binding.address.setText(event.getEventLocation());
             binding.winners.setText(event.getMaxWinners()+" Winners");
             binding.entrants.setText(event.getMaxEntrants()+" Entrants");
             // Load the poster image using an image loading library (e.g., Glide)
