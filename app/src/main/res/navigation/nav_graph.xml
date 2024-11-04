@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.pickme.views.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_eventTestFragment"
+            app:destination="@id/eventTestFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_imageTestFragment"
+            app:destination="@id/imageTestFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/eventTestFragment"
+        android:name="com.example.pickme.views.EventTestFragment"
+        android:label="fragment_event_test"
+        tools:layout="@layout/event_test" >
+        <action
+            android:id="@+id/action_eventTestFragment_to_eventCreationActivity2"
+            app:destination="@id/eventCreationActivity" />
+        <action
+            android:id="@+id/action_eventTestFragment_to_eventDetailsActivity"
+            app:destination="@id/eventDetailsActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageTestFragment"
+        android:name="com.example.pickme.views.ImageTestFragment"
+        android:label="fragment_image_test"
+        tools:layout="@layout/image_test" />
+    <activity
+        android:id="@+id/eventCreationActivity"
+        android:name="com.example.pickme.views.EventCreationActivity"
+        android:label="event_eventcreation"
+        tools:layout="@layout/event_eventcreation" />
+    <activity
+        android:id="@+id/eventDetailsActivity"
+        android:name="com.example.pickme.views.EventDetailsActivity"
+        android:label="event_eventdetails"
+        tools:layout="@layout/event_eventdetails" />
+</navigation>
