@@ -2,14 +2,10 @@ package com.example.pickme.views;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,13 +17,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
-import com.example.pickme.controllers.CreateNotificationController;
-import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+/**
+ * Entry point of the app, responsible for authentication and navigation
+ * Responsibilities:
+ * Handle user authentication
+ * Navigate between fragments and manage user sessions
+ **/
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         askNotificationPermission();
 
         // Handle window insets
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -84,20 +85,20 @@ public class MainActivity extends AppCompatActivity {
 
         //------------- Omar's testing -----------------------
 
-        User user = new User();
-        user.setFirstName("Omar");
-        new UserRepository().addUser(user, (task) -> {
-            Log.i("ADDED", "User added");
-        });
-
-        Button switchButton = findViewById(R.id.switchButton);
-        switchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, CreateNotificationController.class);
-                startActivity(intent);
-            }
-        });
+//        User user = new User();
+//        user.setFirstName("Omar");
+//        new UserRepository().addUser(user, (task) -> {
+//            Log.i("ADDED", "User added");
+//        });
+//
+//        Button switchButton = findViewById(R.id.switchButton);
+//        switchButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(MainActivity.this, CreateNotificationController.class);
+//                startActivity(intent);
+//            }
+//        });
     }
 
     private void checkUserExists(String userId) {

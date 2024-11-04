@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +16,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PickMe"
         tools:targetApi="31">
-        <activity android:name=".views.Example_ImageUpload" />
+        <activity
+            android:name=".views.EventsListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.EventCreationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.EventDetailsActivity"
+            android:exported="false" />
         <activity
             android:name=".views.MainActivity"
             android:exported="true">
@@ -25,16 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".controllers.CreateNotificationController"/>
-
-        <service
-            android:name=".utils.NotificationHelper"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>
