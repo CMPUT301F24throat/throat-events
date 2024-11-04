@@ -70,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
                 //loadFragment(new EventViewModel());
             } else {
                 // Handle the error or case where the user does not exist
-                loadFragment(new SignUpFragment());
+                loadFragment(new UserSignUpFragment());
             }
         });
     }
 
-    private void loadFragment(SignUpFragment fragment) {
+    private void loadFragment(UserSignUpFragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.user_signup_activity, fragment) // Ensure this is the correct container ID
                 .addToBackStack(null)
