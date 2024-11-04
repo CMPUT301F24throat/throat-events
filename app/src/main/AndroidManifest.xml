@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +16,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PickMe"
         tools:targetApi="31">
+        <activity
+            android:name=".views.EventsListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.EventCreationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.EventDetailsActivity"
+            android:exported="false" />
         <activity
             android:name=".views.MainActivity"
             android:exported="true">

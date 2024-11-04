@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="profileEditButton" type="id" />
+    <item name="homeProfileButton" type="id" />
+    <item name="view6" type="id" />
+    <item name="view7" type="id" />
+    <item name="homeEventsText" type="id" />
+    <item name="view5" type="id" />
+    <item name="homeRecentText" type="id" />
+    <item name="homeHomeText" type="id" />
     <item name="shareButton" type="id" />
 </resources>
