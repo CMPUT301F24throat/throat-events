@@ -30,6 +30,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -38,7 +42,6 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.inappmessaging)
-    implementation(libs.mediation.test.suite)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -47,13 +50,27 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
     implementation(libs.glide)
-    implementation(libs.google.firebase.auth)
-    implementation(libs.play.services.auth)
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation(libs.firebase.firestore.v2460)
-    implementation(platform(libs.firebase.bom.v3351))
-    implementation(libs.appcompat.v161)
-    implementation(libs.firebase.firestore.v2511)
+    implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
+    implementation("com.google.firebase:firebase-firestore:24.0.0")
     implementation(libs.circleimageview)
+
+    val nav_version = "2.8.3"
+
+    // Jetpack Compose integration
+    implementation(libs.navigation.compose)
+
+    // Views/Fragments integration
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+
+    // Feature module support for Fragments
+    implementation(libs.navigation.dynamic.features.fragment)
+
+    // Testing Navigation
+    androidTestImplementation(libs.navigation.testing)
+
+    //noinspection GradleDependency
+    implementation (libs.glide)
+    annotationProcessor (libs.compiler)
 
 }
