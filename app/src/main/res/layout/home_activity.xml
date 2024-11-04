@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id = "@+id/user_profile_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background1" >
+
+    <TextView
+        android:id="@+id/homeHomeText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:paddingStart="5dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp"
+        android:text="Home"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        tools:ignore="MissingConstraints,RtlCompat"
+        tools:layout_editor_absoluteX="31dp"
+        tools:layout_editor_absoluteY="38dp" />
+
+    <TextView
+        android:id="@+id/homeRecentText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="330dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="212dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:paddingStart="1dp"
+        android:paddingTop="1dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="1dp"
+        android:text="Recent"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/view6"
+        tools:ignore="MissingConstraints,RtlCompat"
+        tools:layout_editor_absoluteX="15dp" />
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:textAlignment="center"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="15dp"
+        tools:layout_editor_absoluteY="436dp" />
+
+    <TextView
+        android:id="@+id/homeEventsText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="330dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="16dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:paddingStart="1dp"
+        android:paddingTop="1dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="1dp"
+        android:text="Events"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints,RtlCompat"
+        tools:layout_editor_absoluteY="398dp" />
+
+    <View
+        android:id="@+id/view6"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:textAlignment="center"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="15dp"
+        tools:layout_editor_absoluteY="386dp" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="15dp"
+        tools:layout_editor_absoluteY="650dp" />
+
+    <View
+        android:id="@+id/view7"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:background="#FFFFFF"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="15dp"
+        tools:layout_editor_absoluteY="187dp" />
+
+    <ImageButton
+        android:id="@+id/homeProfileButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/rounded_button"
+        android:contentDescription="Click to go to profile"
+        android:elevation="4dp"
+        android:padding="20dp"
+        android:src="@android:drawable/ic_menu_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.example.pickme.activities;
+package com.example.pickme.views;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,13 +11,20 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
 import com.example.pickme.repositories.UserRepository;
-import com.example.pickme.views.SignUpFragment;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+/**
+ * Entry point of the app, responsible for authentication and navigation
+ * Responsibilities:
+ * Handle user authentication
+ * Navigate between fragments and manage user sessions
+ **/
 
 public class MainActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db; 
+    private FirebaseFirestore db;
     private UserRepository userRepository;
 
     @Override

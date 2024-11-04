@@ -15,7 +15,7 @@
         android:layout_marginTop="56dp"
         android:background="@color/background1"
         android:contentDescription="Back"
-        android:src="@drawable/img"
+        android:src="@drawable/ic_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
