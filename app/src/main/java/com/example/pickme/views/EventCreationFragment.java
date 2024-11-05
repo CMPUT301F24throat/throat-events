@@ -33,6 +33,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Random;
 
+/**
+ * Fragment to create and edit events.
+ *
+ * @version 2.0
+ * @author Ayub Ali
+ * Responsibilities:
+ * - Provides UI for creating and updating events
+ * - Manages image uploads for event posters
+ */
+
 public class EventCreationFragment extends Fragment {
     private EventEventcreationBinding binding;
     private String posterUrl;
@@ -40,6 +50,7 @@ public class EventCreationFragment extends Fragment {
     private Event event;
     private EventViewModel eventViewModel = new EventViewModel();
 
+    // Inflates the layout for event creation view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,6 +58,7 @@ public class EventCreationFragment extends Fragment {
         return binding.getRoot();
     }
 
+    // Handles UI actions and event logic once view is created
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -89,7 +101,7 @@ public class EventCreationFragment extends Fragment {
             event = (Event) getArguments().getSerializable("selectedEvent");
         }
 
-        // Set the data to the UI elements
+        // Sets the current date and time for the event fields
         if (event != null) {
             binding.title.setText(event.getEventTitle());
             binding.description.setText(event.getEventDescription());
@@ -117,6 +129,7 @@ public class EventCreationFragment extends Fragment {
 
     }
 
+    // Sets the current date and time for the event fields
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -135,6 +148,8 @@ public class EventCreationFragment extends Fragment {
         binding.endTime.setText(endTime);
     }
 
+
+    // Validates input fields for completeness
     private boolean validateInputs() {
         return !binding.title.getText().toString().isEmpty() &&
                 !binding.address.getText().toString().isEmpty() &&
@@ -143,6 +158,7 @@ public class EventCreationFragment extends Fragment {
                 !binding.description.getText().toString().isEmpty();
     }
 
+    // Opens gallery to select an image
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -177,6 +193,7 @@ public class EventCreationFragment extends Fragment {
         createEventInFirestore();
     }
 
+    // Creates a new event or updates existing event in Firestore
     private void createEventInFirestore() {
         String eventTitle = binding.title.getText().toString();
         String eventDescription = binding.description.getText().toString();
@@ -227,6 +244,7 @@ public class EventCreationFragment extends Fragment {
         }
     }
 
+    // Pushes event data to Firestore
     private void pushEventToFirestore(Event event) {
         eventViewModel.addEvent(event, new OnCompleteListener<Object>() {
             @Override
@@ -241,6 +259,7 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    // Deletes selected event from Firestore
     private void deleteEvent(Event event) {
         eventViewModel.deleteEvent(event, task -> {
             if (task.isSuccessful()) {
@@ -252,6 +271,7 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    // Generates a random QR code ID of given length
     private String generateRandomQrCodeId(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder id = new StringBuilder();
@@ -262,6 +282,7 @@ public class EventCreationFragment extends Fragment {
         return id.toString();
     }
 
+    // Opens date picker dialog to select date
     private void pickDate() {
         Calendar calendar = Calendar.getInstance();
 
@@ -296,3 +317,19 @@ public class EventCreationFragment extends Fragment {
         timePicker.show();
     }
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT
+ * - "How to handle image uploading in Android fragments."
+ *
+ * Stack Overflow
+ * - "Setting up a DatePickerDialog and TimePickerDialog in Android."
+ *
+ * Firebase Documentation
+ * - "Upload files to Firebase and get download URL."
+ *
+ * Android Developers
+ * - "Using Intent.ACTION_PICK for image selection in Android."
+ */
