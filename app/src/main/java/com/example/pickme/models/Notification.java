@@ -15,8 +15,8 @@ public class Notification {
     private boolean read;
     private Timestamp timestamp;
 
-    private User sentFrom;
-    private ArrayList<User> sendTo;
+    private String sentFrom;
+    private ArrayList<String> sendTo;
     private SendLevel level;
 
     public Notification(){
@@ -67,20 +67,20 @@ public class Notification {
     }
 
     //---------- SentFrom --------------------
-    public User getSentFrom() {
+    public String getSentFrom() {
         return sentFrom;
     }
 
-    public void setSentFrom(User sentFrom) {
+    public void setSentFrom(String sentFrom) {
         this.sentFrom = sentFrom;
     }
 
     //---------- SendTo --------------------
-    public ArrayList<User> getSendTo() {
+    public ArrayList<String> getSendTo() {
         return sendTo;
     }
 
-    public void setSendTo(ArrayList<User> sendTo){
+    public void setSendTo(ArrayList<String> sendTo){
         if(this.level != SendLevel.Specific) return;
 
         this.sendTo = sendTo;

@@ -6,10 +6,14 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -17,7 +21,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme.R;
+import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -87,9 +94,35 @@ public class MainActivity extends AppCompatActivity {
 
 //        User user = new User();
 //        user.setFirstName("Omar");
+//
 //        new UserRepository().addUser(user, (task) -> {
 //            Log.i("ADDED", "User added");
 //        });
+//        User.setInstance(user);
+        User user = new User();
+        user.setFirstName("Omar");
+
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        user.setDeviceId(deviceId);
+        user.setUserId(deviceId);
+
+        new UserRepository().addUser(user, task -> {
+            if(task.isSuccessful()) User.setInstance(user);
+        });
+
+        FirebaseMessaging.getInstance().subscribeToTopic("TEST_ALL")
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    String msg = "Subscribed";
+                    if (!task.isSuccessful()) {
+                        msg = "Subscribe failed";
+                    }
+                    Log.d("TAG", msg);
+                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                }
+            });
 //
 //        Button switchButton = findViewById(R.id.switchButton);
 //        switchButton.setOnClickListener(new View.OnClickListener() {

@@ -98,7 +98,7 @@ public class CreateNotificationController extends AppCompatActivity {
 //                        }
 //                    });
 
-                notification.setSentFrom(new User());
+//                notification.setSentFrom(new User());
 
                 notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
 
