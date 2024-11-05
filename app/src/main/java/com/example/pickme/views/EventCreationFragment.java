@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
+import com.example.pickme.R;
 import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventEventcreationBinding;
 import com.example.pickme.models.Event;
@@ -35,6 +37,7 @@ public class EventCreationFragment extends Fragment {
     private EventEventcreationBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
+    private Event event;
     private EventViewModel eventViewModel = new EventViewModel();
 
     @Override
@@ -53,19 +56,64 @@ public class EventCreationFragment extends Fragment {
         binding.date.setOnClickListener(listener -> pickDate());
         binding.startTime.setOnClickListener(listener -> pickTime(true));
         binding.endTime.setOnClickListener(listener -> pickTime(false));
-        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
-
-        binding.create.setOnClickListener(listener -> {
-            if (validateInputs()) {
-                if (selectedImageUri != null) {
-                    uploadImageToFirebase(selectedImageUri);
-                } else {
-                    Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+        binding.back.setOnClickListener(listener -> {
+            if (event==null){
+                Navigation.findNavController(requireView()).navigateUp();
+            }else{
+                deleteEvent(event);
             }
         });
+
+        binding.back1.setOnClickListener(listener -> {
+            Navigation.findNavController(requireView()).navigateUp();
+        });
+
+        binding.create.setOnClickListener(listener -> {
+                if (validateInputs()) {
+                    if (selectedImageUri != null) {
+                        uploadImageToFirebase(selectedImageUri);
+                    } else {
+                        if (event==null) {
+                            Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
+                        }else{
+                            posterUrl = event.getPosterImageId();
+                            createEventInFirestore();
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                }
+        });
+
+        if (getArguments() != null) {
+            event = (Event) getArguments().getSerializable("selectedEvent");
+        }
+
+        // Set the data to the UI elements
+        if (event != null) {
+            binding.title.setText(event.getEventTitle());
+            binding.description.setText(event.getEventDescription());
+            binding.date.setText(event.getEventDate());
+            binding.address.setText(event.getEventLocation());
+            binding.winners.setText(event.getMaxWinners()+" Winners");
+            binding.entrants.setText(event.getMaxEntrants()+" Entrants");
+            // Load the poster image using an image loading library (e.g., Glide)
+            Image image1 = new Image("123456789", "1234567890");
+            image1.download(new ImageQuery() {
+                @Override
+                public void onSuccess(Image image) {
+                    Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
+                }
+
+                @Override
+                public void onEmpty() {
+
+                }
+            });
+            binding.back1.setVisibility(View.VISIBLE);
+            binding.titleMain.setText("Edit Event");
+            binding.back.setImageResource(R.drawable.ic_delete);
+        }
 
     }
 
@@ -136,25 +184,47 @@ public class EventCreationFragment extends Fragment {
         String waitingListQrCodeId = generateRandomQrCodeId(10);
         String date = binding.date.getText().toString() + ", " + binding.startTime.getText().toString() + " - " + binding.endTime.getText().toString();
 
-        Event event = new Event(
-                "123456789",
-                "1234567890",
-                "1234567890123",
-                eventTitle,
-                eventDescription,
-                date,
-                promoQrCodeId,
-                waitingListQrCodeId,
-                posterUrl,
-                binding.address.getText().toString(),
-                binding.winners.getText().toString(),
-                true,
-                Integer.parseInt(binding.entrants.getText().toString()),
-                System.currentTimeMillis(),
-                System.currentTimeMillis()
-        );
+        if (event==null){
+            Event newEvent = new Event(
+                    "123456789",
+                    "1234567890",
+                    "1234567890123",
+                    eventTitle,
+                    eventDescription,
+                    date,
+                    promoQrCodeId,
+                    waitingListQrCodeId,
+                    posterUrl,
+                    binding.address.getText().toString(),
+                    binding.winners.getText().toString(),
+                    true,
+                    Integer.parseInt(binding.entrants.getText().toString()),
+                    System.currentTimeMillis(),
+                    System.currentTimeMillis()
+            );
 
-        pushEventToFirestore(event);
+            pushEventToFirestore(newEvent);
+        }else{
+            Event newEvent = new Event(
+                    event.getEventId(),
+                    event.getOrganizerId(),
+                    event.getFacilityId(),
+                    eventTitle,
+                    eventDescription,
+                    date,
+                    event.getPromoQrCodeId(),
+                    event.getWaitingListQrCodeId(),
+                    posterUrl,
+                    binding.address.getText().toString(),
+                    binding.winners.getText().toString(),
+                    true,
+                    Integer.parseInt(binding.entrants.getText().toString()),
+                    event.getCreatedAt(),
+                    System.currentTimeMillis()
+            );
+
+            pushEventToFirestore(newEvent);
+        }
     }
 
     private void pushEventToFirestore(Event event) {
@@ -167,6 +237,17 @@ public class EventCreationFragment extends Fragment {
                 } else {
                     Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+    }
+
+    private void deleteEvent(Event event) {
+        eventViewModel.deleteEvent(event, task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(requireView()).navigateUp();
+            } else {
+                Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
             }
         });
     }

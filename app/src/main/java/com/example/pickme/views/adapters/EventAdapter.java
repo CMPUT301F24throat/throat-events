@@ -34,7 +34,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event event = eventList.get(position);
-        holder.bind(event, context, listener);
+        holder.bind(event, listener);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             this.binding = binding;
         }
 
-        public void bind(Event event, Context context, OnEventClickListener listener) {
+        public void bind(Event event, OnEventClickListener listener) {
             String[] dateParts = event.getEventDate().split(",", 2);
 
             if (dateParts.length > 1) {

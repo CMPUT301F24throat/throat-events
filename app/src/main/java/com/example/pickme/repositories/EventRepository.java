@@ -34,6 +34,13 @@ public class EventRepository {
                 });
     }
 
+    public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
+        db.collection("events")
+                .document(eventId)
+                .delete()
+                .addOnCompleteListener(onCompleteListener);
+    }
+
     // Read an event by ID
     public void getEventById(String eventId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         eventsRef.document(eventId).get().addOnCompleteListener(onCompleteListener);

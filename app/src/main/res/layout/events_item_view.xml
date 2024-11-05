@@ -6,7 +6,7 @@
     android:padding="15dp"
     android:layout_marginTop="15dp"
     android:id="@+id/parent"
-    android:backgroundTint="@color/border"
+    android:backgroundTint="@color/dialogBG1"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView

@@ -19,7 +19,7 @@ import com.example.pickme.utils.ImageQuery;
 public class EventDetailsFragment extends Fragment {
     private EventEventdetailsBinding binding;
     private Event event;
-
+    private boolean isUpdate;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -35,18 +35,6 @@ public class EventDetailsFragment extends Fragment {
         }
 
         binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
-        Image image = new Image("1234567890", "123456789");
-        image.download(new ImageQuery() {
-            @Override
-            public void onSuccess(Image image) {
-                Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.eventFlyer);
-            }
-
-            @Override
-            public void onEmpty() {
-
-            }
-        });
 
         // Set the data to the UI elements
         if (event != null) {

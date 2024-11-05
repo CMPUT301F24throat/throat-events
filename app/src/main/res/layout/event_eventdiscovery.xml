@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.EventListFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".views.EventDiscoveryFragment"
     android:background="@color/background1">
 
     <androidx.constraintlayout.widget.Guideline
@@ -40,7 +39,7 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your Events"
+        android:text="Discover"
         android:textColor="@color/white"
         android:textSize="22sp"
         app:layout_constraintStart_toEndOf="@id/startGuide"
@@ -62,10 +61,27 @@
         android:background="@color/white"
         app:layout_constraintStart_toEndOf="@id/startGuide"
         app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintTop_toBottomOf="@id/searchBar"
+        android:layout_marginTop="10dp"/>
+
+    <EditText
+        android:id="@+id/searchBar"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
         app:layout_constraintTop_toBottomOf="@id/profile"
-        android:layout_marginTop="15dp"/>
-
-
+        android:layout_marginTop="15dp"
+        android:hint="Search"
+        android:textColorHint="@color/text3"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:maxLines="1"
+        android:drawablePadding="15dp"
+        android:layout_marginHorizontal="15dp"
+        android:background="@drawable/search_bar_bg"
+        android:drawableStart="@drawable/ic_search"
+        android:paddingHorizontal="20dp"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
@@ -77,6 +93,6 @@
         android:layout_marginTop="15dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="vertical"
-        tools:listitem="@layout/events_item_view"
+        tools:listitem="@layout/event_discover_item_view"
         tools:itemCount="7"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

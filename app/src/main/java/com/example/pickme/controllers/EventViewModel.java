@@ -63,6 +63,18 @@ public class EventViewModel {
         });
     }
 
+    public void deleteEvent(Event event, OnCompleteListener<Void> onCompleteListener) {
+        eventRepository.deleteEvent(event.getEventId(), new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(Task<Void> task) {
+                if (task.isSuccessful()) {
+                    events.remove(event); // Remove event from local list
+                }
+                onCompleteListener.onComplete(task); // Notify completion (success or failure)
+            }
+        });
+    }
+
     public boolean removeEvent(Event event) {
         // Logic to remove event from the list
         boolean removed = events.remove(event);
