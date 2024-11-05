@@ -14,7 +14,7 @@ import com.example.pickme.repositories.UserRepository;
 
 public class Admin extends User {
 
-    public Admin(UserRepository userRepository, String userId, String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
-        super(userRepository, userId, firstName, lastName, emailAddress, contactNumber, profilePictureUrl, isAdmin, deviceId, notificationEnabled, geoLocationEnabled);
+    public Admin(UserRepository userRepository, String userId, String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled, boolean isOnline) {
+        super(userRepository, userId, firstName, lastName, emailAddress, contactNumber, profilePictureUrl, isAdmin, deviceId, notificationEnabled, geoLocationEnabled, isOnline);
     }
 }

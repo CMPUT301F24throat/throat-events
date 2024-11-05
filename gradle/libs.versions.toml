@@ -20,6 +20,7 @@ navigationDynamicFeaturesFragment = "2.8.3"
 navigationFragment = "2.8.3"
 navigationTesting = "2.8.3"
 navigationUi = "2.8.3"
+firebaseDatabase = "21.0.0"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -43,6 +44,7 @@ navigation-dynamic-features-fragment = { module = "androidx.navigation:navigatio
 navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigationFragment" }
 navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUi" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 
 
 [plugins]
