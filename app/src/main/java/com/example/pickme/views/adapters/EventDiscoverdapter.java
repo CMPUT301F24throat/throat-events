@@ -26,6 +26,7 @@ public class EventDiscoverdapter extends RecyclerView.Adapter<EventDiscoverdapte
         this.eventList = eventList;
         this.context = context;
         this.listener = listener;
+        this.fullEventList = eventList;
     }
 
     @NonNull
