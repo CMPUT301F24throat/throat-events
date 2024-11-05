@@ -93,7 +93,11 @@ public class EventCreationFragment extends Fragment {
         if (event != null) {
             binding.title.setText(event.getEventTitle());
             binding.description.setText(event.getEventDescription());
-            binding.date.setText(event.getEventDate());
+            String[] parts = event.getEventDate().split(", ");
+            binding.date.setText(parts[0]);
+            String[] times = parts[1].split(" - ");
+            binding.startTime.setText(times[0]);
+            binding.endTime.setText(times[0]);
             binding.address.setText(event.getEventLocation());
             binding.winners.setText(event.getMaxWinners());
             binding.entrants.setText(event.getMaxEntrants().toString());
@@ -223,9 +227,24 @@ public class EventCreationFragment extends Fragment {
                     System.currentTimeMillis()
             );
 
-            pushEventToFirestore(newEvent);
+            pushEventUpdateToFirestore(newEvent);
         }
     }
+
+    private void pushEventUpdateToFirestore(Event event) {
+        eventViewModel.updateEvent(event, new OnCompleteListener<Object>() {
+            @Override
+            public void onComplete(Task<Object> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(requireView()).navigateUp();
+                } else {
+                    Toast.makeText(requireActivity(), "Failed to update event", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 
     private void pushEventToFirestore(Event event) {
         eventViewModel.addEvent(event, new OnCompleteListener<Object>() {

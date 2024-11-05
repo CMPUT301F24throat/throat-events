@@ -34,6 +34,18 @@ public class EventRepository {
                 });
     }
 
+    public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+        DocumentReference newEventRef = eventsRef.document(event.getEventId());
+        db.runTransaction(transaction -> {
+                    transaction.set(newEventRef, event);
+                    return null;
+                }).addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Transaction failed: " + e.getMessage());
+                });
+    }
+
     public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
         db.collection("events")
                 .document(eventId)

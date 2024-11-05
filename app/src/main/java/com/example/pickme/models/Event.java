@@ -1,6 +1,9 @@
 package com.example.pickme.models;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 public class Event implements Serializable {
     private String eventId;             // Unique event ID
@@ -92,7 +95,20 @@ public class Event implements Serializable {
     }
 
     public void setEventDate(String eventDate) {
-        this.eventDate = eventDate;
+        if (eventDate == null) {
+            throw new IllegalArgumentException("Event date cannot be null.");
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a");
+        dateFormat.setLenient(false); // Make strict parsing
+
+        try {
+            dateFormat.parse(eventDate); // Attempt to parse the date
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Please use 'MMMM d yyyy, h:mm a'.");
+        }
+
+        this.eventDate = eventDate; // Assuming eventDate is a String type
     }
 
     public String getPromoQrCodeId() {
@@ -132,8 +148,13 @@ public class Event implements Serializable {
     }
 
     public void setMaxWinners(String maxWinners) {
-        this.maxWinners = maxWinners;
+        if (maxWinners == null || !maxWinners.matches("\\d+")) {  // Check if not numeric
+            throw new IllegalArgumentException("Max winners must be a non-negative numeric value.");
+        }
+
+        this.maxWinners = maxWinners;  // Assuming maxWinners is a String type
     }
+
 
     public boolean isGeoLocationRequired() {
         return geoLocationRequired;
@@ -148,8 +169,16 @@ public class Event implements Serializable {
     }
 
     public void setMaxEntrants(Integer maxEntrants) {
-        this.maxEntrants = maxEntrants;
+        if (maxEntrants == null) {
+            throw new IllegalArgumentException("Max entrants cannot be null.");
+        }
+        if (maxEntrants <= 0) {  // Check for negative and zero values
+            throw new IllegalArgumentException("Max entrants must be a positive value.");
+        }
+
+        this.maxEntrants = maxEntrants;  // Assuming maxEntrants is an Integer
     }
+
 
     public long getCreatedAt() {
         return createdAt;
@@ -162,4 +191,18 @@ public class Event implements Serializable {
     public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true; // Check for reference equality
+        if (obj == null || getClass() != obj.getClass()) return false; // Check for null or same class
+        Event event = (Event) obj; // Cast to Event
+        return eventId.equals(event.eventId); // Compare based on eventId (or any unique field)
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventId); // Use eventId for hash code
+    }
+
 }

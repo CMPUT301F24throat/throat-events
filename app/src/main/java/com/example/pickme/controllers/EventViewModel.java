@@ -18,6 +18,12 @@ public class EventViewModel {
         this.events = new ArrayList<>(); // Initialize the event list
     }
 
+    public EventViewModel(EventRepository eventRepository) {
+        this.eventRepository = eventRepository; // Use the injected repository
+        this.events = new ArrayList<>(); // Initialize the event list
+    }
+
+
     // ---------- Selected Event --------------------
     public Event getSelectedEvent() {
         return selectedEvent;
@@ -63,6 +69,25 @@ public class EventViewModel {
         });
     }
 
+    public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+        eventRepository.updateEvent(event, new OnCompleteListener<Object>() {
+            @Override
+            public void onComplete(Task<Object> task) {
+                if (task.isSuccessful()) {
+                    for (int i = 0; i < events.size(); i++) {
+                        if (events.get(i).getEventId().equals(event.getEventId())) {
+                            events.set(i, event); // Update the event in the local list
+                            break;
+                        }
+                    }
+                    onCompleteListener.onComplete(task); // Notify completion
+                } else {
+                    onCompleteListener.onComplete(task); // Notify failure
+                }
+            }
+        });
+    }
+
     public void deleteEvent(Event event, OnCompleteListener<Void> onCompleteListener) {
         eventRepository.deleteEvent(event.getEventId(), new OnCompleteListener<Void>() {
             @Override
@@ -73,19 +98,6 @@ public class EventViewModel {
                 onCompleteListener.onComplete(task); // Notify completion (success or failure)
             }
         });
-    }
-
-    public boolean removeEvent(Event event) {
-        // Logic to remove event from the list
-        boolean removed = events.remove(event);
-        return removed;
-    }
-
-    // ---------- Event Management --------------------
-    public boolean updateEvent(Event event) {
-        // Logic to update event
-        // If you want to update the event in Firestore, you can call eventRepository.updateEvent(event);
-        return true;
     }
 
     // ---------- Lottery Selection --------------------
