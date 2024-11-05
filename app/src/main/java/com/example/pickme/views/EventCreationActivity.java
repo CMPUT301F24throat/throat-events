@@ -19,6 +19,7 @@ import com.example.pickme.R;
 import com.example.pickme.databinding.EventEventcreationBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
+import com.example.pickme.repositories.QrRepository;
 import com.example.pickme.utils.ImageQuery;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -30,6 +31,7 @@ public class EventCreationActivity extends AppCompatActivity {
     private EventEventcreationBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
+    private QrRepository qrRepository; // Initialize QrRepository for QR operations
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,8 @@ public class EventCreationActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        qrRepository = new QrRepository(); // Initialize QrRepository instance
 
         setCurrentDateTime();
 
@@ -130,6 +134,11 @@ public class EventCreationActivity extends AppCompatActivity {
         String promoQrCodeId = generateRandomQrCodeId(10);
         String waitingListQrCodeId = generateRandomQrCodeId(10);
         String date = binding.date.getText().toString() + ", " + binding.startTime.getText().toString() + " - " + binding.endTime.getText().toString();
+
+        // Create QR codes in Firestore using QrRepository before creating the event [Need to add eventID and uploaderID to the qrData]
+        qrRepository.createQR(promoQrCodeId, "event_info", "/events/" + "123456789", "123456789", date);
+        qrRepository.createQR(waitingListQrCodeId, "event_join", "/events/" + "123456789", "123456789", date);
+
 
         Event event = new Event(
                 "123456789",
