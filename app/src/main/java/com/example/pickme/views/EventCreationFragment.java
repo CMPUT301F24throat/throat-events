@@ -98,8 +98,8 @@ public class EventCreationFragment extends Fragment {
             binding.winners.setText(event.getMaxWinners()+" Winners");
             binding.entrants.setText(event.getMaxEntrants()+" Entrants");
             // Load the poster image using an image loading library (e.g., Glide)
-            Image image1 = new Image("123456789", "1234567890");
-            image1.download(new ImageQuery() {
+            Image image = new Image("1234567890", "123456789");
+            image.download(new ImageQuery() {
                 @Override
                 public void onSuccess(Image image) {
                     Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
