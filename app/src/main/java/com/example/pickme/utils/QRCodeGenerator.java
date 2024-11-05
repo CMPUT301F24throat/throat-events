@@ -1,34 +1,83 @@
 package com.example.pickme.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
+import com.example.pickme.repositories.QrRepository;
+import com.google.android.gms.tasks.Tasks;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-/**
- * Utility to generate QR codes for events
- * Responsibilities:
- * Generate QR codes based on event data (e.g., event ID, hash)
- * Return the image URL for event QR codes
- **/
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class QRCodeGenerator {
 
     private static final int QR_CODE_WIDTH = 500;
     private static final int QR_CODE_HEIGHT = 500;
+    private static final String CACHE_DIR = "qr_cache";
+
+    private final QrRepository qrRepository;
+
+    public QRCodeGenerator(QrRepository qrRepository) {
+        this.qrRepository = qrRepository;
+    }
 
     /**
-     * Generate QR Code Bitmap from a given event string
+     * Generate or retrieve cached QR Code for an event based on eventID and qrType.
      *
-     * @param eventData Data for the event (e.g., event ID or hash)
+     * @param context Context to access cache directory
+     * @param eventID ID of the event
+     * @param qrType Type of the QR code (e.g., "event_info", "event_join")
+     * @return File path to the cached QR code image or null if an error occurred
+     */
+    public String getQRCodeImage(Context context, String eventID, String qrType) {
+        String cacheFileName = eventID + "_" + qrType + ".png";
+        File cacheFile = new File(context.getCacheDir(), CACHE_DIR + "/" + cacheFileName);
+
+        // Check if QR code already exists in cache
+        if (cacheFile.exists()) {
+            return cacheFile.getAbsolutePath(); // Return cached file path if it exists
+        }
+
+        // QR code not in cache; retrieve qrID from Firestore using QrRepository
+        try {
+            String qrID = retrieveQrID(eventID, qrType);
+            if (qrID == null) {
+                Log.e("QRCodeGenerator", "QR ID not found for eventID: " + eventID + " and qrType: " + qrType);
+                return null;
+            }
+
+            // Generate and cache QR code
+            Bitmap qrCodeBitmap = generateQRCode(qrID);
+            if (qrCodeBitmap != null) {
+                saveBitmapToCache(cacheFile, qrCodeBitmap);
+                return cacheFile.getAbsolutePath(); // Return the path to the cached QR code image
+            } else {
+                Log.e("QRCodeGenerator", "Failed to generate QR code bitmap for qrID: " + qrID);
+                return null;
+            }
+        } catch (Exception e) {
+            Log.e("QRCodeGenerator", "Error generating QR code", e);
+            return null;
+        }
+    }
+
+    /**
+     * Generate QR Code Bitmap from a given QR ID.
+     *
+     * @param qrID ID to encode into the QR code
      * @return Bitmap representing the QR code
      */
-    public static Bitmap generateQRCode(String eventData) {
+    private Bitmap generateQRCode(String qrID) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
-            BitMatrix bitMatrix = writer.encode(eventData, BarcodeFormat.QR_CODE, QR_CODE_WIDTH, QR_CODE_HEIGHT);
+            BitMatrix bitMatrix = writer.encode(qrID, BarcodeFormat.QR_CODE, QR_CODE_WIDTH, QR_CODE_HEIGHT);
 
             int width = bitMatrix.getWidth();
             int height = bitMatrix.getHeight();
@@ -40,23 +89,37 @@ public class QRCodeGenerator {
             }
             return bmp;
         } catch (WriterException e) {
-            // add logging
+            Log.e("QRCodeGenerator", "Error generating QR code", e);
             return null;
         }
     }
 
     /**
-     * Convert event to a QR Code image URL
+     * Retrieve qrID for a given eventID and qrType from Firestore.
      *
-     * @param eventData Data for the event
-     * @return URL of the generated QR code image (Placeholder: add actual upload/storage logic)
+     * @param eventID ID of the event
+     * @param qrType Type of the QR code
+     * @return qrID if found, null otherwise
      */
-    public static String getQRCodeImageURL(String eventData) {
-        // For now, this method is a placeholder.
-        Bitmap qrCodeBitmap = generateQRCode(eventData);
+    private String retrieveQrID(String eventID, String qrType) throws ExecutionException, InterruptedException {
+        return Tasks.await(qrRepository.readQRByReferenceAndType("/events/" + eventID, qrType))
+                .getDocuments().stream().findFirst()
+                .map(document -> document.getString("qrID"))
+                .orElse(null);
+    }
 
-        // TODO: Upload qrCodeBitmap to Firebase and return the URL/pointer to data
-        return "https://example.com/qrcode_placeholder.png";
+    /**
+     * Save bitmap to cache directory.
+     *
+     * @param file File where the bitmap will be saved
+     * @param bitmap Bitmap to save
+     */
+    private void saveBitmapToCache(File file, Bitmap bitmap) {
+        file.getParentFile().mkdirs(); // Ensure the directory exists
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (IOException e) {
+            Log.e("QRCodeGenerator", "Error saving QR code to cache", e);
+        }
     }
 }
-
