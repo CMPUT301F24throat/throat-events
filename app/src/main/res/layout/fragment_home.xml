@@ -9,22 +9,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center">
+        android:gravity="center|top">
 
         <Button
             android:id="@+id/btn_EventTesting"
-            android:text="Event Testing"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Event Testing" />
 
         <Button
             android:id="@+id/btn_ImageTesting"
-            android:text="Image Testing"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Image Testing" />
 
     </LinearLayout>
-
 
 
 </FrameLayout>
