@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.pickme.repositories.QrRepository;
 import com.google.android.gms.tasks.Tasks;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
