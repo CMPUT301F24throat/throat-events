@@ -34,8 +34,20 @@ public class ImageTestFragment extends Fragment {
     String TAG = "Example_ImageUpload";
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
 
+
     UserRepository ur = new UserRepository();
-    User user1 = new User(ur, auth.getUid());
+
+    String firstName = "Joe";
+    String lastName = "Doe";
+    String emailAddress = "example@hotmail.com";
+    String contactNumber = "000-000-0000";
+    boolean isAdmin = false;
+    String deviceId = "";
+    boolean notificationEnabled = true;
+    boolean geoLocationEnabled = false;
+    boolean isOnline = true;
+
+    User user1 = new User(ur, auth.getUid(), firstName, lastName, emailAddress, contactNumber, null, isAdmin, deviceId, notificationEnabled, geoLocationEnabled, isOnline);
     Event event1 = new Event();
     //endregion
 
