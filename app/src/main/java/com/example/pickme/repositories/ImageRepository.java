@@ -7,9 +7,7 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 
-import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
-import com.example.pickme.models.User;
 import com.example.pickme.utils.GalleryAdapter;
 import com.example.pickme.utils.ImageQuery;
 import com.google.firebase.auth.FirebaseAuth;
@@ -113,15 +111,14 @@ public class ImageRepository {
                 });
     }
 
-     /**
-      * Uploads a new image or updates an existing one with attached URI to FirebaseStorage,
-      * then stores the image information to Firestore DB.
-      *
-      * @param i      The image object to upload
-      * @param event1
-      * @param uri    The image URI to be attached
-      */
-    public void upload(@NonNull User i, Event event1, @NonNull Uri uri) {
+    /**
+     * Uploads a new image or updates an existing one with attached URI to FirebaseStorage,
+     * then stores the image information to Firestore DB.
+     *
+     * @param i The image object to upload
+     * @param uri The image URI to be attached
+     */
+    public void upload(@NonNull Image i, @NonNull Uri uri) {
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
@@ -219,21 +216,21 @@ public class ImageRepository {
 
         // update storage file
         imgRef
-            .putFile(uri)
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, String.format("update: File %s updated", imageId));
+                .putFile(uri)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, String.format("update: File %s updated", imageId));
 
-                    // update document
-                    imgRef.getDownloadUrl().addOnSuccessListener(url -> {
-                        // db store
-                        doc.update("imageUrl", url)
-                            .addOnSuccessListener(unused ->
-                                    Log.d(TAG, String.format("update: Document %s updated", imageId))
-                            );
-                    });
-                }
-            });
+                        // update document
+                        imgRef.getDownloadUrl().addOnSuccessListener(url -> {
+                            // db store
+                            doc.update("imageUrl", url)
+                                    .addOnSuccessListener(unused ->
+                                            Log.d(TAG, String.format("update: Document %s updated", imageId))
+                                    );
+                        });
+                    }
+                });
     }
 
     /**
@@ -275,11 +272,9 @@ public class ImageRepository {
 
     /**
      * Delete an image from Firestore db.
-     *
-     * @param i      Image object to be deleted
-     * @param event1
+     * @param i Image object to be deleted
      */
-    public void delete(@NonNull User i, Event event1) {
+    public void delete(@NonNull Image i) {
 
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
