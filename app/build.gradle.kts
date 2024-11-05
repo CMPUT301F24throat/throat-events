@@ -55,6 +55,9 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.circleimageview)
 
+    implementation("com.google.android.gms:play-services-tasks:18.2.0")
+
+
     val nav_version = "2.8.3"
 
     // Jetpack Compose integration
