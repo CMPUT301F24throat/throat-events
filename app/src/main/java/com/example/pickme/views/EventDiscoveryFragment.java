@@ -82,6 +82,6 @@ public class EventDiscoveryFragment extends Fragment implements EventDiscoverdap
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", event);
 
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventListFragment_to_eventDetailsFragment, bundle);
+        Navigation.findNavController(requireView()).navigate(R.id.action_eventDiscoveryFragment_to_eventDetailsFragment, bundle);
     }
 }

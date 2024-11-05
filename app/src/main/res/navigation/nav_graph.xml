@@ -60,6 +60,10 @@
         android:id="@+id/eventDiscoveryFragment"
         android:name="com.example.pickme.views.EventDiscoveryFragment"
         android:label="event_eventdiscovery"
-        tools:layout="@layout/event_eventdiscovery" />
+        tools:layout="@layout/event_eventdiscovery" >
+        <action
+            android:id="@+id/action_eventDiscoveryFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
 
 </navigation>
