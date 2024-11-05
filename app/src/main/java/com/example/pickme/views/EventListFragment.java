@@ -22,6 +22,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment displaying a list of events with navigation to event creation.
+ *
+ * @version 2.0
+ * Responsibilities:
+ * - Display a list of events from Firestore
+ * - Provide navigation to event creation or editing
+ */
 public class EventListFragment extends Fragment implements EventAdapter.OnEventClickListener {
 
     private EventEventslistBinding binding;
@@ -29,13 +37,14 @@ public class EventListFragment extends Fragment implements EventAdapter.OnEventC
     private List<Event> eventList = new ArrayList<>();
     private EventViewModel eventViewModel = new EventViewModel();
 
+    // Inflate the layout for the fragment
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = EventEventslistBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 
+    // Set up RecyclerView adapter and fetch data after the view is created
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -46,12 +55,12 @@ public class EventListFragment extends Fragment implements EventAdapter.OnEventC
         fetchEventsFromFirestore();
     }
 
+    // Fetches event data from Firestore
     private void fetchEventsFromFirestore() {
         eventViewModel.fetchEvents(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    // Handle successful fetch
                     List<Event> fetchedEvents = eventViewModel.getEvents();
                     eventAdapter.updateEvents(fetchedEvents);
                 }
@@ -59,6 +68,7 @@ public class EventListFragment extends Fragment implements EventAdapter.OnEventC
         });
     }
 
+    // Handle event item click and navigate to event creation/edit screen
     @Override
     public void onEventClick(Event event) {
         Bundle bundle = new Bundle();
@@ -66,4 +76,17 @@ public class EventListFragment extends Fragment implements EventAdapter.OnEventC
 
         Navigation.findNavController(requireView()).navigate(R.id.action_eventListFragment_to_eventCreationFragment, bundle);
     }
+
+    /**
+     * Code Sources
+     *
+     * Stack Overflow
+     * - "RecyclerView setup and data binding in Android"
+     *
+     * Firebase Documentation
+     * - Firestore > Collection Data Fetching
+     *
+     * Android Developers
+     * - "Navigation components for data transfer between fragments"
+     */
 }

@@ -6,21 +6,22 @@ import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 public class Event implements Serializable {
-    private String eventId;             // Unique event ID
-    private String organizerId;         // Organizer's user ID
-    private String facilityId;          // Facility ID
-    private String eventTitle;          // Title of the event
-    private String eventDescription;    // Description of the event
-    private String eventDate;           // Date and time of the event (as a String)
-    private String promoQrCodeId;      // Promo QR code ID
-    private String waitingListQrCodeId; // Waiting list QR code ID
-    private String posterImageId;       // URL of the poster image
-    private String eventLocation;       // Location of the event
-    private String maxWinners;          // Maximum number of winners (String to match provided data)
-    private boolean geoLocationRequired; // Indicates if geo location is required
-    private Integer maxEntrants;        // Maximum number of entrants (Integer)
-    private long createdAt;  // Timestamp for when the event was created
-    private long updatedAt;         // Timestamp for when the event was last updated
+
+    private String eventId;              // Unique event ID
+    private String organizerId;          // Organizer's user ID
+    private String facilityId;           // Facility ID
+    private String eventTitle;           // Title of the event
+    private String eventDescription;     // Description of the event
+    private String eventDate;            // Date and time of the event (as a String)
+    private String promoQrCodeId;        // Promo QR code ID
+    private String waitingListQrCodeId;  // Waiting list QR code ID
+    private String posterImageId;        // URL of the poster image
+    private String eventLocation;        // Location of the event
+    private String maxWinners;           // Max number of winners
+    private boolean geoLocationRequired; // Indicates if geolocation is required
+    private Integer maxEntrants;         // Maximum number of entrants
+    private long createdAt;              // Creation timestamp
+    private long updatedAt;              // Last updated timestamp
 
     // Default constructor (required for Firestore)
     public Event() {
@@ -206,3 +207,17 @@ public class Event implements Serializable {
     }
 
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT
+ * - "Explanation on handling event properties using classes in Java."
+ * - "Firestore documentation on serializable classes in Android."
+ *
+ * Stack Overflow
+ * - "Java Serializable vs Parcelable for data classes."
+ *
+ * Android Developers
+ * - "Best practices for defining data classes in Android."
+ */
