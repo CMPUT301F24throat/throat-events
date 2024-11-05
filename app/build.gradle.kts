@@ -42,6 +42,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.inappmessaging)
+
+    // QR Code
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.android)
+
     implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
@@ -58,6 +63,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.8.3")
     implementation("com.google.firebase:firebase-auth:version")
     implementation("com.google.firebase:firebase-firestore:version")
+    implementation("com.google.android.gms:play-services-tasks:18.2.0")
 
     val nav_version = "2.8.3"
 

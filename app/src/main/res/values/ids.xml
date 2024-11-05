@@ -8,4 +8,5 @@
     <item name="view5" type="id" />
     <item name="homeRecentText" type="id" />
     <item name="homeHomeText" type="id" />
+    <item name="shareButton" type="id" />
 </resources>
