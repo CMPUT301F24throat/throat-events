@@ -42,6 +42,10 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.inappmessaging)
+
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.android)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -50,6 +54,9 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
     implementation(libs.circleimageview)
+
+    implementation("com.google.android.gms:play-services-tasks:18.2.0")
+
 
     val nav_version = "2.8.3"
 
