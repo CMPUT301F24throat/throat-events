@@ -96,7 +96,7 @@ public class EventCreationFragment extends Fragment {
             binding.date.setText(event.getEventDate());
             binding.address.setText(event.getEventLocation());
             binding.winners.setText(event.getMaxWinners());
-            binding.entrants.setText(event.getMaxEntrants());
+            binding.entrants.setText(event.getMaxEntrants().toString());
             // Load the poster image using an image loading library (e.g., Glide)
             Image image = new Image("1234567890", "123456789");
             image.download(new ImageQuery() {
