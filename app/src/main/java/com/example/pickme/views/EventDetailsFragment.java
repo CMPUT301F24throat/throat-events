@@ -17,13 +17,18 @@ import com.example.pickme.models.Image;
 import com.example.pickme.utils.ImageQuery;
 
 /**
- * Fragment to display event details to the user.
+ * Fragment to display detailed information about a specific event.
+ * This includes the event title, description, date, location, image, and participant limits.
+ * Allows users to view all relevant details of the event, and navigate back to the previous screen.
  *
  * @version 2.0
  * @author Ayub Ali
  * Responsibilities:
- * - Shows event data such as title, description, date, location, and image.
+ * - Display full event details for selected events.
+ * - Load and display the event poster image from a stored URL.
+ * - Handle back navigation for seamless user experience.
  */
+
 public class EventDetailsFragment extends Fragment {
     private EventEventdetailsBinding binding;
     private Event event;
@@ -68,17 +73,20 @@ public class EventDetailsFragment extends Fragment {
             });
         }
     }
-
-    /**
-     * Code Sources
-     *
-     * ChatGPT
-     * - "How to navigate fragments and handle back navigation in Android"
-     *
-     * Stack Overflow
-     * - "Using Glide to load images into ImageView in a Fragment"
-     *
-     * Android Developers
-     * - "Fragment lifecycle and inflating layouts"
-     */
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT:
+ * - "How to navigate fragments and handle back navigation in Android."
+ *
+ * Stack Overflow:
+ * - "Using Glide to load images into ImageView in a Fragment" - https://stackoverflow.com/questions/23978828/how-to-use-glide-in-fragment-to-load-image
+ * - "Passing data between fragments using Android Architecture Components" - https://stackoverflow.com/questions/51075486/passing-data-between-fragments-using-android-architecture-components
+ *
+ * Android Developer Documentation:
+ * - [Fragment Lifecycle](https://developer.android.com/guide/fragments/lifecycle) - Guidelines for managing fragment lifecycle.
+ * - [Navigating with Fragments](https://developer.android.com/guide/navigation/navigation-getting-started) - Handling fragment navigation.
+ * - [Using Glide for Image Loading](https://bumptech.github.io/glide/) - Documentation on image loading with Glide.
+ */

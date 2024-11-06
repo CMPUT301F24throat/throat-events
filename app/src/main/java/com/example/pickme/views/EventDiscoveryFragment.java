@@ -25,13 +25,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fragment to display and search events in a discovery view.
+ * Fragment for discovering and searching events.
+ * Displays a list of available events with search functionality for filtering.
+ * Fetches event data from Firestore and handles user interactions for viewing details.
  *
  * @version 2.0
+ * @author Ayub Ali
  * Responsibilities:
- * - Displays a list of events and enables search filtering
- * - Fetches events from Firestore
+ * - Display a list of events
+ * - Fetch event data from Firestore and update the list.
  */
+
 public class EventDiscoveryFragment extends Fragment implements EventDiscoverdapter.OnEventClickListener {
 
     private EventEventdiscoveryBinding binding;
@@ -90,17 +94,19 @@ public class EventDiscoveryFragment extends Fragment implements EventDiscoverdap
         bundle.putSerializable("selectedEvent", event);
         Navigation.findNavController(requireView()).navigate(R.id.action_eventDiscoveryFragment_to_eventDetailsFragment, bundle);
     }
-
-    /**
-     * Code Sources
-     *
-     * Stack Overflow
-     * - "How to set up a RecyclerView with search filtering"
-     *
-     * Firebase Documentation
-     * - Firestore > Data fetching and filtering
-     *
-     * Android Developers
-     * - "Implementing navigation between fragments with data passing"
-     */
 }
+
+/**
+ * Code Sources
+ *
+ * Stack Overflow:
+ * - "Setting up RecyclerView with search filtering" - https://stackoverflow.com/questions/30398247/how-to-filter-a-recyclerview-with-a-searchview
+ * - "Passing data between fragments with Navigation Component" - https://stackoverflow.com/questions/51075486/passing-data-between-fragments-using-android-architecture-components
+ *
+ * Firebase Documentation:
+ * - [Firestore: Data fetching and filtering](https://firebase.google.com/docs/firestore/query-data/get-data) - Methods for querying and retrieving data.
+ *
+ * Android Developers:
+ * - [Implementing RecyclerView](https://developer.android.com/guide/topics/ui/layout/recyclerview) - Guidelines for displaying a list with RecyclerView.
+ * - [Fragment navigation with arguments](https://developer.android.com/guide/navigation/navigation-pass-data) - Navigating and passing data between fragments with the Navigation component.
+ */

@@ -5,6 +5,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
+/**
+ * Data model class representing an event in the system.
+ * Stores all relevant details and constraints for each event, including title, description, date,
+ * location, geolocation requirements, QR codes, and timestamps.
+ *
+ * @version 2.0
+ * @author Ayub Ali
+ * Responsibilities:
+ * - Define the properties and structure for event-related data.
+ * - Validate key fields such as max entrants and event date format.
+ * - Manage event identity and equality for list operations and comparisons.
+ */
+
 public class Event implements Serializable {
 
     private String eventId;              // Unique event ID

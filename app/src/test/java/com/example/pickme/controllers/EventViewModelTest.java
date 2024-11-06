@@ -28,6 +28,20 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Unit tests for the EventViewModel class using mocked EventRepository.
+ * This test class verifies the ViewModel's behavior, particularly in CRUD operations,
+ * data fetching, event selection, and Firestore interaction.
+ *
+ * @version 1.0
+ * @author Ayub Ali
+ * Responsibilities:
+ * - Test CRUD operations via the ViewModel and mock repository.
+ * - Validate that Firestore completion listeners trigger correctly for each operation.
+ * - Ensure ViewModel functions like event selection and list maintenance behave as expected.
+ * - Use Mockito to simulate Firestore operations and confirm correct method interactions.
+ */
+
 public class EventViewModelTest {
 
     @Mock

@@ -34,13 +34,21 @@ import java.util.Calendar;
 import java.util.Random;
 
 /**
- * Fragment to create and edit events.
+ * Fragment for creating and managing events in the system.
+ * Provides a UI for organizers to input event details, such as title, description, date, location, and poster image.
+ * Handles validation, image selection, Firestore data storage, and QR code generation for events.
  *
  * @version 2.0
+ * @author Ayub Ali
  * Responsibilities:
- * - Provides UI for creating and updating events
- * - Manages image uploads for event posters
+ * - Capture and validate user input for event details.
+ * - Manage event creation, updating, and deletion in Firestore.
+ * - Handle image selection and upload for event posters.
+ * - Generate QR codes for promotional and waiting list purposes.
+ * - Navigate to appropriate screens based on user actions.
+ *
  */
+
 public class EventCreationFragment extends Fragment {
     private EventEventcreationBinding binding;
     private String posterUrl;

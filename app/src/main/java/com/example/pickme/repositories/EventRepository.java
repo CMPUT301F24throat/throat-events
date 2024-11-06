@@ -9,11 +9,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 /**
- * Handles interactions with the events collection
- * @author sophiecabungcal
- * @version 1.0
+ * Facilitates CRUD operations and interactions with the Firestore events collection.
+ * Manages event data transactions, including adding, updating, deleting, and retrieving events.
+ * Ensures data integrity through Firestore transactions and handles completion notifications for each operation.
+ *
+ * @version 2.0
+ * @author Ayub Ali
  * Responsibilities:
- * CRUD operations for event data
+ * - Perform CRUD operations on event data in Firestore.
+ * - Manage transactions for consistent updates and deletion.
+ * - Retrieve event data by ID or organizer user ID.
+ * - Notify completion or failure of Firestore operations.
  */
 
 public class EventRepository {
