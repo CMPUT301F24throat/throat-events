@@ -2,12 +2,14 @@ package com.example.pickme.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * The main activity for our app.
@@ -28,10 +30,13 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.home_activity);
 
         // Variable Initialization
-        ImageButton homeProfileButton = findViewById(R.id.homeProfileButton);
+        CircleImageView homeProfileButton = findViewById(R.id.homeProfileButton);
 
         // Retrieves the User documentation from MainActivity.
         User user = (User) getIntent().getSerializableExtra("user_data");
+        Glide.with(this)
+                .load(User.getInstance().getProfilePictureUrl())
+                .into(homeProfileButton);
 
         // Listens for if the User clicks their Profile.
         homeProfileButton.setOnClickListener(v -> {
