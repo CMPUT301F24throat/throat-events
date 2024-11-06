@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
             // User proven to exist, load their information.
             loadUserInformation(user, document);
         });
-
     }
 
     //---------- Activity Redirection --------------------
