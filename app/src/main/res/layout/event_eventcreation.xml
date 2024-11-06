@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.EventCreationActivity"
+    tools:context=".views.EventCreationFragment"
     android:background="@color/background1">
 
     <androidx.constraintlayout.widget.Guideline
@@ -37,12 +37,14 @@
         android:id="@+id/bottomGuide"/>
 
     <TextView
+        android:id="@+id/titleMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create an event"
         android:textColor="@color/white"
         android:textSize="22sp"
-        app:layout_constraintStart_toEndOf="@id/startGuide"
+        android:layout_marginStart="15dp"
+        app:layout_constraintStart_toEndOf="@id/back1"
         app:layout_constraintTop_toBottomOf="@id/topGuide"/>
 
     <ImageView
@@ -51,6 +53,16 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_close"
         app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintTop_toBottomOf="@id/topGuide"/>
+
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/back1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
         app:layout_constraintTop_toBottomOf="@id/topGuide"/>
 
     <ScrollView
@@ -234,10 +246,10 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="start"
+                    android:gravity="top|start"
                     android:padding="15dp"
                     android:hint="Description"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:textColorHint="@color/text3"
                     android:textColor="@color/text1"
                     android:textSize="14sp"

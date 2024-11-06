@@ -37,44 +37,62 @@ android {
 }
 
 dependencies {
+
+    // Core Android Libraries
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    // Firebase Services
     implementation(libs.firebase.inappmessaging)
-
-    implementation(libs.zxing.core)
-    implementation(libs.zxing.android)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.firebase.database)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
+
+    // Image Handling Libraries
+    implementation(libs.glide)
     implementation(libs.circleimageview)
 
-    implementation("com.google.android.gms:play-services-tasks:18.2.0")
+    // Navigation Components
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.3")
 
+    // Barcode Scanning Libraries
+    implementation(libs.zxing.core.v350)
+    implementation(libs.javase)
+    implementation(libs.zxing.android)
 
-    val nav_version = "2.8.3"
+    // Play Services for Background Tasks
+    implementation(libs.play.services.tasks)
 
-    // Jetpack Compose integration
+    // Firebase Bills of Materials for Version Alignment
+    implementation(libs.firebase.bom)
+    implementation(libs.firebase.firestore)
+    implementation(libs.google.firebase.auth)
+
+    // Testing Libraries
+    testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.junit.jupiter)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.navigation.testing)
+
+    // Jetpack Compose Integration
     implementation(libs.navigation.compose)
 
-    // Views/Fragments integration
+    // Views/Fragments Integration
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
 
     // Feature module support for Fragments
     implementation(libs.navigation.dynamic.features.fragment)
 
-    // Testing Navigation
-    androidTestImplementation(libs.navigation.testing)
-
-    //noinspection GradleDependency
+    // Noinspection GradleDependency
     implementation (libs.glide)
     annotationProcessor (libs.compiler)
-
 }

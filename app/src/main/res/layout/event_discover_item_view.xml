@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ic_button_bg_main"
+    android:padding="15dp"
+    android:layout_marginTop="15dp"
+    android:id="@+id/parent"
+    android:backgroundTint="@color/dialogBG1"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Events"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/event_flyer"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_clock"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:layout_marginTop="10dp"/>
+
+    <ImageView
+        android:id="@+id/calendarIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_calendar"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@id/event_flyer"
+        app:layout_constraintTop_toTopOf="@id/event_flyer"/>
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="October 5, 2024"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@id/calendarIcon"
+        app:layout_constraintTop_toTopOf="@id/calendarIcon"
+        app:layout_constraintBottom_toBottomOf="@id/calendarIcon"
+        android:layout_marginStart="15dp"/>
+
+    <ImageView
+        android:id="@+id/timeIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_clock"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@id/event_flyer"
+        app:layout_constraintTop_toBottomOf="@+id/calendarIcon"
+        app:layout_constraintBottom_toTopOf="@id/locationPin"/>
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7:00 PM - 8:00 PM"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@id/timeIcon"
+        app:layout_constraintTop_toTopOf="@id/timeIcon"
+        app:layout_constraintBottom_toBottomOf="@id/timeIcon"
+        android:layout_marginStart="15dp"/>
+
+    <ImageView
+        android:id="@+id/locationPin"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_location"
+        app:layout_constraintStart_toStartOf="@id/timeIcon"
+        app:layout_constraintEnd_toEndOf="@id/timeIcon"
+        app:layout_constraintTop_toBottomOf="@id/time"
+        app:layout_constraintBottom_toBottomOf="@id/event_flyer"/>
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Somewhere"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@id/locationPin"
+        app:layout_constraintTop_toTopOf="@id/locationPin"
+        app:layout_constraintBottom_toBottomOf="@id/locationPin"
+        android:layout_marginStart="15dp"/>
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DescriptioLorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et tincidunt nulla, in maximus ante. Suspendisse vulputate et eros id imperdiet. Quisque id cursus nunc. Cras leo nisi, ornare id condimentum sed. Vestibulum eget iaculis elit, at dignissim leo. Nunc a ex non felis aliquet efficitur.n"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:maxLines="3"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/event_flyer"
+        android:layout_marginTop="10dp"/>
+
+    <ImageView
+        android:id="@+id/booked"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_register"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
