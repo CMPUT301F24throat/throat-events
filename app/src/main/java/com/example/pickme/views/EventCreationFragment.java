@@ -167,15 +167,9 @@ public class EventCreationFragment extends Fragment {
     // Upload image to Firebase Storage and get the download URL
     private void uploadImageToFirebase(Uri imageUri) {
         Image image = new Image("1234567890", "123456789");
-        image.upload(imageUri);
-        image.download(new ImageQuery() {
-            @Override
-            public void onSuccess(Image image) {
-                posterUrl = image.getImageUrl();
-            }
-
-            @Override
-            public void onEmpty() {
+        image.upload(imageUri, task -> {
+            if (task.isSuccessful()) {
+                posterUrl = task.getResult().getImageUrl();
             }
         });
         createEventInFirestore();

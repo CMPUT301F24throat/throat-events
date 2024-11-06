@@ -2,6 +2,7 @@ package com.example.pickme.repositories;
 
 import android.util.Log;
 
+import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -58,7 +59,13 @@ public class UserRepository {
                 String userAuthId = Objects.requireNonNull(task.getResult().getUser()).getUid();
 
                 // Creates the User object
-                User newUser = new User(this, userAuthId, firstName, lastName, email, contact, null, false, deviceId, true, false, true);
+                Image newImage = new Image(deviceId, deviceId);
+                newImage.generate(task1 -> {
+                    if (task1.isSuccessful()) {
+                        newImage.setImageUrl(task1.getResult().getImageUrl());
+                    }
+                });
+                User newUser = new User(this, userAuthId, firstName, lastName, email, contact, newImage.getImageUrl(), false, deviceId, true, false, true);
                 newUser.signup(firstName, lastName);
                 User.setInstance(newUser);
 
@@ -86,7 +93,7 @@ public class UserRepository {
         updates.put("contactNumber", user.getContactNumber());
         updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
         updates.put("notificationEnabled", user.isNotificationEnabled());
-        // TODO: Add the users profile picture here
+        updates.put("profilePictureUrl", user.getProfilePictureUrl());
 
         usersRef.document(user.getDeviceId())
                 .update(updates)
