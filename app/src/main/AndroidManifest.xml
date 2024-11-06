@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -13,8 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PickMe"
-        tools:targetApi="31">
-        <activity android:name=".views.Example_ImageUpload" />
+        tools:targetApi="31"
+        tools:ignore="ExtraText">
         <activity
             android:name=".views.MainActivity"
             android:exported="true">
@@ -24,6 +26,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".views.UserSignUpActivity"
+            tools:ignore="Instantiatable" />
+        <activity android:name=".views.HomeActivity"
+            tools:ignore="Instantiatable" />
+        <activity android:name=".views.UserProfileActivity" />
+        <activity android:name=".views.UserProfileEditActivity" />
     </application>
 
 </manifest>

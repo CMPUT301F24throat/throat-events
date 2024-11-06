@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/user_profile_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background1" >
+
+    <!-- Back Button Layout -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingLeft="30dp"
+        android:paddingTop="30dp"
+        tools:ignore="MissingConstraints">
+
+        <ImageButton
+            android:id="@+id/myImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow"
+            android:background="@null"
+            android:contentDescription="@string/returnText" />
+
+        <TextView
+            android:id="@+id/profileBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="58dp"
+            tools:layout_editor_absoluteY="15dp" />
+    </LinearLayout>
+
+    <!-- QR Code and Share Button Layout with Event Title -->
+    <LinearLayout
+        android:id="@+id/qrLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        tools:layout_editor_absoluteX="0dp">
+
+        <!-- Event Title TextView -->
+        <TextView
+            android:id="@+id/eventTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Event Name"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Large QR Code -->
+        <ImageView
+            android:id="@+id/qrCodeImage"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            android:contentDescription="@string/todo"
+            android:scaleType="fitCenter"
+            android:src="@drawable/qr_code_placeholder" />
+
+        <!-- Share Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/shareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/button_squircle_background"
+            android:drawableStart="@drawable/baseline_ios_share_24"
+            android:drawablePadding="8dp"
+            android:padding="12dp"
+            android:text="@string/share"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

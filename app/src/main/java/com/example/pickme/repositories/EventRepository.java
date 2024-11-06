@@ -34,6 +34,25 @@ public class EventRepository {
                 });
     }
 
+    public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+        DocumentReference newEventRef = eventsRef.document(event.getEventId());
+        db.runTransaction(transaction -> {
+                    transaction.set(newEventRef, event);
+                    return null;
+                }).addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Transaction failed: " + e.getMessage());
+                });
+    }
+
+    public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
+        db.collection("events")
+                .document(eventId)
+                .delete()
+                .addOnCompleteListener(onCompleteListener);
+    }
+
     // Read an event by ID
     public void getEventById(String eventId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         eventsRef.document(eventId).get().addOnCompleteListener(onCompleteListener);
@@ -50,7 +69,7 @@ public class EventRepository {
     }
 
     // Read all events by organizer user ID
-    public void getEventsByOrganizerUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(onCompleteListener);
+    public void getEventsByOrganizerUserId(OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        eventsRef.get().addOnCompleteListener(onCompleteListener);
     }
 }
