@@ -2,6 +2,7 @@ package com.example.pickme.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,8 @@ import com.example.pickme.models.User;
  **/
 public class HomeActivity extends AppCompatActivity {
 
+    private ImageButton homeProfileButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,12 +36,23 @@ public class HomeActivity extends AppCompatActivity {
         // Retrieves the User documentation from MainActivity.
         User user = (User) getIntent().getSerializableExtra("user_data");
 
+        homeProfileButton.setVisibility(View.VISIBLE);
+
         // Listens for if the User clicks their Profile.
         homeProfileButton.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
             intent.putExtra("user_data", user);
             startActivity(intent);
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Make the button visible again when returning to the activity
+        if (homeProfileButton != null) {
+            homeProfileButton.setVisibility(View.VISIBLE);
+        }
     }
 }
 
