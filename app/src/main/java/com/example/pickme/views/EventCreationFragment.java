@@ -33,6 +33,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Random;
 
+/**
+ * Fragment to create and edit events.
+ *
+ * @version 2.0
+ * Responsibilities:
+ * - Provides UI for creating and updating events
+ * - Manages image uploads for event posters
+ */
 public class EventCreationFragment extends Fragment {
     private EventEventcreationBinding binding;
     private String posterUrl;
@@ -47,6 +55,7 @@ public class EventCreationFragment extends Fragment {
         return binding.getRoot();
     }
 
+    // Initializes UI elements and sets up event listeners
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -57,9 +66,9 @@ public class EventCreationFragment extends Fragment {
         binding.startTime.setOnClickListener(listener -> pickTime(true));
         binding.endTime.setOnClickListener(listener -> pickTime(false));
         binding.back.setOnClickListener(listener -> {
-            if (event==null){
+            if (event == null) {
                 Navigation.findNavController(requireView()).navigateUp();
-            }else{
+            } else {
                 deleteEvent(event);
             }
         });
@@ -69,67 +78,67 @@ public class EventCreationFragment extends Fragment {
         });
 
         binding.create.setOnClickListener(listener -> {
-                if (validateInputs()) {
-                    if (selectedImageUri != null) {
-                        uploadImageToFirebase(selectedImageUri);
-                    } else {
-                        if (event==null) {
-                            Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
-                        }else{
-                            posterUrl = event.getPosterImageId();
-                            createEventInFirestore();
-                        }
-                    }
+            if (validateInputs()) {
+                if (selectedImageUri != null) {
+                    uploadImageToFirebase(selectedImageUri);
                 } else {
-                    Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    if (event == null) {
+                        Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
+                    } else {
+                        posterUrl = event.getPosterImageId();
+                        createEventInFirestore();
+                    }
                 }
+            } else {
+                Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            }
         });
 
         if (getArguments() != null) {
             event = (Event) getArguments().getSerializable("selectedEvent");
         }
-
-        // Set the data to the UI elements
         if (event != null) {
-            binding.title.setText(event.getEventTitle());
-            binding.description.setText(event.getEventDescription());
-            String[] parts = event.getEventDate().split(", ");
-            binding.date.setText(parts[0]);
-            String[] times = parts[1].split(" - ");
-            binding.startTime.setText(times[0]);
-            binding.endTime.setText(times[0]);
-            binding.address.setText(event.getEventLocation());
-            binding.winners.setText(event.getMaxWinners());
-            binding.entrants.setText(event.getMaxEntrants().toString());
-            // Load the poster image using an image loading library (e.g., Glide)
-            Image image = new Image("1234567890", "123456789");
-            image.download(new ImageQuery() {
-                @Override
-                public void onSuccess(Image image) {
-                    Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
-                }
-
-                @Override
-                public void onEmpty() {
-
-                }
-            });
-            binding.back1.setVisibility(View.VISIBLE);
-            binding.titleMain.setText("Edit Event");
-            binding.back.setImageResource(R.drawable.ic_delete);
+            setEventData();
         }
-
     }
 
+    // Set the data to the UI elements if editing an event
+    private void setEventData() {
+        binding.title.setText(event.getEventTitle());
+        binding.description.setText(event.getEventDescription());
+        String[] parts = event.getEventDate().split(", ");
+        binding.date.setText(parts[0]);
+        String[] times = parts[1].split(" - ");
+        binding.startTime.setText(times[0]);
+        binding.endTime.setText(times[1]);
+        binding.address.setText(event.getEventLocation());
+        binding.winners.setText(event.getMaxWinners());
+        binding.entrants.setText(event.getMaxEntrants().toString());
+
+        // Load the poster image using an image loading library (e.g., Glide)
+        Image image = new Image("1234567890", "123456789");
+        image.download(new ImageQuery() {
+            @Override
+            public void onSuccess(Image image) {
+                Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
+            }
+
+            @Override
+            public void onEmpty() {}
+        });
+        binding.back1.setVisibility(View.VISIBLE);
+        binding.titleMain.setText("Edit Event");
+        binding.back.setImageResource(R.drawable.ic_delete);
+    }
+
+    // Sets the current date and time in the UI as default values
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
-        // Set current date
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
         String currentDate = dateFormat.format(calendar.getTime());
         binding.date.setText(currentDate);
 
-        // Set current time
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         String currentTime = timeFormat.format(calendar.getTime());
         binding.startTime.setText(currentTime);
@@ -139,6 +148,7 @@ public class EventCreationFragment extends Fragment {
         binding.endTime.setText(endTime);
     }
 
+    // Validates that all required input fields are filled
     private boolean validateInputs() {
         return !binding.title.getText().toString().isEmpty() &&
                 !binding.address.getText().toString().isEmpty() &&
@@ -147,6 +157,7 @@ public class EventCreationFragment extends Fragment {
                 !binding.description.getText().toString().isEmpty();
     }
 
+    // Opens the gallery for the user to select an image
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -164,7 +175,7 @@ public class EventCreationFragment extends Fragment {
             }
     );
 
-    // Upload image to Firebase Storage and get the download URL
+    // Uploads image to Firebase Storage and retrieves the download URL
     private void uploadImageToFirebase(Uri imageUri) {
         Image image = new Image("1234567890", "123456789");
         image.upload(imageUri, task -> {
@@ -176,13 +187,14 @@ public class EventCreationFragment extends Fragment {
     }
 
     private void createEventInFirestore() {
+        // Generate a new event or update existing one based on user input
         String eventTitle = binding.title.getText().toString();
         String eventDescription = binding.description.getText().toString();
         String promoQrCodeId = generateRandomQrCodeId(10);
         String waitingListQrCodeId = generateRandomQrCodeId(10);
         String date = binding.date.getText().toString() + ", " + binding.startTime.getText().toString() + " - " + binding.endTime.getText().toString();
 
-        if (event==null){
+        if (event == null) {
             Event newEvent = new Event(
                     "123456789",
                     "1234567890",
@@ -202,7 +214,7 @@ public class EventCreationFragment extends Fragment {
             );
 
             pushEventToFirestore(newEvent);
-        }else{
+        } else {
             Event newEvent = new Event(
                     event.getEventId(),
                     event.getOrganizerId(),
@@ -239,7 +251,6 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
-
     private void pushEventToFirestore(Event event) {
         eventViewModel.addEvent(event, new OnCompleteListener<Object>() {
             @Override
@@ -260,7 +271,7 @@ public class EventCreationFragment extends Fragment {
                 Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).navigateUp();
             } else {
-                Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), "Failed to delete event", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -290,7 +301,7 @@ public class EventCreationFragment extends Fragment {
         datePicker.show();
     }
 
-    private void pickTime(boolean b){
+    private void pickTime(boolean isStartTime) {
         Calendar calendar = Calendar.getInstance();
         TimePickerDialog timePicker = new TimePickerDialog(requireActivity(), (timeView, hourOfDay, minute) -> {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -299,7 +310,7 @@ public class EventCreationFragment extends Fragment {
             SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
             String formattedTime = timeFormat.format(calendar.getTime());
 
-            if (b) {
+            if (isStartTime) {
                 binding.startTime.setText(formattedTime);
             } else {
                 binding.endTime.setText(formattedTime);
@@ -309,3 +320,20 @@ public class EventCreationFragment extends Fragment {
         timePicker.show();
     }
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT:
+ * - "Implementing an image picker in Android Fragment."
+ * - "Managing Firebase Firestore data for UI fragments."
+ *
+ * Stack Overflow:
+ * - "How to open the image gallery in an Android Fragment." - https://stackoverflow.com/questions/5309190/android-pick-image-from-gallery
+ * - "Using DatePickerDialog and TimePickerDialog in Fragment." - https://stackoverflow.com/questions/18634750/how-to-use-datepicker-in-fragment
+ *
+ * Android Developer Documentation:
+ * - [Firebase Firestore for Android](https://firebase.google.com/docs/firestore) - Documentation on Firestore integration.
+ * - [Fragments and Navigation](https://developer.android.com/guide/navigation) - Guidance on using navigation with Fragments.
+ * - [Displaying Date and Time Pickers](https://developer.android.com/guide/topics/ui/controls/pickers) - Documentation for using date and time pickers.
+ */
