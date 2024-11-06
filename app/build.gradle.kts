@@ -66,21 +66,21 @@ dependencies {
     implementation(libs.zxing.android)
 
     // Play Services for Background Tasks
-    implementation("com.google.android.gms:play-services-tasks:18.2.0")
+    implementation(libs.play.services.tasks)
 
     // Firebase Bills of Materials for Version Alignment
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation("com.google.firebase:firebase-firestore:25.1.1")
-    implementation("com.google.firebase:firebase-auth:version")
-    implementation("com.google.firebase:firebase-firestore:version")
+    implementation(libs.firebase.bom)
+    implementation(libs.firebase.firestore)
+    implementation(libs.google.firebase.auth)
 
     // Testing Libraries
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.junit.jupiter)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.navigation.testing)
-
-    val nav_version = "2.8.3"
 
     // Jetpack Compose Integration
     implementation(libs.navigation.compose)
