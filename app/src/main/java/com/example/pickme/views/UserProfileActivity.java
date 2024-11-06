@@ -11,14 +11,18 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileActivity extends AppCompatActivity {
 
     private TextView profileFullName, profileEmailAddress, profileContactNumber;
     private SwitchCompat profileLocationSwitch, profileNotificationOrganizerSwitch, profileNotificationAdminSwitch;
+    private CircleImageView profilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,7 @@ public class UserProfileActivity extends AppCompatActivity {
         profileLocationSwitch = findViewById(R.id.profileLocationSwitch);
         profileNotificationOrganizerSwitch = findViewById(R.id.profileNotificationOrganizerSwitch);
         profileNotificationAdminSwitch = findViewById(R.id.profileNotificationAdminSwitch);
-        // TODO: Add the Profile Pictures initialization here
+        profilePicture = findViewById(R.id.profilePicture);
         ImageButton editButton = findViewById(R.id.profileEditButton);
         Button editGoBackButton = findViewById(R.id.profileMainGoBackButton);
 
@@ -53,7 +57,9 @@ public class UserProfileActivity extends AppCompatActivity {
             profileLocationSwitch.setChecked(user.isGeoLocationEnabled());
             profileNotificationOrganizerSwitch.setChecked(user.isNotificationEnabled());
             profileNotificationAdminSwitch.setChecked(user.isAdmin());
-            // TODO: Load the Profile Picture using user.getProfilePictureUrl();
+            Glide.with(this)
+                    .load(user.getProfilePictureUrl())
+                    .into(profilePicture);
         } else {
             Toast.makeText(this, "User data not available.", Toast.LENGTH_SHORT).show();
         }
@@ -76,7 +82,6 @@ public class UserProfileActivity extends AppCompatActivity {
         user.setGeoLocationEnabled(profileLocationSwitch.isChecked());
         user.setNotificationEnabled(profileNotificationOrganizerSwitch.isChecked());
         user.setAdmin(profileNotificationAdminSwitch.isChecked());
-        // TODO: Save the Profile Picture by setting and using what ever validation cases you need.
     }
 
     private void saveUserToFirestore(User user) {
