@@ -192,3 +192,23 @@ public class EventViewModelTest {
         assertFalse(availableSpots);  // No available spots in this test case
     }
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT:
+ * - "How do I structure Mockito test methods to handle different scenarios?"
+ * - "What are best practices for handling Task completion in Firebase testing?"
+ * - "Mockito best practices for verifying repository interactions."
+ *
+ * Stack Overflow:
+ * - "How to mock Firestore queries and Task objects in JUnit tests." - https://stackoverflow.com/questions/57276718/how-to-mock-firestore-queries-for-unit-tests
+ * - "JUnit vs AssertJ: Choosing assert methods in Android tests." - https://stackoverflow.com/questions/43988538/assertj-vs-junit-assertions-for-unit-testing-in-java
+ *
+ * Firebase Documentation:
+ * - [Firestore Testing and Debugging](https://firebase.google.com/docs/firestore/extend-with-functions)
+ *
+ * Mockito Documentation:
+ * - [ArgumentMatchers in Mockito](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/ArgumentMatchers.html)
+ * - [Verification in Mockito](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#verification)
+ */

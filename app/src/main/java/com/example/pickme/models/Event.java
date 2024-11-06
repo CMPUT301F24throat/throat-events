@@ -51,9 +51,7 @@ public class Event implements Serializable {
     }
 
     // Getters and Setters
-    public String getEventId() {
-        return eventId;
-    }
+    public String getEventId() {return eventId;}
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
