@@ -44,6 +44,17 @@
         app:layout_constraintTop_toBottomOf="@+id/editProfileGoBackButton"
         tools:ignore="MissingConstraints" />
 
+    <ImageButton
+        android:id="@+id/removeProfilePicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Tap to remove your profile picture"
+        android:src="@drawable/ic_close"
+        android:background="@drawable/rounded_button"
+        android:padding="4dp"
+        app:layout_constraintStart_toEndOf="@+id/editProfilePicture"
+        app:layout_constraintTop_toTopOf="@+id/editProfilePicture" />
+
     <TextView
         android:id="@+id/profilePictureInstructions"
         style="@style/Widget.AppCompat.TextView"

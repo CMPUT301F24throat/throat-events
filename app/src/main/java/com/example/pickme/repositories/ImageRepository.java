@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.example.pickme.models.Image;
 import com.example.pickme.utils.GalleryAdapter;
 import com.example.pickme.utils.ImageQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -111,23 +112,23 @@ public class ImageRepository {
                 });
     }
 
-    /**
+     /**
      * Uploads a new image or updates an existing one with attached URI to FirebaseStorage,
      * then stores the image information to Firestore DB.
      *
      * @param i The image object to upload
      * @param uri The image URI to be attached
      */
-    public void upload(@NonNull Image i, @NonNull Uri uri) {
+    public void upload(@NonNull Image i, @NonNull Uri uri, OnCompleteListener<Image> listener) {
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
-                update(doc, i.getUploaderId(), uri);
+                update(i, doc, uri, listener);
             }
 
             @Override
             public void noDuplicate() {
-                uploadFile(i, uri);
+                uploadFile(i, uri, listener);
             }
         });
     }
@@ -137,7 +138,7 @@ public class ImageRepository {
      * @param i The image object to upload
      * @param uri The image URI to be attached
      */
-    private void uploadFile(@NonNull Image i, @NonNull Uri uri) {
+    private void uploadFile(@NonNull Image i, @NonNull Uri uri, OnCompleteListener<Image> listener) {
 
         String uploaderId = i.getUploaderId();
 
@@ -163,9 +164,7 @@ public class ImageRepository {
                                     transaction.set(imgDoc, i);
                                     return i;
                                 })
-                                .addOnSuccessListener(image ->
-                                        Log.d(TAG, String.format("upload: Document %s upload successful", imageId))
-                                );
+                                .addOnCompleteListener(listener);
                     });
                 });
     }
@@ -175,62 +174,64 @@ public class ImageRepository {
      * @param i Image object of which the URL being uploaded is associated with
      * @param imageUrl The URL to upload
      */
-    public void uploadUrl(@NonNull Image i, Uri imageUrl) {
+    public void uploadUrl(@NonNull Image i, Uri imageUrl, OnCompleteListener<Image> listener) {
         i.setImageUrl(imageUrl.toString());
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
-                String imageId = doc.getId();
-                doc.update("imageUrl", imageUrl)
-                        .addOnSuccessListener(unused ->
-                                Log.d(TAG, String.format("update: Document %s updated", imageId))
-                        );
-            }
+                db
+                        .runTransaction(transaction -> {
+                            transaction.set(doc, i);
+                            return i;
+                        })
+                        .addOnCompleteListener(listener);
+                }
 
             @Override
             public void noDuplicate() {
                 DocumentReference imgDoc = imgCollection.document();
-                String imageId = imgDoc.getId();
                 db
                         .runTransaction(transaction -> {
                             transaction.set(imgDoc, i);
                             return i;
                         })
-                        .addOnSuccessListener(image ->
-                                Log.d(TAG, String.format("uploadUrl: Document %s upload successful", imageId))
-                        );
+                        .addOnCompleteListener(listener);
             }
         });
     }
 
     /**
      * upload() helper function to update existing images
+     * @param i Image object of which the URL being uploaded is associated with
      * @param doc The document reference from the query result to update
-     * @param uploaderId The uploaderId of the existing images
      * @param uri The uri to update with
      */
-    private void update(DocumentReference doc, String uploaderId, Uri uri) {
+    private void update(Image i, DocumentReference doc, Uri uri, OnCompleteListener<Image> listener) {
 
         String imageId = doc.getId();
+        String uploaderId = i.getUploaderId();
         StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
 
         // update storage file
         imgRef
-                .putFile(uri)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, String.format("update: File %s updated", imageId));
+            .putFile(uri)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, String.format("update: File %s updated", imageId));
 
-                        // update document
-                        imgRef.getDownloadUrl().addOnSuccessListener(url -> {
-                            // db store
-                            doc.update("imageUrl", url)
-                                    .addOnSuccessListener(unused ->
-                                            Log.d(TAG, String.format("update: Document %s updated", imageId))
-                                    );
-                        });
-                    }
-                });
+                    // update document
+                    imgRef.getDownloadUrl().addOnSuccessListener(url -> {
+                        // db store
+                        i.setImageUrl(url.toString());
+                        db
+                                .runTransaction(transaction -> {
+                                    transaction.set(doc, i);
+                                    return i;
+                                })
+                                .addOnCompleteListener(listener);
+                    });
+                }
+            });
     }
 
     /**
@@ -274,7 +275,7 @@ public class ImageRepository {
      * Delete an image from Firestore db.
      * @param i Image object to be deleted
      */
-    public void delete(@NonNull Image i) {
+    public void delete(@NonNull Image i, OnCompleteListener<Image> listener) {
 
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
@@ -307,20 +308,18 @@ public class ImageRepository {
                                     .delete()
                                     .addOnCompleteListener(deleteFileTask -> {
                                         if (deleteFileTask.isSuccessful()) {
-                                            Log.d(TAG, String.format("delete: File %s deleted", imageId));
+                                            Log.d(TAG, "DB: Deleting document " + imageId);
+                                            db
+                                                    .runTransaction(transaction -> {
+                                                        transaction.delete(doc);
+                                                        return i;
+                                                    })
+                                                    .addOnCompleteListener(listener);
                                         } else {
                                             Log.d(TAG, String.format("delete: File %s deletion failed!", imageId));
                                         }
                                     });
-                            Log.d(TAG, "DB: Deleting document " + imageId);
-                            doc.delete()
-                                    .addOnCompleteListener(deleteDocTask -> {
-                                        if (deleteDocTask.isSuccessful()) {
-                                            Log.d(TAG, String.format("delete: Document %s deleted", imageId));
-                                        } else {
-                                            Log.d(TAG, String.format("delete: Document %s deletion failed!", imageId));
-                                        }
-                                    });
+
                         } else {
                             Log.d(TAG, "delete: Query returned empty, no deletion occurred");
                         }

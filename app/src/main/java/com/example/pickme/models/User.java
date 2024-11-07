@@ -1,8 +1,10 @@
 package com.example.pickme.models;
 
 import androidx.annotation.NonNull;
+
 import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.Timestamp;
+
 import java.io.Serializable;
 
 /**
@@ -53,7 +55,7 @@ public class User implements Serializable {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.contactNumber = contactNumber;
-        this.profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : defaultProfilePictureUrl;
+        this.profilePictureUrl = profilePictureUrl;
         this.deviceId = deviceId;
         this.isAdmin = isAdmin;
         this.notificationEnabled = notificationEnabled;

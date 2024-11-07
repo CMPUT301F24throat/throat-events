@@ -5,14 +5,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * An entry point for the app and is responsible for user authentication.
@@ -28,6 +36,9 @@ public class UserProfileEditActivity extends AppCompatActivity {
 
     private EditText editProfileFirstName, editProfileLastName, editProfileEmailAddress, editProfileContactNumber;
     private SwitchCompat editEnableAdminView;
+    private CircleImageView editProfilePicture;
+    private ImageButton removeProfilePicture;
+    private Image img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +51,52 @@ public class UserProfileEditActivity extends AppCompatActivity {
         editProfileEmailAddress = findViewById(R.id.editProfileEmailAddress);
         editProfileContactNumber = findViewById(R.id.editProfileContactNumber);
         editEnableAdminView = findViewById(R.id.editEnableAdminView);
-        // TODO: Add the Profile Pictures initialization here
+        editProfilePicture = findViewById(R.id.editProfilePicture);
+        removeProfilePicture = findViewById(R.id.removeProfilePicture);
         Button saveButton = findViewById(R.id.editSaveButton);
         Button goBackButton = findViewById(R.id.editProfileGoBackButton);
 
         loadUserData();
+
+        // profile image gallery picker
+        ActivityResultLauncher<PickVisualMediaRequest> pickPfp =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // callback is invoked after the user selects a media item or closes the photo picker
+                    if (uri != null) {
+                        // uploads the image selected
+                        img.upload(uri, task -> {
+                            if (task.isSuccessful()) {
+                                Image i = task.getResult();
+                                img.setImageUrl(i.getImageUrl());
+                                // preview
+                                Glide.with(editProfilePicture.getRootView())
+                                        .load(img.getImageUrl())
+                                        .into(editProfilePicture);
+                            }
+                        });
+
+                        Toast.makeText(
+                                this,
+                                "Profile picture uploaded!",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
+
+        // launches the gallery picker when the user clicks the profile picture
+        editProfilePicture.setOnClickListener(v -> {
+            pickPfp.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        });
+
+        removeProfilePicture.setOnClickListener(v -> {
+            img.generate(task -> Toast.makeText(this, "Profile picture deleted.", Toast.LENGTH_SHORT).show());
+            Glide.with(editProfilePicture.getRootView())
+                    .load(img.getImageUrl())
+                    .into(editProfilePicture);
+        });
 
         // Sets up the response to if the user wants to save their information.
         saveButton.setOnClickListener(v -> {
@@ -67,8 +119,11 @@ public class UserProfileEditActivity extends AppCompatActivity {
             editProfileEmailAddress.setText(user.getEmailAddress());
             editProfileContactNumber.setText(user.getContactNumber());
             editEnableAdminView.setChecked(user.isAdmin());
-            // TODO: Load the Profile Picture using user.getProfilePictureUrl();
 
+            img = new Image(user.getUserId(), user.getUserId());
+            Glide.with(editProfilePicture.getRootView())
+                    .load(user.getProfilePictureUrl())
+                    .into(editProfilePicture);
         } else {
             Toast.makeText(this, "User data not available.", Toast.LENGTH_SHORT).show();
         }
@@ -81,7 +136,6 @@ public class UserProfileEditActivity extends AppCompatActivity {
         String lastName = editProfileLastName.getText().toString().trim();
         String emailAddress = editProfileEmailAddress.getText().toString().trim();
         String contactNumber = editProfileContactNumber.getText().toString().trim();
-        // TODO: Save the Profile Picture using user.getProfilePictureUrl();
 
         // Validates firstName
         if (User.validateFirstName(firstName)) {
@@ -137,6 +191,7 @@ public class UserProfileEditActivity extends AppCompatActivity {
         user.setLastName(editProfileLastName.getText().toString().trim());
         user.setEmailAddress(editProfileEmailAddress.getText().toString().trim());
         user.setContactNumber(editProfileContactNumber.getText().toString().trim());
+        user.setProfilePictureUrl(img.getImageUrl());
     }
 
     //---------- Activity Redirection --------------------

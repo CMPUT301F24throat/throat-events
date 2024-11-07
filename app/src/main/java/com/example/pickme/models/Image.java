@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.example.pickme.models.Enums.ImageType;
 import com.example.pickme.repositories.ImageRepository;
 import com.example.pickme.utils.ImageQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.Timestamp;
 
 /**
@@ -124,8 +125,8 @@ public class Image {
      *
      * @param imageUri The image URI to be attached; obtained from gallery picker
      */
-    public void upload(@NonNull Uri imageUri) {
-        ir.upload(this, imageUri);
+    public void upload(@NonNull Uri imageUri, OnCompleteListener<Image> listener) {
+        ir.upload(this, imageUri, listener);
     }
 
     /**
@@ -142,16 +143,16 @@ public class Image {
     /**
      * Delete the image from Firestore DB with query matching this image class.
      */
-    public void delete() {
-        ir.delete(this);
+    public void delete(OnCompleteListener<Image> listener) {
+        ir.delete(this, listener);
     }
 
     /**
      * Generates a random image from the uploader ID.
      */
-    public void generate() {
+    public void generate(OnCompleteListener<Image> listener) {
         Uri url = Uri.parse(String.format("https://www.gravatar.com/avatar/%s?s=55&d=identicon&r=PG", this.uploaderId));
-        ir.uploadUrl(this, url);
+        ir.uploadUrl(this, url, listener);
     }
 
     //endregion
