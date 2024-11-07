@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.example.pickme.databinding.EvenEventSignUpBinding;
+import com.example.pickme.databinding.EventEventSignUpBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
@@ -31,13 +31,13 @@ import com.example.pickme.utils.ImageQuery;
  */
 
 public class EventSignUpFragment extends Fragment {
-    private EvenEventSignUpBinding binding;
+    private EventEventSignUpBinding binding;
     private Event event;
 
     // Inflates the layout for event details view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = EvenEventSignUpBinding.inflate(getLayoutInflater(), container, false);
+        binding = EventEventSignUpBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 
