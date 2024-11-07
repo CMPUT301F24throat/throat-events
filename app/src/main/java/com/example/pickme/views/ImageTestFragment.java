@@ -76,12 +76,15 @@ public class ImageTestFragment extends Fragment {
                     if (uri != null) {
 
                         Image image = new Image(user1.getUserId(), user1.getUserId());
-                        image.upload(uri);
+                        image.upload(uri, task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(
+                                        view.getContext(),
+                                        "Profile picture uploaded for user: " + user1.getUserId(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
-                        Toast.makeText(
-                                view.getContext(),
-                                "Profile picture uploaded for user: " + user1.getUserId(),
-                                Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                         Toast.makeText(
@@ -97,12 +100,15 @@ public class ImageTestFragment extends Fragment {
                     if (uri != null) {
 
                         Image image = new Image(user1.getUserId(), event1.getEventId());
-                        image.upload(uri);
+                        image.upload(uri, task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(
+                                        view.getContext(),
+                                        "Profile picture uploaded for user: " + user1.getUserId(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
-                        Toast.makeText(
-                                view.getContext(),
-                                "Profile picture uploaded for user: " + user1.getUserId(),
-                                Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                         Toast.makeText(
@@ -125,11 +131,10 @@ public class ImageTestFragment extends Fragment {
         });
 
         Button uploadEPButton = view.findViewById(R.id.uploadEPButton) ;
-        uploadEPButton.setOnClickListener(view1 -> {
-            pickEP.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build());
-        });
+        uploadEPButton.setOnClickListener(view1 ->
+                pickEP.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build()));
 
         // downloads
         ImageView imageView = view.findViewById(R.id.imageView);
@@ -137,7 +142,7 @@ public class ImageTestFragment extends Fragment {
         Button generateButton = view.findViewById(R.id.generatePfpButton);
         generateButton.setOnClickListener(view1 -> {
             Image image = new Image(user1.getUserId(), user1.getUserId());
-            image.generate();
+            image.generate(task -> Log.d(TAG, "image generated"));
             Glide.with(view)
                     .load(image.getImageUrl())
                     .into(imageView);
@@ -172,8 +177,6 @@ public class ImageTestFragment extends Fragment {
 
         Button downloadEPButton = view.findViewById(R.id.downloadEPButton);
         downloadEPButton.setOnClickListener(view1 -> {
-            ImageRepository ir = new ImageRepository();
-
             // clears the imageview
             imageView.setImageResource(0);
 
@@ -196,13 +199,13 @@ public class ImageTestFragment extends Fragment {
         Button deletePfpButton = view.findViewById(R.id.deletePfpButton);
         deletePfpButton.setOnClickListener(view1 -> {
             Image image = new Image(user1.getUserId(), user1.getUserId());
-            image.delete();
+            image.delete(task -> Log.d(TAG, "deletion successful"));
         });
 
         Button deleteEPButton = view.findViewById(R.id.deleteEPButton);
         deleteEPButton.setOnClickListener(view1 -> {
             Image image = new Image(user1.getUserId(), event1.getEventId());
-            image.delete();
+            image.delete(task -> Log.d(TAG, "deletion successful"));
         });
 
         // get all in gallery

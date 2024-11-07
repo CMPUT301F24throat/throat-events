@@ -141,7 +141,7 @@
         app:layout_constraintTop_toBottomOf="@+id/homeRecentText"
         tools:ignore="MissingConstraints" />
 
-    <ImageButton
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/homeProfileButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -150,8 +150,7 @@
         android:background="@drawable/rounded_button"
         android:contentDescription="Click to go to profile"
         android:elevation="1dp"
-        android:padding="5dp"
-        android:src="@drawable/ic_profile_name"
+        android:padding="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

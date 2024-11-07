@@ -3,6 +3,7 @@ agp = "8.7.1"
 compiler = "4.15.1"
 circleimageview = "3.1.0"
 coreVersion = "3.5.0"
+firebaseAuth = "version"
 glide = "4.16.0"
 javase = "3.5.0"
 junit = "4.13.2"
@@ -17,12 +18,16 @@ firebaseInappmessaging = "21.0.1"
 firebaseFirestore = "24.0.0"
 firebaseStorage = "21.0.1"
 firebaseBom = "33.5.0"
+mockitoJunitJupiter = "4.0.0"
+mockitoCore = "4.0.0"
 navigationCompose = "2.8.3"
 navigationDynamicFeaturesFragment = "2.8.3"
 navigationFragment = "2.8.3"
 navigationTesting = "2.8.3"
 navigationUi = "2.8.3"
 firebaseDatabase = "21.0.0"
+junitJupiter = "5.8.1"
+playServicesTasks = "18.2.0"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -33,6 +38,7 @@ circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circ
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+google-firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 javase = { module = "com.google.zxing:javase", version.ref = "javase" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -42,6 +48,9 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
+play-services-tasks = { module = "com.google.android.gms:play-services-tasks", version.ref = "playServicesTasks" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockitoJunitJupiter" }
 zxing-core = { group = "com.google.zxing", name = "core", version = "3.5.1" }
 zxing-android = { group = "com.journeyapps", name = "zxing-android-embedded", version = "4.3.0" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -51,6 +60,7 @@ navigation-testing = { module = "androidx.navigation:navigation-testing", versio
 navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUi" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 zxing-core-v350 = { module = "com.google.zxing:core", version.ref = "coreVersion" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 
 
 [plugins]

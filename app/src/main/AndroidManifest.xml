@@ -18,15 +18,6 @@
         tools:targetApi="31"
         tools:ignore="ExtraText">
         <activity
-            android:name=".views.EventsListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".views.EventCreationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".views.EventDetailsActivity"
-            android:exported="false" />
-        <activity
             android:name=".views.MainActivity"
             android:exported="true">
             <intent-filter>
