@@ -2,16 +2,23 @@
 package com.example.pickme.views.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pickme.R;
 import com.example.pickme.databinding.EventsItemViewBinding;
 import com.example.pickme.models.Event;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
     private List<Event> eventList;
@@ -51,19 +58,49 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
         public void bind(Event event, OnEventClickListener listener) {
-            String[] dateParts = event.getEventDate().split(",", 2);
+            String eventDateTime = event.getEventDate(); // e.g., "October 5 2024, 7:00 PM - 8:00 PM"
+            String[] parts = eventDateTime.split(", ");
 
-            if (dateParts.length > 1) {
-                binding.time.setText(dateParts[1].trim()); // Set time part
-            } else {
-                binding.time.setText(event.getEventDate());
+            // Extract date and times from the string
+            if (parts.length == 2) {
+                String datePart = parts[0].trim();
+                String timePart = parts[1].trim();
+
+                // Set the time view with the parsed time part
+                binding.time.setText(timePart);
+                binding.title.setText(event.getEventTitle());
+                binding.address.setText(event.getEventLocation());
+
+                // Parse the date and end time
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a", Locale.getDefault());
+                SimpleDateFormat endTimeFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a", Locale.getDefault());
+
+                try {
+                    Date startDate = dateFormat.parse(datePart + ", " + timePart.split(" - ")[0]);
+                    Date endDate = endTimeFormat.parse(datePart + ", " + timePart.split(" - ")[1]);
+
+                    // Get the current date and time
+                    Date currentDate = new Date();
+
+                    if (endDate != null && endDate.before(currentDate)) {
+                        // If the event has ended, set the title text color to gray
+                        binding.title.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text3));
+                        binding.time.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text3));
+                        binding.address.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text3));
+                    } else {
+                        // If the event is still upcoming or ongoing, use the default color
+                        binding.title.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.white));
+                        binding.time.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.white));
+                        binding.address.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.white));
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    binding.title.setTextColor(Color.BLACK); // Default color in case of parse failure
+                }
+
+                // Set the click listener to notify the fragment
+                binding.parent.setOnClickListener(v -> listener.onEventClick(event));
             }
-
-            binding.title.setText(event.getEventTitle());
-            binding.address.setText(event.getEventLocation());
-
-            // Set the click listener to notify the fragment
-            binding.parent.setOnClickListener(v -> listener.onEventClick(event));
         }
     }
 
