@@ -121,8 +121,9 @@ public class UserProfileEditActivity extends AppCompatActivity {
             editEnableAdminView.setChecked(user.isAdmin());
 
             img = new Image(user.getUserId(), user.getUserId());
+            img.setImageUrl(user.getProfilePictureUrl());
             Glide.with(editProfilePicture.getRootView())
-                    .load(user.getProfilePictureUrl())
+                    .load(img.getImageUrl())
                     .into(editProfilePicture);
         } else {
             Toast.makeText(this, "User data not available.", Toast.LENGTH_SHORT).show();
