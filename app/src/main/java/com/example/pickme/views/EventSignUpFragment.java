@@ -62,8 +62,8 @@ public class EventSignUpFragment extends Fragment {
             binding.description.setText(event.getEventDescription());
             binding.date.setText(event.getEventDate());
             binding.address.setText(event.getEventLocation());
-            binding.winners.setText(event.getMaxWinners() + " Winners");
-            binding.entrants.setText(event.getEntrants()+" / "+event.getMaxEntrants() + " Entrants");
+            binding.winners.setText(event.getMaxWinners() + (Integer.parseInt(event.getMaxWinners()) == 1 ? " Winner" : " Winners"));
+            binding.entrants.setText(event.getEntrants() + " / " +event.getMaxEntrants()+ (event.getEntrants() == 1 ? " Entrant" : " Entrants"));
 
             // Load the event flyer image using Glide
             Image image = new Image("1234567890", "123456789");
