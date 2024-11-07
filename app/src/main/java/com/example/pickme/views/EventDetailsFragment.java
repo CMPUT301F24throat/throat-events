@@ -79,14 +79,14 @@ public class EventDetailsFragment extends Fragment {
  * Code Sources
  *
  * ChatGPT:
- * - "How to navigate fragments and handle back navigation in Android."
+ * - How to navigate fragments and handle back navigation in Android.
  *
  * Stack Overflow:
- * - "Using Glide to load images into ImageView in a Fragment" - https://stackoverflow.com/questions/23978828/how-to-use-glide-in-fragment-to-load-image
- * - "Passing data between fragments using Android Architecture Components" - https://stackoverflow.com/questions/51075486/passing-data-between-fragments-using-android-architecture-components
+ * - Using Glide to load images into ImageView in a Fragment
+ * - Passing data between fragments using Android Architecture Components
  *
  * Android Developer Documentation:
- * - [Fragment Lifecycle](https://developer.android.com/guide/fragments/lifecycle) - Guidelines for managing fragment lifecycle.
- * - [Navigating with Fragments](https://developer.android.com/guide/navigation/navigation-getting-started) - Handling fragment navigation.
- * - [Using Glide for Image Loading](https://bumptech.github.io/glide/) - Documentation on image loading with Glide.
+ * - Fragment Lifecycle - Guidelines for managing fragment lifecycle.
+ * - Navigating with Fragments - Handling fragment navigation.
+ * - Using Glide for Image Loading - Documentation on image loading with Glide.
  */

@@ -158,19 +158,19 @@ public class EventTest {
  * Code Sources
  *
  * ChatGPT:
- * - "JUnit 4: Testing exception handling for invalid inputs."
- * - "Handling assertions for null values and edge cases."
- * - "JUnit 4 best practices for validating expected exceptions."
+ * - JUnit 4: Testing exception handling for invalid inputs.
+ * - Handling assertions for null values and edge cases.
+ * - JUnit 4 best practices for validating expected exceptions.
  *
  * Stack Overflow:
- * - "Validating method arguments in Java: IllegalArgumentException." - https://stackoverflow.com/questions/19751794/throwing-illegalargumentexception-if-argument-not-valid
- * - "Best practices for JUnit 4 testing with custom error messages." - https://stackoverflow.com/questions/27666035/junit-asserting-meaningful-error-messages
+ * - Validating method arguments in Java: IllegalArgumentException.
+ * - Best practices for JUnit 4 testing with custom error messages.
  *
  * Java Documentation:
- * - [Java String class methods and formatting techniques](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html)
+ * - Java String class methods and formatting techniques
  *
  * JUnit 4 Documentation:
- * - [Assertions and Exception handling in JUnit 4](https://junit.org/junit4/javadoc/4.13/org/junit/Assert.html)
+ * - Assertions and Exception handling in JUnit 4
  */
 
 

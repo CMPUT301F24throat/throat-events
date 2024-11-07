@@ -56,8 +56,8 @@ public class EventTestFragment extends Fragment {
  * Code Sources
  *
  * Stack Overflow:
- * - "Firebase initialization in fragment lifecycle" - https://stackoverflow.com/questions/39758063/initialize-firebase-in-android-fragment
+ * - Firebase initialization in fragment lifecycle
  *
  * Android Developers:
- * - [Setting up navigation between fragments](https://developer.android.com/guide/navigation/navigation-getting-started) - Guide on using the Navigation component to transition between fragments.
+ * - Setting up navigation between fragments - Guide on using the Navigation component to transition between fragments.
  */

@@ -85,14 +85,14 @@ public class EventRepository {
  * Code Sources
  *
  * Firebase Documentation:
- * - [Firestore Transactions and Batched Writes](https://firebase.google.com/docs/firestore/manage-data/transactions) - Guidelines on implementing transactions for atomic operations.
- * - [CRUD Operations in Firestore](https://firebase.google.com/docs/firestore/query-data/get-data) - Documentation on creating, reading, updating, and deleting data.
- * - [Firestore Exception Handling](https://firebase.google.com/docs/firestore/manage-errors) - Handling Firestore transaction and request failures.
+ * - Firestore Transactions and Batched Writes
+ * - CRUD Operations in Firestore
+ * - Firestore Exception Handling
  *
  * Stack Overflow:
- * - "How to use runTransaction for Firestore CRUD operations" - https://stackoverflow.com/questions/50742963/how-to-use-runtransaction-in-firestore
- * - "Firestore transaction error handling and best practices" - https://stackoverflow.com/questions/49912948/how-to-handle-firestore-transaction-failures
+ * - How to use runTransaction for Firestore CRUD operations
+ * - Firestore transaction error handling and best practices
  *
  * Java Documentation:
- * - [Handling Completion Listeners in Firebase](https://firebase.google.com/docs/reference/android/com/google/android/gms/tasks/OnCompleteListener) - Documentation on using `OnCompleteListener` with Firestore operations.
+ * - Handling Completion Listeners in Firebase Documentation on using `OnCompleteListener` with Firestore operations.
  */

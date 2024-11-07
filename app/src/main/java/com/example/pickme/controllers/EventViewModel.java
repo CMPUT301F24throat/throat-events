@@ -129,13 +129,13 @@ public class EventViewModel {
  * Code Sources
  *
  * Firebase Documentation:
- * - [Firestore Data Model](https://firebase.google.com/docs/firestore/data-model) - Details on how to structure data in Firestore.
- * - [Transaction Management in Firestore](https://firebase.google.com/docs/firestore/manage-data/transactions) - Best practices for handling transaction-based operations.
+ * - Firestore Data Model- Details on how to structure data in Firestore.
+ * - Transaction Management in Firestore - Best practices for handling transaction-based operations.
  *
  * Android Developers:
- * - [Using ViewModel for Managing UI-related Data](https://developer.android.com/topic/libraries/architecture/viewmodel) - Best practices for using ViewModel in Android applications.
+ * - Using ViewModel for Managing UI-related Data - Best practices for using ViewModel in Android applications.
  *
  * Stack Overflow:
- * - "Passing data between ViewModel and Repository layers in Android." - https://stackoverflow.com/questions/46705535/passing-data-between-viewmodel-and-repository-layers
- * - "How to manage asynchronous data with OnCompleteListener in Firestore." - https://stackoverflow.com/questions/51503349/using-oncompletelistener-with-firestore-query-in-android
+ * - Passing data between ViewModel and Repository layers in Android.
+ * - How to manage asynchronous data with OnCompleteListener in Firestore.
  */

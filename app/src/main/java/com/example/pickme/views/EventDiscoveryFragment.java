@@ -100,13 +100,13 @@ public class EventDiscoveryFragment extends Fragment implements EventDiscoverdap
  * Code Sources
  *
  * Stack Overflow:
- * - "Setting up RecyclerView with search filtering" - https://stackoverflow.com/questions/30398247/how-to-filter-a-recyclerview-with-a-searchview
- * - "Passing data between fragments with Navigation Component" - https://stackoverflow.com/questions/51075486/passing-data-between-fragments-using-android-architecture-components
+ * - Setting up RecyclerView with search filtering
+ * - Passing data between fragments with Navigation Component
  *
  * Firebase Documentation:
- * - [Firestore: Data fetching and filtering](https://firebase.google.com/docs/firestore/query-data/get-data) - Methods for querying and retrieving data.
+ * - Firestore: Data fetching and filtering
  *
  * Android Developers:
- * - [Implementing RecyclerView](https://developer.android.com/guide/topics/ui/layout/recyclerview) - Guidelines for displaying a list with RecyclerView.
- * - [Fragment navigation with arguments](https://developer.android.com/guide/navigation/navigation-pass-data) - Navigating and passing data between fragments with the Navigation component.
+ * - Implementing RecyclerView Guidelines for displaying a list with RecyclerView.
+ * - Fragment navigation with arguments - Navigating and passing data between fragments with the Navigation component.
  */

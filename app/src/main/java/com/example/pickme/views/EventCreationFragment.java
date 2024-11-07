@@ -333,15 +333,15 @@ public class EventCreationFragment extends Fragment {
  * Code Sources
  *
  * ChatGPT:
- * - "Implementing an image picker in Android Fragment."
- * - "Managing Firebase Firestore data for UI fragments."
+ * - Implementing an image picker in Android Fragment.
+ * - Managing Firebase Firestore data for UI fragments.
  *
  * Stack Overflow:
- * - "How to open the image gallery in an Android Fragment." - https://stackoverflow.com/questions/5309190/android-pick-image-from-gallery
- * - "Using DatePickerDialog and TimePickerDialog in Fragment." - https://stackoverflow.com/questions/18634750/how-to-use-datepicker-in-fragment
+ * - How to open the image gallery in an Android Fragment.
+ * - Using DatePickerDialog and TimePickerDialog in Fragment.
  *
  * Android Developer Documentation:
- * - [Firebase Firestore for Android](https://firebase.google.com/docs/firestore) - Documentation on Firestore integration.
- * - [Fragments and Navigation](https://developer.android.com/guide/navigation) - Guidance on using navigation with Fragments.
- * - [Displaying Date and Time Pickers](https://developer.android.com/guide/topics/ui/controls/pickers) - Documentation for using date and time pickers.
+ * - Firebase Firestore for Android
+ * - Fragments and Navigation
+ * - Displaying Date and Time Pickers- Documentation for using date and time pickers.
  */

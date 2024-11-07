@@ -84,11 +84,11 @@ public class EventListFragment extends Fragment implements EventAdapter.OnEventC
  * Code Sources
  *
  * Stack Overflow:
- * - "RecyclerView setup and data binding in Android" - https://stackoverflow.com/questions/30561646/how-to-use-recyclerview-and-cardview-in-android
+ * - RecyclerView setup and data binding in Android
  *
  * Firebase Documentation:
- * - [Firestore: Fetching and displaying collection data](https://firebase.google.com/docs/firestore/query-data/get-data) - Retrieving collections of documents from Firestore.
+ * - Firestore: Fetching and displaying collection data
  *
  * Android Developers:
- * - [Navigation components for data transfer between fragments](https://developer.android.com/guide/navigation/navigation-pass-data) - Navigating and passing data between fragments with the Navigation component.
+ * - Navigation components for data transfer between fragments]- Navigating and passing data between fragments with the Navigation component.
  */
