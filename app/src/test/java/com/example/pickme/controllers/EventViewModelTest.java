@@ -70,7 +70,7 @@ public class EventViewModelTest {
         eventViewModel = new EventViewModel(mockEventRepository); // Initialize the ViewModel with mocked repository
         eventViewModel = spy(eventViewModel);  // Spy on the ViewModel to intercept calls to fetchEvents, etc.
 
-        // Setup a sample event for testing
+        // Sample event paremeters for testing
         event = new Event("1", "organizer123", "facility456", "Sample Event",
                 "An event description", "October 5 2024, 7:00 PM",
                 "promo123", "waitingList123", "poster123",
