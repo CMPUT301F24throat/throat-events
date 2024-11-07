@@ -123,79 +123,34 @@ public class ImageRepository {
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
-                update(i, doc, uri, listener);
+                uploadUriToFirebase(i, doc, uri, listener);
             }
 
             @Override
             public void noDuplicate() {
-                uploadFile(i, uri, listener);
+                DocumentReference doc = imgCollection.document();
+                uploadUriToFirebase(i, doc, uri, listener);
             }
         });
     }
 
     /**
-     * upload() helper function for uploading new image files
-     * @param i The image object to upload
-     * @param uri The image URI to be attached
-     */
-    private void uploadFile(@NonNull Image i, @NonNull Uri uri, OnCompleteListener<Image> listener) {
-
-        String uploaderId = i.getUploaderId();
-
-        // creating document first to generate unique id
-        DocumentReference imgDoc = imgCollection.document();
-        String imageId = imgDoc.getId();
-
-        // setting child storage reference to the unique id
-        StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
-
-        // storing the image in firebasestorage
-        imgRef
-                .putFile(uri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    Log.d(TAG, String.format("upload: File %s upload successful", imageId));
-
-                    // now get the image download url
-                    imgRef.getDownloadUrl().addOnSuccessListener(url -> {
-                        // db store
-                        i.setImageUrl(url.toString());
-                        db
-                                .runTransaction(transaction -> {
-                                    transaction.set(imgDoc, i);
-                                    return i;
-                                })
-                                .addOnCompleteListener(listener);
-                    });
-                });
-    }
-
-    /**
      * Uploads an image URL to Firestore DB. Used for generated images.
      * @param i Image object of which the URL being uploaded is associated with
-     * @param imageUrl The URL to upload
+     * @param data The bytes of a bitmap to upload
      */
-    public void uploadUrl(@NonNull Image i, Uri imageUrl, OnCompleteListener<Image> listener) {
-        i.setImageUrl(imageUrl.toString());
+    public void upload(@NonNull Image i, byte[] data, OnCompleteListener<Image> listener) {
+
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
-                db
-                        .runTransaction(transaction -> {
-                            transaction.set(doc, i);
-                            return i;
-                        })
-                        .addOnCompleteListener(listener);
-                }
+                uploadBytes(i, doc, data, listener);
+            }
 
             @Override
             public void noDuplicate() {
-                DocumentReference imgDoc = imgCollection.document();
-                db
-                        .runTransaction(transaction -> {
-                            transaction.set(imgDoc, i);
-                            return i;
-                        })
-                        .addOnCompleteListener(listener);
+                DocumentReference doc = imgCollection.document();
+                uploadBytes(i, doc, data, listener);
             }
         });
     }
@@ -206,7 +161,7 @@ public class ImageRepository {
      * @param doc The document reference from the query result to update
      * @param uri The uri to update with
      */
-    private void update(Image i, DocumentReference doc, Uri uri, OnCompleteListener<Image> listener) {
+    private void uploadUriToFirebase(Image i, DocumentReference doc, Uri uri, OnCompleteListener<Image> listener) {
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
@@ -232,6 +187,34 @@ public class ImageRepository {
                     });
                 }
             });
+    }
+
+    private void uploadBytes(Image i, DocumentReference doc, byte[] data, OnCompleteListener<Image> listener) {
+
+        String imageId = doc.getId();
+        String uploaderId = i.getUploaderId();
+        StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
+
+        // update storage file
+        imgRef
+                .putBytes(data)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, String.format("update: File %s updated", imageId));
+
+                        // update document
+                        imgRef.getDownloadUrl().addOnSuccessListener(url -> {
+                            // db store
+                            i.setImageUrl(url.toString());
+                            db
+                                    .runTransaction(transaction -> {
+                                        transaction.set(doc, i);
+                                        return i;
+                                    })
+                                    .addOnCompleteListener(listener);
+                        });
+                    }
+                });
     }
 
     /**

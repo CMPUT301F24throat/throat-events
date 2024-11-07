@@ -142,7 +142,7 @@ public class ImageTestFragment extends Fragment {
         Button generateButton = view.findViewById(R.id.generatePfpButton);
         generateButton.setOnClickListener(view1 -> {
             Image image = new Image(user1.getUserId(), user1.getUserId());
-            image.generate(task -> Log.d(TAG, "image generated"));
+            image.generate("ED", task -> Log.d(TAG, "image generated"));
             Glide.with(view)
                     .load(image.getImageUrl())
                     .into(imageView);
