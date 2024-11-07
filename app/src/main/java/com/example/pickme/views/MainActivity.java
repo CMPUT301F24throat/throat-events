@@ -111,6 +111,22 @@ public class MainActivity extends AppCompatActivity {
             if(task.isSuccessful()) User.setInstance(user);
         });
 
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.i("TAG", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        Log.i("TOKEN", token);
+                    }
+                });
+
         FirebaseMessaging.getInstance().subscribeToTopic("TEST_ALL")
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override

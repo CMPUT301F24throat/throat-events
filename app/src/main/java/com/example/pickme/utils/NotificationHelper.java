@@ -17,7 +17,7 @@ import com.google.firebase.messaging.RemoteMessage;
  **/
 
 public class NotificationHelper extends FirebaseMessagingService{
-    Notification notification;
+    private Notification notification;
 
     public NotificationHelper(){
 
@@ -37,6 +37,6 @@ public class NotificationHelper extends FirebaseMessagingService{
 
     @Override
     public void onNewToken(@NonNull String token) {
-
+//        TODO: sendRegistrationToServer(token);
     }
 }

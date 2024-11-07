@@ -23,6 +23,9 @@ navigationDynamicFeaturesFragment = "2.8.3"
 navigationFragment = "2.8.3"
 navigationTesting = "2.8.3"
 navigationUi = "2.8.3"
+playServicesBaseVersion = "18.1.0"
+playServicesPhenotype = "18.0.0"
+playServicesTasks = "18.2.0"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
@@ -42,6 +45,9 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
+play-services-base-v1810 = { module = "com.google.android.gms:play-services-base", version.ref = "playServicesBaseVersion" }
+play-services-phenotype = { module = "com.google.android.gms:play-services-phenotype", version.ref = "playServicesPhenotype" }
+play-services-tasks = { module = "com.google.android.gms:play-services-tasks", version.ref = "playServicesTasks" }
 zxing-core = { group = "com.google.zxing", name = "core", version = "3.5.1" }
 zxing-android = { group = "com.journeyapps", name = "zxing-android-embedded", version = "4.3.0" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

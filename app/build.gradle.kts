@@ -43,7 +43,6 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.firebase.inappmessaging)
     implementation(libs.firebase.messaging)
-//    implementation(libs.firebase.messaging)
 
     implementation(libs.zxing.core)
     implementation(libs.zxing.android)
@@ -57,7 +56,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.circleimageview)
 
-    implementation("com.google.android.gms:play-services-tasks:18.2.0")
+    implementation(libs.play.services.tasks)
 
     val nav_version = "2.8.3"
 
