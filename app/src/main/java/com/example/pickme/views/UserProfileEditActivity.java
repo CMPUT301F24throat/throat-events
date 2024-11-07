@@ -174,7 +174,6 @@ public class UserProfileEditActivity extends AppCompatActivity {
         if (editProfilePicture.getTag() == "deleted") {
             generateProfilePicture(user, task -> {
                 Log.d("Image", "generate: New profile picture generated");
-                user.setProfilePictureUrl(img.getImageUrl());
                 updateUserInstanceWithInput(user);
                 pushUserToFirestore(user);
                 navigateToHomeActivity();
@@ -206,6 +205,7 @@ public class UserProfileEditActivity extends AppCompatActivity {
         user.setLastName(editProfileLastName.getText().toString().trim());
         user.setEmailAddress(editProfileEmailAddress.getText().toString().trim());
         user.setContactNumber(editProfileContactNumber.getText().toString().trim());
+        user.setProfilePictureUrl(img.getImageUrl());
     }
 
     private void generateProfilePicture(User user, OnCompleteListener<Image> listener) {
