@@ -25,6 +25,7 @@ import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventEventcreationBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
+import com.example.pickme.repositories.QrRepository;
 import com.example.pickme.utils.ImageQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +40,8 @@ public class EventCreationFragment extends Fragment {
     private Uri selectedImageUri;
     private Event event;
     private EventViewModel eventViewModel = new EventViewModel();
+    private QrRepository qrRepository = new QrRepository();
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

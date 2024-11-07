@@ -2,6 +2,7 @@ package com.example.pickme.controllers;
 
 import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.repositories.QrRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -12,14 +13,17 @@ public class EventViewModel {
     private Event selectedEvent;
     private ArrayList<Event> events;
     private final EventRepository eventRepository;
+    private final QrRepository qrRepository;  // QR repository for QR code creation
 
     public EventViewModel() {
         this.eventRepository = new EventRepository();
+        this.qrRepository = new QrRepository();  // Initialize QrRepository
         this.events = new ArrayList<>(); // Initialize the event list
     }
 
-    public EventViewModel(EventRepository eventRepository) {
+    public EventViewModel(EventRepository eventRepository, QrRepository qrRepository) {
         this.eventRepository = eventRepository; // Use the injected repository
+        this.qrRepository = qrRepository;
         this.events = new ArrayList<>(); // Initialize the event list
     }
 
@@ -60,8 +64,14 @@ public class EventViewModel {
             @Override
             public void onComplete(Task<Object> task) {
                 if (task.isSuccessful()) {
+                    String eventId = event.getEventId();  // Retrieve the assigned event ID
                     events.add(event); // Add the event to the local list
                     onCompleteListener.onComplete(task); // Notify completion
+
+                    // Now create the QR code associated with this eventId
+                    qrRepository.createQR("/events/" + eventId)
+                            .addOnSuccessListener(aVoid -> System.out.println("QR code created successfully"))
+                            .addOnFailureListener(e -> System.err.println("Failed to create QR code: " + e.getMessage()));
                 } else {
                     onCompleteListener.onComplete(task); // Notify failure
                 }
