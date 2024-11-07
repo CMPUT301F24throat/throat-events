@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Unit tests for the EventViewModel class using mocked EventRepository.
  * This test class verifies the ViewModel's behavior, particularly in CRUD operations,
- * data fetching, event selection, and Firestore interaction.
+ * data fetching, event selection, and Firestore interaction
  *
  * @version 1.0
  * @author Ayub Ali
