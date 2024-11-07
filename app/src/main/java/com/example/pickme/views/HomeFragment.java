@@ -14,6 +14,8 @@ import androidx.navigation.Navigation;
 
 import com.example.pickme.R;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class HomeFragment extends Fragment {
 
     @Override
@@ -28,7 +30,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ImageButton homeProfileButton = getActivity().findViewById(R.id.homeProfileButton);
+        CircleImageView homeProfileButton = getActivity().findViewById(R.id.homeProfileButton);
 
         Button imageTest = view.findViewById(R.id.btn_ImageTesting);
         imageTest.setOnClickListener(view1 -> {
