@@ -26,27 +26,49 @@
         android:label="fragment_event_test"
         tools:layout="@layout/event_test" >
         <action
-            android:id="@+id/action_eventTestFragment_to_eventCreationActivity2"
-            app:destination="@id/eventCreationActivity" />
+            android:id="@+id/action_eventTestFragment_to_eventCreationFragment"
+            app:destination="@id/eventCreationFragment" />
         <action
-            android:id="@+id/action_eventTestFragment_to_eventDetailsActivity"
-            app:destination="@id/eventDetailsActivity" />
+            android:id="@+id/action_eventTestFragment_to_eventListFragment"
+            app:destination="@id/eventListFragment" />
+        <action
+            android:id="@+id/action_eventTestFragment_to_eventDiscoveryFragment"
+            app:destination="@id/eventDiscoveryFragment" />
     </fragment>
     <fragment
         android:id="@+id/imageTestFragment"
         android:name="com.example.pickme.views.ImageTestFragment"
         android:label="fragment_image_test"
         tools:layout="@layout/image_test" />
-    <activity
-        android:id="@+id/eventCreationActivity"
-        android:name="com.example.pickme.views.EventCreationActivity"
-        android:label="event_eventcreation"
-        tools:layout="@layout/event_eventcreation" />
-    <activity
-        android:id="@+id/eventDetailsActivity"
-        android:name="com.example.pickme.views.EventDetailsActivity"
-        android:label="event_eventdetails"
+    <fragment
+        android:id="@+id/eventCreationFragment"
+        android:name="com.example.pickme.views.EventCreationFragment"
+        android:label="EventCreationFragment"
+        tools:layout="@layout/event_eventcreation"  />
+    <fragment
+        android:id="@+id/eventDetailsFragment"
+        android:name="com.example.pickme.views.EventDetailsFragment"
+        android:label="EventDetailsFragment"
         tools:layout="@layout/event_eventdetails" />
+    <fragment
+        android:id="@+id/eventListFragment"
+        android:name="com.example.pickme.views.EventListFragment"
+        android:label="EventListFragment"
+        tools:layout="@layout/event_eventslist">
+        <action
+            android:id="@+id/action_eventListFragment_to_eventCreationFragment"
+            app:destination="@id/eventCreationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/eventDiscoveryFragment"
+        android:name="com.example.pickme.views.EventDiscoveryFragment"
+        android:label="event_eventdiscovery"
+        tools:layout="@layout/event_eventdiscovery" >
+        <action
+            android:id="@+id/action_eventDiscoveryFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/createNotificationFragment"
         android:name="com.example.pickme.views.CreateNotificationFragment"

@@ -1,7 +1,6 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -77,7 +77,12 @@ public class CreateNotificationFragment extends Fragment {
 
                 NotificationRepository repo = new NotificationRepository();
 
-                repo.addNotification(notification, task -> Log.i("MYTAG", "Notification added"));
+                repo.addNotification(notification, task ->
+                        Toast.makeText(
+                        view.getContext(),
+                        "Notification Sent",
+                        Toast.LENGTH_SHORT).show());
+
                 getActivity().getOnBackPressedDispatcher().onBackPressed();
             }
         });

@@ -1,31 +1,38 @@
 package com.example.pickme.models;
 
 import androidx.annotation.NonNull;
+
 import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.Timestamp;
 
+import java.io.Serializable;
+
 /**
- * Class that can represent, validate, and stores a user in the app
+ * Class that can represent, validate, and stores a user in the app.
+ *
+ * @author Kenneth (aesoji)
+ * @version 1.2
+ *
  * Responsibilities:
  * - Models a user in the users collection.
  * - Validates user data to ensure formats match.
  * - Tracks user activity status and manages admin status.
  * - Contains full name string format.
  **/
+public class User implements Serializable {
 
-public class User {
-
+    private static final long serialVersionUID = 1L;
     private static final String defaultProfilePictureUrl = "default_profile_picture_url";
-    private final UserRepository userRepository;
+    private transient UserRepository userRepository;
 
     // User Profile Information
-    private String userId; // Unique string for user, for easy identification.
-    private String firstName; // First name of user
-    private String lastName; // Last name of user
-    private String emailAddress; // Email address of user
-    private String contactNumber; // Contact number of user
-    private String profilePictureUrl = defaultProfilePictureUrl; // Customizable user profile picture
-    private boolean isOnline; // Checks if the user is currently online
+    private String userAuthId; // Unique string for user, for easy identification.
+    private String firstName; // First name of user.
+    private String lastName; // Last name of user.
+    private String emailAddress; // Email address of user.
+    private String contactNumber; // Contact number of user.
+    private String profilePictureUrl = defaultProfilePictureUrl; // Customizable user profile picture.
+    private boolean isOnline; // Checks if the user is currently online.
 
     // User Preferences & Permissions
     private String deviceId; // Attaches on device to user
@@ -35,47 +42,37 @@ public class User {
     private boolean geoLocationEnabled; // Permission to track user's location
 
     // User Timestamps
-    private final Timestamp createdAt; // When was the account created
-    private Timestamp updatedAt; // When was the profile last updated
-    private static User user; // Tracks the active user throughout the app's lifecycle
+    private transient Timestamp createdAt; // When was the account created.
+    private transient Timestamp updatedAt; // When was the profile last updated.
+    private static User user; // Tracks the active user throughout the app's lifecycle.
 
-    public User(){
-        this.createdAt = Timestamp.now();
-        this.userRepository = null;
-    }
-
-    // Timestamp Function
-    public User(UserRepository userRepository, String userId) {
-        this.userRepository = userRepository;
-        this.userId = userId;
-        this.isAdmin = false;
-        this.createdAt = Timestamp.now();
-    }
+    public User() {}
 
     // Constructor
-    public User(UserRepository userRepository, String userId, String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled) {
+    public User(UserRepository userRepository, String userAuthId, String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled, boolean isOnline) {
         this.userRepository = userRepository;
-        this.userId = userId;
+        this.userAuthId = userAuthId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.contactNumber = contactNumber;
-        this.profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : defaultProfilePictureUrl;
+        this.profilePictureUrl = profilePictureUrl;
         this.deviceId = deviceId;
         this.isAdmin = isAdmin;
         this.notificationEnabled = notificationEnabled;
         this.geoLocationEnabled = geoLocationEnabled;
+        this.isOnline = isOnline;
         this.createdAt = Timestamp.now();
         this.updatedAt = this.createdAt;
     }
 
     //---------- Get/Set User Profile Information --------------------
     public String getUserId() {
-        return userId;
+        return userAuthId;
     }
 
     public void setUserId(String userId) {
-        this.userId = userId;
+        this.userAuthId = userId;
     }
 
     public String getFirstName() {
@@ -183,24 +180,24 @@ public class User {
         return updatedAt;
     }
 
-    public static User getInstance() {
+    public static synchronized User getInstance() {
         return User.user;
     }
 
-    public static void setInstance(User newUser) {
+    public static synchronized void setInstance(User newUser) {
         User.user = newUser;
     }
 
     //---------- Validate User Information --------------------
-    public boolean validateFirstName(String firstName) {
-        return firstName != null && firstName.matches("[A-Za-z]+");
+    public static boolean validateFirstName(String firstName) {
+        return firstName == null || !firstName.matches("^[A-Za-z]+(-[A-Za-z]+)*$"); // Credits: ChatGBT: How do I only validate hyphens in the middle.
     }
 
-    public boolean validateLastName(String lastName) {
-        return lastName != null && lastName.matches("[A-Za-z]+");
+    public static boolean validateLastName(String lastName) {
+        return lastName == null || !lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
     }
 
-    public boolean validateEmailAddress(String emailAddress) {
+    public static boolean validateEmailAddress(String emailAddress) {
         String[] validEmailAddressDomains = {".com", ".ca", ".net", ".org", ".kr", ".co", ".uk", "ir", ".ch"};
 
         if (emailAddress == null || !emailAddress.contains("@")) {
@@ -215,21 +212,23 @@ public class User {
         return false;
     }
 
-    public boolean validateContactInformation(String contactNumber) {
+    public static boolean validateContactInformation(String contactNumber) {
         return contactNumber != null && contactNumber.matches("\\+?[0-9\\-() ]{7,15}");
-    }
-
-    public boolean validateUserInformation() {
-        return validateFirstName(firstName) && validateLastName(lastName) &&
-                validateEmailAddress(emailAddress) && validateContactInformation(contactNumber);
     }
 
     //---------- Information Transformations --------------------
     @NonNull
     public String fullName(String firstName, String lastName) {
-      return (firstName + " " + lastName);
+        // Function to concatenate the user's full name.
+        return (firstName + " " + lastName);
     }
 
+    public void signup(String newFirstName, String newLastName) {
+        // Function that sets a user's required first and optional last name.
+        setFirstName(newFirstName);
+        setLastName(newLastName);
+        this.updatedAt = Timestamp.now();
+    }
 }
 
 

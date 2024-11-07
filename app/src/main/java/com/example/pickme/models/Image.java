@@ -1,5 +1,9 @@
 package com.example.pickme.models;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
@@ -7,7 +11,11 @@ import androidx.annotation.NonNull;
 import com.example.pickme.models.Enums.ImageType;
 import com.example.pickme.repositories.ImageRepository;
 import com.example.pickme.utils.ImageQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.Timestamp;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Random;
 
 /**
  * Represents an image uploaded by the user
@@ -124,8 +132,8 @@ public class Image {
      *
      * @param imageUri The image URI to be attached; obtained from gallery picker
      */
-    public void upload(@NonNull Uri imageUri) {
-        ir.upload(this, imageUri);
+    public void upload(@NonNull Uri imageUri, OnCompleteListener<Image> listener) {
+        ir.upload(this, imageUri, listener);
     }
 
     /**
@@ -142,16 +150,35 @@ public class Image {
     /**
      * Delete the image from Firestore DB with query matching this image class.
      */
-    public void delete() {
-        ir.delete(this);
+    public void delete(OnCompleteListener<Image> listener) {
+        ir.delete(this, listener);
     }
 
     /**
      * Generates a random image from the uploader ID.
      */
-    public void generate() {
-        Uri url = Uri.parse(String.format("https://www.gravatar.com/avatar/%s?s=55&d=identicon&r=PG", this.uploaderId));
-        ir.uploadUrl(this, url);
+    public void generate(String initials, OnCompleteListener<Image> listener) {
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(128), rnd.nextInt(128), rnd.nextInt(128));
+        Bitmap b=Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        Paint p = new Paint();
+        c.drawColor(color);
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setColor(Color.parseColor("white"));
+        p.setTextSize(128);
+        c.drawText(
+                initials,
+                (float) c.getWidth() / 2,
+                (((float) c.getHeight() / 2) - ((p.descent() + p.ascent()) / 2)),
+                p
+        );
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        b.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+        byte[] data = bytes.toByteArray();
+
+        ir.upload(this, data, listener);
     }
 
     //endregion

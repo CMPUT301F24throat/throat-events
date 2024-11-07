@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background1"
-    tools:context=".views.EventDetailsActivity">
+    tools:context=".views.EventDetailsFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:layout_width="wrap_content"
