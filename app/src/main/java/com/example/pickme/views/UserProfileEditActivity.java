@@ -19,6 +19,7 @@ import com.example.pickme.R;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+import com.google.android.gms.tasks.OnCompleteListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -63,6 +64,7 @@ public class UserProfileEditActivity extends AppCompatActivity {
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                     // callback is invoked after the user selects a media item or closes the photo picker
                     if (uri != null) {
+                        editProfilePicture.setTag("");
                         // uploads the image selected
                         img.upload(uri, task -> {
                             if (task.isSuccessful()) {
@@ -92,17 +94,15 @@ public class UserProfileEditActivity extends AppCompatActivity {
         });
 
         removeProfilePicture.setOnClickListener(v -> {
-            img.generate(task -> Toast.makeText(this, "Profile picture deleted.", Toast.LENGTH_SHORT).show());
-            Glide.with(editProfilePicture.getRootView())
-                    .load(img.getImageUrl())
-                    .into(editProfilePicture);
+            Toast.makeText(this, "Profile picture deleted.", Toast.LENGTH_SHORT).show();
+            editProfilePicture.setImageBitmap(null);
+            editProfilePicture.setTag("deleted");
         });
 
         // Sets up the response to if the user wants to save their information.
         saveButton.setOnClickListener(v -> {
             if (validateUserChanges()) {
-                saveUserDataToFirestore();
-                navigateToHomeActivity();
+                saveUserData();
             }
         });
 
@@ -121,8 +121,9 @@ public class UserProfileEditActivity extends AppCompatActivity {
             editEnableAdminView.setChecked(user.isAdmin());
 
             img = new Image(user.getUserId(), user.getUserId());
+            img.setImageUrl(user.getProfilePictureUrl());
             Glide.with(editProfilePicture.getRootView())
-                    .load(user.getProfilePictureUrl())
+                    .load(img.getImageUrl())
                     .into(editProfilePicture);
         } else {
             Toast.makeText(this, "User data not available.", Toast.LENGTH_SHORT).show();
@@ -163,7 +164,7 @@ public class UserProfileEditActivity extends AppCompatActivity {
         return true;
     }
 
-    private void saveUserDataToFirestore() {
+    private void saveUserData() {
         // Retrieve and update the current user instance with the new data from input fields
         User user = User.getInstance();
         if (user == null) {
@@ -171,8 +172,22 @@ public class UserProfileEditActivity extends AppCompatActivity {
             return;
         }
 
-        updateUserInstanceWithInput(user);
+        if (editProfilePicture.getTag() == "deleted") {
+            generateProfilePicture(user, task -> {
+                Log.d("Image", "generate: New profile picture generated");
+                updateUserInstanceWithInput(user);
+                pushUserToFirestore(user);
+                navigateToHomeActivity();
+            });
 
+        } else {
+            updateUserInstanceWithInput(user);
+            pushUserToFirestore(user);
+            navigateToHomeActivity();
+        }
+    }
+
+    private void pushUserToFirestore(User user) {
         // Use UserRepository to handle the update in Firestore
         UserRepository userRepository = new UserRepository();
         userRepository.updateUser(user, task -> {
@@ -192,6 +207,14 @@ public class UserProfileEditActivity extends AppCompatActivity {
         user.setEmailAddress(editProfileEmailAddress.getText().toString().trim());
         user.setContactNumber(editProfileContactNumber.getText().toString().trim());
         user.setProfilePictureUrl(img.getImageUrl());
+    }
+
+    private void generateProfilePicture(User user, OnCompleteListener<Image> listener) {
+        String firstName = editProfileFirstName.getText().toString().trim();
+        String lastName = editProfileLastName.getText().toString().trim();
+        String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
+
+        img.generate(initials, listener);
     }
 
     //---------- Activity Redirection --------------------

@@ -59,21 +59,23 @@ public class UserRepository {
                 String userAuthId = Objects.requireNonNull(task.getResult().getUser()).getUid();
 
                 // Creates the User object
+                String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
                 Image newImage = new Image(deviceId, deviceId);
-                newImage.generate(task1 -> {
+                newImage.generate(initials, task1 -> {
                     if (task1.isSuccessful()) {
                         newImage.setImageUrl(task1.getResult().getImageUrl());
+                        User newUser = new User(this, userAuthId, firstName, lastName, email, contact, newImage.getImageUrl(), false, deviceId, true, false, true);
+                        newUser.signup(firstName, lastName);
+                        User.setInstance(newUser);
+
+                        // Save user data to Firestore using DeviceID as the document ID
+                        db.collection("users").document(deviceId)
+                                .set(newUser)
+                                .addOnSuccessListener(aVoid -> callback.onSuccess(newUser))
+                                .addOnFailureListener(e -> callback.onFailure("Failed to save user data: " + e.getMessage()));
                     }
                 });
-                User newUser = new User(this, userAuthId, firstName, lastName, email, contact, newImage.getImageUrl(), false, deviceId, true, false, true);
-                newUser.signup(firstName, lastName);
-                User.setInstance(newUser);
 
-                // Save user data to Firestore using DeviceID as the document ID
-                db.collection("users").document(deviceId)
-                        .set(newUser)
-                        .addOnSuccessListener(aVoid -> callback.onSuccess(newUser))
-                        .addOnFailureListener(e -> callback.onFailure("Failed to save user data: " + e.getMessage()));
             } else {
                 callback.onFailure("Authentication failed!");
             }

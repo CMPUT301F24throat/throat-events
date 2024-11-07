@@ -57,8 +57,8 @@ dependencies {
     implementation(libs.circleimageview)
 
     // Navigation Components
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.3")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.3")
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
 
     // Barcode Scanning Libraries
     implementation(libs.zxing.core.v350)
@@ -69,7 +69,7 @@ dependencies {
     implementation(libs.play.services.tasks)
 
     // Firebase Bills of Materials for Version Alignment
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.google.firebase.auth)
 
