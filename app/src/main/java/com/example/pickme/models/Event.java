@@ -33,6 +33,7 @@ public class Event implements Serializable {
     private String maxWinners;           // Max number of winners
     private boolean geoLocationRequired; // Indicates if geolocation is required
     private Integer maxEntrants;         // Maximum number of entrants
+    private Integer entrants;         // Number of entrants registered
     private long createdAt;              // Creation timestamp
     private long updatedAt;              // Last updated timestamp
 
@@ -45,6 +46,7 @@ public class Event implements Serializable {
                  String eventDescription, String eventDate, String promoQrCodeId,
                  String waitingListQrCodeId, String posterImageId, String eventLocation,
                  String maxWinners, boolean geoLocationRequired, Integer maxEntrants,
+                 Integer entrants,
                  long createdAt, long updatedAt) {
         this.eventId = eventId;
         this.organizerId = organizerId;
@@ -59,6 +61,7 @@ public class Event implements Serializable {
         this.maxWinners = maxWinners;
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
+        this.entrants = entrants;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -68,6 +71,18 @@ public class Event implements Serializable {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Integer getEntrants() {
+        return entrants;
+    }
+
+    public void setEntrants(Integer entrants) {
+        this.entrants = entrants;
     }
 
     public String getOrganizerId() {

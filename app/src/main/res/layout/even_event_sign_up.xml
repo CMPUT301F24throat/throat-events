@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background1"
-    tools:context=".views.EventDetailsFragment">
+    tools:context=".views.EventSignUpFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:layout_width="wrap_content"
@@ -99,13 +99,39 @@
                 android:layout_marginTop="15dp"
                 android:id="@+id/eventFlyer"/>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:gravity="center"
+                android:id="@+id/joinWaitingList"
+                android:paddingVertical="10dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/ic_button_bg_main"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/eventFlyer">
+
+                <TextView
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Join Waitlist"
+                    app:drawableStartCompat="@drawable/ic_add"
+                    android:drawablePadding="10dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <ImageView
                 android:id="@+id/calendar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_calendar"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/eventFlyer"
+                app:layout_constraintTop_toBottomOf="@id/joinWaitingList"
                 android:layout_marginTop="15dp"/>
 
             <TextView

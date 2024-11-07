@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.example.pickme.databinding.EventEventdetailsBinding;
+import com.example.pickme.databinding.EvenEventSignUpBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
@@ -30,14 +30,14 @@ import com.example.pickme.utils.ImageQuery;
  * - Handle back navigation for seamless user experience.
  */
 
-public class EventDetailsFragment extends Fragment {
-    private EventEventdetailsBinding binding;
+public class EventSignUpFragment extends Fragment {
+    private EvenEventSignUpBinding binding;
     private Event event;
 
     // Inflates the layout for event details view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = EventEventdetailsBinding.inflate(getLayoutInflater(), container, false);
+        binding = EvenEventSignUpBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 
@@ -51,19 +51,19 @@ public class EventDetailsFragment extends Fragment {
         }
 
         binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
-
         // Populate UI with event data if available
         if (event != null) {
             User user = new User();
             if (user.isAdmin()){
                 binding.scanQr.setVisibility(View.GONE);
             }
+
             binding.title.setText(event.getEventTitle());
             binding.description.setText(event.getEventDescription());
             binding.date.setText(event.getEventDate());
             binding.address.setText(event.getEventLocation());
             binding.winners.setText(event.getMaxWinners() + " Winners");
-            binding.entrants.setText(event.getMaxEntrants() + " Entrants");
+            binding.entrants.setText(event.getEntrants()+" / "+event.getMaxEntrants() + " Entrants");
 
             // Load the event flyer image using Glide
             Image image = new Image("1234567890", "123456789");

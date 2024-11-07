@@ -44,9 +44,6 @@ public class EventTestFragment extends Fragment {
         // Navigate to event creation screen
         binding.createEvent.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventCreationFragment));
 
-        // Navigate to event discovery screen
-        binding.viewEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventDiscoveryFragment));
-
         // Navigate to event list screen for updating events
         binding.updateEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventListFragment));
     }
