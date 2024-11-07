@@ -2,6 +2,8 @@ package com.example.pickme.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,6 +26,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  **/
 public class HomeActivity extends AppCompatActivity {
 
+    private ImageButton homeProfileButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,12 +42,23 @@ public class HomeActivity extends AppCompatActivity {
                 .load(User.getInstance().getProfilePictureUrl())
                 .into(homeProfileButton);
 
+        homeProfileButton.setVisibility(View.VISIBLE);
+
         // Listens for if the User clicks their Profile.
         homeProfileButton.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
             intent.putExtra("user_data", user);
             startActivity(intent);
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Make the button visible again when returning to the activity
+        if (homeProfileButton != null) {
+            homeProfileButton.setVisibility(View.VISIBLE);
+        }
     }
 }
 
