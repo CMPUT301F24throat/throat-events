@@ -18,16 +18,17 @@ import com.example.pickme.models.User;
 import com.example.pickme.utils.ImageQuery;
 
 /**
- * Fragment to display detailed information about a specific event.
+ * Fragment to display Signup information about a specific event.
  * This includes the event title, description, date, location, image, and participant limits.
- * Allows users to view all relevant details of the event, and navigate back to the previous screen.
+ * Allows users to join a waitlist of the event, and navigate back to the previous screen.
  *
  * @version 2.0
  * @author Ayub Ali
  * Responsibilities:
- * - Display full event details for selected events.
- * - Load and display the event poster image from a stored URL.
- * - Handle back navigation for seamless user experience.
+ * - Display full event details for signup process
+ * - Load and display the event poster image from a stored URL
+ * - Show current entrant count and capacity
+ * - Handle back navigation for seamless user experience
  */
 
 public class EventSignUpFragment extends Fragment {
