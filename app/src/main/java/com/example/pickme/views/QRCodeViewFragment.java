@@ -133,7 +133,7 @@ public class QRCodeViewFragment extends Fragment {
      */
     private void displayQRCode() {
         // Generate QR code for the eventID and qrType, and retrieve the cached image path if available
-        String qrCodeFilePath = qrCodeGenerator.getQRCodeImage(requireContext(), eventID, qrType);
+        String qrCodeFilePath = qrCodeGenerator.getQRCodeImage(requireContext(), eventID);
         if (qrCodeFilePath != null) {
             // Load the QR code bitmap from the cached file path
             Bitmap qrBitmap = BitmapFactory.decodeFile(qrCodeFilePath);

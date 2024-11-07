@@ -30,15 +30,14 @@ public class QRCodeGenerator {
     }
 
     /**
-     * Generate or retrieve cached QR Code for an event based on eventID and qrType.
+     * Generate or retrieve cached QR Code for an event based on eventID.
      *
      * @param context Context to access cache directory
      * @param eventID ID of the event
-     * @param qrType Type of the QR code (e.g., "event_info", "event_join")
      * @return File path to the cached QR code image or null if an error occurred
      */
-    public String getQRCodeImage(Context context, String eventID, String qrType) {
-        String cacheFileName = eventID + "_" + qrType + ".png";
+    public String getQRCodeImage(Context context, String eventID) {
+        String cacheFileName = eventID + ".png";
         File cacheFile = new File(context.getCacheDir(), CACHE_DIR + "/" + cacheFileName);
 
         // Check if QR code already exists in cache
@@ -48,9 +47,9 @@ public class QRCodeGenerator {
 
         // QR code not in cache; retrieve qrID from Firestore using QrRepository
         try {
-            String qrID = retrieveQrID(eventID, qrType);
+            String qrID = retrieveQrID(eventID);
             if (qrID == null) {
-                Log.e("QRCodeGenerator", "QR ID not found for eventID: " + eventID + " and qrType: " + qrType);
+                Log.e("QRCodeGenerator", "QR ID not found for eventID: " + eventID);
                 return null;
             }
 
@@ -96,14 +95,13 @@ public class QRCodeGenerator {
     }
 
     /**
-     * Retrieve qrID for a given eventID and qrType from Firestore.
+     * Retrieve qrID for a given eventID from Firestore.
      *
      * @param eventID ID of the event
-     * @param qrType Type of the QR code
      * @return qrID if found, null otherwise
      */
-    private String retrieveQrID(String eventID, String qrType) throws ExecutionException, InterruptedException {
-        return Tasks.await(qrRepository.readQRByReferenceAndType("/events/" + eventID, qrType))
+    private String retrieveQrID(String eventID) throws ExecutionException, InterruptedException {
+        return Tasks.await(qrRepository.readQRByAssociation("/events/" + eventID))
                 .getDocuments().stream().findFirst()
                 .map(document -> document.getString("qrID"))
                 .orElse(null);

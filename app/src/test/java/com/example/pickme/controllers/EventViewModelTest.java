@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.repositories.QrRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -48,6 +49,9 @@ public class EventViewModelTest {
     private EventRepository mockEventRepository;
 
     @Mock
+    private QrRepository mockQrRepository;
+
+    @Mock
     private Task<QuerySnapshot> mockQuerySnapshotTask;
 
     @Mock
@@ -67,7 +71,7 @@ public class EventViewModelTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);  // Initialize the mocks
-        eventViewModel = new EventViewModel(mockEventRepository); // Initialize the ViewModel with mocked repository
+        eventViewModel = new EventViewModel(mockEventRepository, mockQrRepository); // Initialize the ViewModel with mocked repository
         eventViewModel = spy(eventViewModel);  // Spy on the ViewModel to intercept calls to fetchEvents, etc.
 
         // Sample event paremeters for testing
