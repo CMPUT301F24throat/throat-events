@@ -48,10 +48,37 @@
             app:destination="@id/homeFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/qrCameraFragment"
+        android:name="com.example.pickme.views.QRCameraFragment"
+        android:label="QR Camera"
+        tools:layout="@layout/fragment_qr_camera" />
+
+    <fragment
+        android:id="@+id/inboxFragment"
+        android:name="com.example.pickme.views.InboxFragment"
+        android:label="Inbox"
+        tools:layout="@layout/fragment_inbox" />
+
+    <fragment
+        android:id="@+id/myEventsFragment"
+        android:name="com.example.pickme.views.MyEventsFragment"
+        android:label="My Events"
+        tools:layout="@layout/fragment_my_events" />
+
     <!-- Global actions -->
     <action
         android:id="@+id/action_global_homeFragment"
         app:destination="@id/homeFragment" />
+    <action
+        android:id="@+id/action_global_qrCameraFragment"
+        app:destination="@id/qrCameraFragment" />
+    <action
+        android:id="@+id/action_global_inboxFragment"
+        app:destination="@id/inboxFragment" />
+    <action
+        android:id="@+id/action_global_myEventsFragment"
+        app:destination="@id/myEventsFragment" />
     <action
         android:id="@+id/action_global_userSignUpFragment"
         app:destination="@id/userSignUpFragment" />

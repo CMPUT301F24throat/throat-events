@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
 
         User user = User.getInstance();
         if (user != null) {
+            String profilePictureUrl = user.getProfilePictureUrl();
             Glide.with(this)
                     .load(user.getProfilePictureUrl())
                     .into(homeProfileButton);
