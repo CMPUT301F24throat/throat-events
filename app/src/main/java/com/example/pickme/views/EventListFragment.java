@@ -8,9 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
-import com.example.pickme.R;
 import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventEventslistBinding;
 import com.example.pickme.models.Event;
@@ -76,7 +74,7 @@ public class EventListFragment extends Fragment implements EventAdapter.OnEventC
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", event);
 
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventListFragment_to_eventCreationFragment, bundle);
+        //Navigation.findNavController(requireView()).navigate(R.id.action_eventListFragment_to_eventCreationFragment, bundle);
     }
 }
 

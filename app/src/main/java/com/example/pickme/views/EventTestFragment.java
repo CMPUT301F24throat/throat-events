@@ -8,9 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
-import com.example.pickme.R;
 import com.example.pickme.databinding.EventTestBinding;
 import com.google.firebase.FirebaseApp;
 
@@ -40,13 +38,13 @@ public class EventTestFragment extends Fragment {
         FirebaseApp.initializeApp(view.getContext());
 
         // Navigate to event creation screen
-        binding.createEvent.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventCreationFragment));
+        //binding.createEvent.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventCreationFragment));
 
         // Navigate to event list screen for updating events
-        binding.updateEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventListFragment));
+        //binding.updateEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventListFragment));
 
         // Navigate to event details screen
-        binding.viewEventDetails.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventDetailsFragment));
+        //binding.viewEventDetails.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventDetailsFragment));
     }
 }
 

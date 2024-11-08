@@ -1,35 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background1"
     tools:context=".views.HomeFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center|top">
+    <TextView
+        android:id="@+id/homeHomeText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="40dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:paddingStart="5dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp"
+        android:text="Home"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints,RtlCompat" />
 
-        <Button
-            android:id="@+id/btn_EventTesting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Event Testing" />
+    <TextView
+        android:id="@+id/homeRecentText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="330dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="220dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:paddingStart="1dp"
+        android:paddingTop="1dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="1dp"
+        android:text="Recent"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/divider2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homeProfileButton"
+        tools:ignore="MissingConstraints,RtlCompat" />
 
-        <Button
-            android:id="@+id/btn_ImageTesting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Image Testing" />
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homeEventsText"
+        tools:ignore="MissingConstraints" />
 
-        <Button
-            android:id="@+id/notifTest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notif testing" />
+    <TextView
+        android:id="@+id/homeEventsText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="330dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="40dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:paddingStart="1dp"
+        android:paddingTop="1dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="1dp"
+        android:text="Events"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/divider1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider2"
+        tools:ignore="MissingConstraints,RtlCompat" />
 
-    </LinearLayout>
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="210dp"
+        android:layout_marginEnd="15dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/homeEventsText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider4"
+        tools:ignore="MissingConstraints" />
 
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="210dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="80dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider1"
+        tools:ignore="MissingConstraints" />
 
-</FrameLayout>
+    <View
+        android:id="@+id/divider4"
+        android:layout_width="380dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="15dp"
+        android:background="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homeRecentText"
+        tools:ignore="MissingConstraints" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/homeProfileButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="30dp"
+        android:background="@drawable/rounded_button"
+        android:contentDescription="Click to go to profile"
+        android:elevation="1dp"
+        android:padding="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
