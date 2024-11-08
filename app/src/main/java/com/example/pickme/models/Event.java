@@ -5,6 +5,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
+/**
+ * Data model class representing an event in the system.
+ * Stores all relevant details and constraints for each event, including title, description, date,
+ * location, geolocation requirements, QR codes, and timestamps.
+ *
+ * @version 2.0
+ * @author Ayub Ali
+ * Responsibilities:
+ * - Define the properties and structure for event-related data.
+ * - Validate key fields such as max entrants and event date format.
+ * - Manage event identity and equality for list operations and comparisons.
+ */
+
 public class Event implements Serializable {
 
     private String eventId;              // Unique event ID
@@ -20,6 +33,7 @@ public class Event implements Serializable {
     private String maxWinners;           // Max number of winners
     private boolean geoLocationRequired; // Indicates if geolocation is required
     private Integer maxEntrants;         // Maximum number of entrants
+    private Integer entrants;         // Number of entrants registered
     private long createdAt;              // Creation timestamp
     private long updatedAt;              // Last updated timestamp
 
@@ -32,6 +46,7 @@ public class Event implements Serializable {
                  String eventDescription, String eventDate, String promoQrCodeId,
                  String waitingListQrCodeId, String posterImageId, String eventLocation,
                  String maxWinners, boolean geoLocationRequired, Integer maxEntrants,
+                 Integer entrants,
                  long createdAt, long updatedAt) {
         this.eventId = eventId;
         this.organizerId = organizerId;
@@ -46,17 +61,28 @@ public class Event implements Serializable {
         this.maxWinners = maxWinners;
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
+        this.entrants = entrants;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
-    public String getEventId() {
-        return eventId;
-    }
+    public String getEventId() {return eventId;}
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Integer getEntrants() {
+        return entrants;
+    }
+
+    public void setEntrants(Integer entrants) {
+        this.entrants = entrants;
     }
 
     public String getOrganizerId() {

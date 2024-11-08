@@ -29,6 +29,20 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Unit tests for the EventViewModel class using mocked EventRepository.
+ * This test class verifies the ViewModel's behavior, particularly in CRUD operations,
+ * data fetching, event selection, and Firestore interaction
+ *
+ * @version 1.0
+ * @author Ayub Ali
+ * Responsibilities:
+ * - Test CRUD operations via the ViewModel and mock repository.
+ * - Validate that Firestore completion listeners trigger correctly for each operation.
+ * - Ensure ViewModel functions like event selection and list maintenance behave as expected.
+ * - Use Mockito to simulate Firestore operations and confirm correct method interactions.
+ */
+
 public class EventViewModelTest {
 
     @Mock
@@ -60,11 +74,11 @@ public class EventViewModelTest {
         eventViewModel = new EventViewModel(mockEventRepository, mockQrRepository); // Initialize the ViewModel with mocked repository
         eventViewModel = spy(eventViewModel);  // Spy on the ViewModel to intercept calls to fetchEvents, etc.
 
-        // Setup a sample event for testing
+        // Sample event paremeters for testing
         event = new Event("1", "organizer123", "facility456", "Sample Event",
                 "An event description", "October 5 2024, 7:00 PM",
                 "promo123", "waitingList123", "poster123",
-                "123 Main St", "5", true, 100, System.currentTimeMillis(), System.currentTimeMillis());
+                "123 Main St",  "5", true, 100, 10, System.currentTimeMillis(), System.currentTimeMillis());
 
         // Mock the behavior of repository methods
 
@@ -196,3 +210,23 @@ public class EventViewModelTest {
         assertFalse(availableSpots);  // No available spots in this test case
     }
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT:
+ * - How do I structure Mockito test methods to handle different scenarios?
+ * - What are best practices for handling Task completion in Firebase testing?
+ * - Mockito best practices for verifying repository interactions.
+ *
+ * Stack Overflow:
+ * - How to mock Firestore queries and Task objects in JUnit tests.
+ * - JUnit vs AssertJ: Choosing assert methods in Android tests.
+ *
+ * Firebase Documentation:
+ * - Firestore Testing and Debugging
+ *
+ * Mockito Documentation:
+ * - ArgumentMatchers in Mockito
+ * - Verification in Mockito
+ */

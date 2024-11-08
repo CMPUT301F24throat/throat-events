@@ -10,6 +10,21 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * Manages the logic and state for event-related operations.
+ * This ViewModel serves as an intermediary between the UI and the EventRepository,
+ * facilitating CRUD operations, event selection, and other event-related interactions.
+ *
+ * @version 2.0
+ * @author Ayub Ali
+ * Responsibilities:
+ * - Handle CRUD operations for events by interfacing with EventRepository.
+ * - Maintain and provide access to a selected event.
+ * - Maintain a list of events for the organizer.
+ * - Manage lottery selection and available spot checks for events.
+ * - Handle Firestore completion notifications for event operations.
+ */
+
 public class EventViewModel {
     private Event selectedEvent;
     private ArrayList<Event> events;
@@ -122,3 +137,18 @@ public class EventViewModel {
         return false;
     }
 }
+
+/**
+ * Code Sources
+ *
+ * Firebase Documentation:
+ * - Firestore Data Model- Details on how to structure data in Firestore.
+ * - Transaction Management in Firestore - Best practices for handling transaction-based operations.
+ *
+ * Android Developers:
+ * - Using ViewModel for Managing UI-related Data - Best practices for using ViewModel in Android applications.
+ *
+ * Stack Overflow:
+ * - Passing data between ViewModel and Repository layers in Android.
+ * - How to manage asynchronous data with OnCompleteListener in Firestore.
+ */

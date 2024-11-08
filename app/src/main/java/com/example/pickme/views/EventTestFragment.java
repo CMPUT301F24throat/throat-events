@@ -21,6 +21,7 @@ import com.google.firebase.FirebaseApp;
  * Responsibilities: Ayub Ali
  * - Provides buttons for navigation to event creation, viewing, and updating screens.
  */
+
 public class EventTestFragment extends Fragment {
 
     private EventTestBinding binding;
@@ -43,20 +44,17 @@ public class EventTestFragment extends Fragment {
         // Navigate to event creation screen
         binding.createEvent.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventCreationFragment));
 
-        // Navigate to event discovery screen
-        binding.viewEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventDiscoveryFragment));
-
         // Navigate to event list screen for updating events
         binding.updateEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventListFragment));
     }
-
-    /**
-     * Code Sources
-     *
-     * Stack Overflow
-     * - "Firebase initialization in fragment lifecycle"
-     *
-     * Android Developers
-     * - "Setting up navigation between fragments"
-     */
 }
+
+/**
+ * Code Sources
+ *
+ * Stack Overflow:
+ * - Firebase initialization in fragment lifecycle
+ *
+ * Android Developers:
+ * - Setting up navigation between fragments - Guide on using the Navigation component to transition between fragments.
+ */
