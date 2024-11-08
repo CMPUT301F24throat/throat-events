@@ -26,7 +26,7 @@ import java.util.Objects;
  * - CRUD operations for user data based on DeviceID
  */
 public class UserRepository {
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
     private final FirebaseAuth auth;
     private CollectionReference usersRef;
 
@@ -38,6 +38,12 @@ public class UserRepository {
         if (db != null) {
             this.usersRef = db.collection("users");
         }
+    }
+
+    public UserRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference usersRef) {
+        this.db = db;
+        this.auth = auth;
+        this.usersRef = usersRef;
     }
 
     public void getUserByDeviceId(String deviceId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
@@ -131,4 +137,5 @@ public class UserRepository {
 
             void onFailure(String errorMessage);
         }
+
     }
