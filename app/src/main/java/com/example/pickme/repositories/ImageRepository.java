@@ -36,9 +36,7 @@ import java.util.List;
 public class ImageRepository {
     private final String TAG = "ImageRepository";
 
-    //region Attributes
     // authentication
-    private final FirebaseAuth auth;
     private final String auth_uid;
 
     // image storage
@@ -63,24 +61,25 @@ public class ImageRepository {
      * Constructs a new ImageRepository for image CRUD operations.
      */
     public ImageRepository() {
-        auth = FirebaseAuth.getInstance();
+        //region Attributes
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         auth_uid = auth.getUid();
+
         FirebaseStorage storage = FirebaseStorage.getInstance();
         imgStorage = storage.getReference();
+
         db = FirebaseFirestore.getInstance();
         imgCollection = db.collection("images");
+
+        // anonymous auth
+        auth.signInAnonymously().addOnSuccessListener(authResult ->
+                Log.d(TAG, "AUTH: uid " + auth_uid + " successful authentication")
+        );
     }
 
     //endregion
 
     //region Class methods
-
-    private void auth() {
-        // temporary anonymous auth
-        auth.signInAnonymously().addOnSuccessListener(authResult ->
-                Log.d(TAG, "AUTH: uid " + auth_uid + " successful authentication")
-        );
-    }
 
     /**
      * Checks Firestore DB for image duplicates and
@@ -89,8 +88,6 @@ public class ImageRepository {
      * @param callback The duplicateCallback for conditional handling
      */
     private void checkDuplicates(Image i, duplicateCallback callback) {
-        auth();
-
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
         String imageType = i.getImageType().toString();
@@ -131,7 +128,7 @@ public class ImageRepository {
      * @param uri The image URI to be attached
      */
     public void upload(@NonNull Image i, @NonNull Uri uri, OnCompleteListener<Image> listener) {
-        auth();
+        
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
@@ -152,7 +149,7 @@ public class ImageRepository {
      * @param data The bytes of a bitmap to upload
      */
     public void upload(@NonNull Image i, byte[] data, OnCompleteListener<Image> listener) {
-        auth();
+        
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
@@ -174,7 +171,7 @@ public class ImageRepository {
      * @param uri The uri to update with
      */
     private void uploadUriToFirebase(Image i, DocumentReference doc, Uri uri, OnCompleteListener<Image> listener) {
-        auth();
+        
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
@@ -203,7 +200,7 @@ public class ImageRepository {
     }
 
     private void uploadBytes(Image i, DocumentReference doc, byte[] data, OnCompleteListener<Image> listener) {
-        auth();
+        
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
@@ -240,7 +237,7 @@ public class ImageRepository {
      * @see com.example.pickme.utils.ImageQuery
      */
     public void download(@NonNull Image i, @NonNull ImageQuery callback) {
-        auth();
+        
 
         String imageAssociation = i.getImageAssociation();
         String imageType = i.getImageType().toString();
@@ -274,7 +271,7 @@ public class ImageRepository {
      * @param i Image object to be deleted
      */
     public void delete(@NonNull Image i, OnCompleteListener<Image> listener) {
-        auth();
+        
 
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
@@ -333,7 +330,7 @@ public class ImageRepository {
      * @param gallery The gridView you want to show the images
      */
     public void getAllImages(@NonNull Context context, @NonNull GridView gallery) {
-        auth();
+        
         // querying images collection for everything
         imgCollection
                 .get()
