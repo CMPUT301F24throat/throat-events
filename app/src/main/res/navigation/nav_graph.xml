@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_homeFragment_to_QRCodeViewFragment"
             app:destination="@id/QRCodeViewFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_createNotificationFragment"
+            app:destination="@id/createNotificationFragment" />
     </fragment>
     <fragment
         android:id="@+id/eventTestFragment"
@@ -31,6 +34,9 @@
         <action
             android:id="@+id/action_eventTestFragment_to_eventListFragment"
             app:destination="@id/eventListFragment" />
+        <action
+            android:id="@+id/action_eventTestFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/imageTestFragment"
@@ -75,4 +81,9 @@
             android:name="eventID"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/createNotificationFragment"
+        android:name="com.example.pickme.views.CreateNotificationFragment"
+        android:label="CreateNotificationFragment" />
 </navigation>

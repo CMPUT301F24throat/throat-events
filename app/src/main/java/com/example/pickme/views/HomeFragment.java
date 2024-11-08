@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +48,11 @@ public class HomeFragment extends Fragment {
             if (homeProfileButton != null) {
                 homeProfileButton.setVisibility(View.GONE);
             }
+        });
+
+        Button notifTest = view.findViewById(R.id.notifTest);
+        notifTest.setOnClickListener(view3 -> {
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_createNotificationFragment);
         });
 
         // Button to navigate to QR Code View Fragment
