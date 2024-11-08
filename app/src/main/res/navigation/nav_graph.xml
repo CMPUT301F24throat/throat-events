@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_homeFragment_to_imageTestFragment"
             app:destination="@id/imageTestFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_createNotificationFragment"
+            app:destination="@id/createNotificationFragment" />
     </fragment>
     <fragment
         android:id="@+id/eventTestFragment"
@@ -54,4 +57,8 @@
             app:destination="@id/eventCreationFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/createNotificationFragment"
+        android:name="com.example.pickme.views.CreateNotificationFragment"
+        android:label="CreateNotificationFragment" />
 </navigation>

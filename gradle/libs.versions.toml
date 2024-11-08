@@ -4,6 +4,8 @@ avatarviewCoil = "1.0.4"
 comAmulyakhareTextdrawable = "1.0.1"
 compiler = "4.15.1"
 circleimageview = "3.1.0"
+firebaseBom = "33.5.0"
+firebaseMessaging = "24.0.3"
 coreVersion = "3.5.0"
 firebaseAuth = "version"
 glide = "4.16.0"
@@ -19,7 +21,8 @@ firebaseInappmessaging = "21.0.1"
 
 firebaseFirestore = "24.0.0"
 firebaseStorage = "21.0.1"
-firebaseBom = "33.5.0"
+playServicesAuth = "20.6.0"
+playServicesBase = "18.0.1"
 mockitoJunitJupiter = "4.0.0"
 mockitoCore = "4.0.0"
 navigationCompose = "2.8.3"
@@ -28,6 +31,8 @@ navigationFragment = "2.8.3"
 navigationFragmentKtx = "2.8.3"
 navigationTesting = "2.8.3"
 navigationUi = "2.8.3"
+playServicesBaseVersion = "18.1.0"
+playServicesPhenotype = "18.0.0"
 firebaseDatabase = "21.0.0"
 junitJupiter = "5.8.1"
 navigationUiKtx = "2.8.3"
@@ -43,6 +48,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-storage = { module = "com.google.firebase:firebase-storage", version.ref = "firebaseStorage" }
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 google-firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
@@ -55,9 +61,11 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
+play-services-base-v1810 = { module = "com.google.android.gms:play-services-base", version.ref = "playServicesBaseVersion" }
+play-services-phenotype = { module = "com.google.android.gms:play-services-phenotype", version.ref = "playServicesPhenotype" }
+play-services-tasks = { module = "com.google.android.gms:play-services-tasks", version.ref = "playServicesTasks" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtx" }
-play-services-tasks = { module = "com.google.android.gms:play-services-tasks", version.ref = "playServicesTasks" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockitoJunitJupiter" }
 textdrawable = { module = "com.github.jahirfiquitiva:TextDrawable", version.ref = "textdrawable" }
@@ -72,6 +80,8 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 zxing-core-v350 = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
