@@ -9,12 +9,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 /**
- * Handles interactions with the events collection
- * @author sophiecabungcal
- * @version 1.0
+ * Facilitates CRUD operations and interactions with the Firestore events collection.
+ * Manages event data transactions, including adding, updating, deleting, and retrieving events.
+ * Ensures data integrity through Firestore transactions and handles completion notifications for each operation.
+ *
+ * @version 2.0
+ * @author Ayub Ali
  * Responsibilities:
- * CRUD operations for event data
+ * - Perform CRUD operations on event data in Firestore.
+ * - Manage transactions for consistent updates and deletion.
+ * - Retrieve event data by ID or organizer user ID.
+ * - Notify completion or failure of Firestore operations.
  */
+
 public class EventRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference eventsRef = db.collection("events");
@@ -73,3 +80,19 @@ public class EventRepository {
         eventsRef.get().addOnCompleteListener(onCompleteListener);
     }
 }
+
+/**
+ * Code Sources
+ *
+ * Firebase Documentation:
+ * - Firestore Transactions and Batched Writes
+ * - CRUD Operations in Firestore
+ * - Firestore Exception Handling
+ *
+ * Stack Overflow:
+ * - How to use runTransaction for Firestore CRUD operations
+ * - Firestore transaction error handling and best practices
+ *
+ * Java Documentation:
+ * - Handling Completion Listeners in Firebase Documentation on using `OnCompleteListener` with Firestore operations.
+ */

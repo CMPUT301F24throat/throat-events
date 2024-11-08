@@ -26,10 +26,12 @@ import java.util.List;
  * Fragment displaying a list of events with navigation to event creation.
  *
  * @version 2.0
+ * @author Ayub Ali
  * Responsibilities:
  * - Display a list of events from Firestore
  * - Provide navigation to event creation or editing
  */
+
 public class EventListFragment extends Fragment implements EventAdapter.OnEventClickListener {
 
     private EventEventslistBinding binding;
@@ -76,17 +78,17 @@ public class EventListFragment extends Fragment implements EventAdapter.OnEventC
 
         Navigation.findNavController(requireView()).navigate(R.id.action_eventListFragment_to_eventCreationFragment, bundle);
     }
-
-    /**
-     * Code Sources
-     *
-     * Stack Overflow
-     * - "RecyclerView setup and data binding in Android"
-     *
-     * Firebase Documentation
-     * - Firestore > Collection Data Fetching
-     *
-     * Android Developers
-     * - "Navigation components for data transfer between fragments"
-     */
 }
+
+/**
+ * Code Sources
+ *
+ * Stack Overflow:
+ * - RecyclerView setup and data binding in Android
+ *
+ * Firebase Documentation:
+ * - Firestore: Fetching and displaying collection data
+ *
+ * Android Developers:
+ * - Navigation components for data transfer between fragments]- Navigating and passing data between fragments with the Navigation component.
+ */

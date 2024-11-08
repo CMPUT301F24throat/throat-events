@@ -1,5 +1,9 @@
 package com.example.pickme.models;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
@@ -9,6 +13,9 @@ import com.example.pickme.repositories.ImageRepository;
 import com.example.pickme.utils.ImageQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.Timestamp;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Random;
 
 /**
  * Represents an image uploaded by the user
@@ -51,6 +58,17 @@ public class Image {
      */
     public Image(@NonNull String userId, @NonNull String imageAssociation) {
         this.ir = new ImageRepository();
+        this.uploaderId = userId;
+        this.imageAssociation = imageAssociation;
+        this.imageType = userId.equals(imageAssociation) ?
+                ImageType.PROFILE_PICTURE :
+                ImageType.EVENT_POSTER;
+        this.createdAt = Timestamp.now();
+        this.updatedAt = Timestamp.now();
+    }
+
+    public Image(@NonNull String userId, @NonNull String imageAssociation, ImageRepository ir) {
+        this.ir = ir;
         this.uploaderId = userId;
         this.imageAssociation = imageAssociation;
         this.imageType = userId.equals(imageAssociation) ?
@@ -130,6 +148,16 @@ public class Image {
     }
 
     /**
+     * Uploads an image with attached image byte data to FirebaseStorage,
+     * then stores the image information to Firestore DB.
+     *
+     * @param data The byte data of the image to be uploaded
+     */
+    public void upload(@NonNull byte[] data, OnCompleteListener<Image> listener) {
+        ir.upload(this, data, listener);
+    }
+
+    /**
      * Download the image from Firestore DB with query matching this image class.
      * <br>
      * <b>Requires the ImageQuery callback to access the query data.</b>
@@ -150,9 +178,28 @@ public class Image {
     /**
      * Generates a random image from the uploader ID.
      */
-    public void generate(OnCompleteListener<Image> listener) {
-        Uri url = Uri.parse(String.format("https://www.gravatar.com/avatar/%s?s=55&d=identicon&r=PG", this.uploaderId));
-        ir.uploadUrl(this, url, listener);
+    public void generate(String initials, OnCompleteListener<Image> listener) {
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(128), rnd.nextInt(128), rnd.nextInt(128));
+        Bitmap b=Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        Paint p = new Paint();
+        c.drawColor(color);
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setColor(Color.parseColor("white"));
+        p.setTextSize(128);
+        c.drawText(
+                initials,
+                (float) c.getWidth() / 2,
+                (((float) c.getHeight() / 2) - ((p.descent() + p.ascent()) / 2)),
+                p
+        );
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        b.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+        byte[] data = bytes.toByteArray();
+
+        ir.upload(this, data, listener);
     }
 
     //endregion

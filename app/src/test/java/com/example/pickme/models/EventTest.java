@@ -11,6 +11,19 @@ import org.junit.Test;
 
 import java.util.Objects;
 
+/**
+ * Unit tests for the Event class.
+ * This test class verifies the behavior, constraints, and validation logic of the Event model class,
+ * including date formatting, entrant limits, and winner specifications.
+ *
+ * @version 1.0
+ * @author Ayub Ali
+ * Responsibilities:
+ * - Test validation and setting of event properties such as date, max entrants, and max winners.
+ * - Verify equality and hash code generation for events.
+ * - Confirm behavior for null and invalid inputs on key fields.
+ */
+
 public class EventTest {
 
     private Event event;
@@ -20,7 +33,7 @@ public class EventTest {
         event = new Event("1", "organizer123", "facility456", "Sample Event",
                 "An event description", "October 5 2024, 7:00 PM", "promo123",
                 "waitingList123", "poster123", "123 Main St", "5",
-                true, 100, System.currentTimeMillis(), System.currentTimeMillis());
+                true, 100, 10, System.currentTimeMillis(), System.currentTimeMillis());
     }
 
     @Test
@@ -140,3 +153,24 @@ public class EventTest {
         assertEquals(validPosterImageId, event.getPosterImageId());
     }
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT:
+ * - JUnit 4: Testing exception handling for invalid inputs.
+ * - Handling assertions for null values and edge cases.
+ * - JUnit 4 best practices for validating expected exceptions.
+ *
+ * Stack Overflow:
+ * - Validating method arguments in Java: IllegalArgumentException.
+ * - Best practices for JUnit 4 testing with custom error messages.
+ *
+ * Java Documentation:
+ * - Java String class methods and formatting techniques
+ *
+ * JUnit 4 Documentation:
+ * - Assertions and Exception handling in JUnit 4
+ */
+
+

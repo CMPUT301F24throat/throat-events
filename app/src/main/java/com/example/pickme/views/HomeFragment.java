@@ -47,5 +47,10 @@ public class HomeFragment extends Fragment {
                 homeProfileButton.setVisibility(View.GONE);
             }
         });
+
+        Button notifTest = view.findViewById(R.id.notifTest);
+        notifTest.setOnClickListener(view3 -> {
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_createNotificationFragment);
+        });
     }
 }

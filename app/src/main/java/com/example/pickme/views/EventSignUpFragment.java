@@ -11,73 +11,51 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.example.pickme.controllers.EventViewModel;
-import com.example.pickme.databinding.EventEventdetailsBinding;
+import com.example.pickme.databinding.EventEventSignUpBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.utils.ImageQuery;
 
-import java.util.Random;
-
 /**
- * Fragment to display detailed information about a specific event.
+ * Fragment to display Signup information about a specific event.
  * This includes the event title, description, date, location, image, and participant limits.
- * Allows users to view all relevant details of the event, and navigate back to the previous screen.
+ * Allows users to join a waitlist of the event, and navigate back to the previous screen.
  *
  * @version 2.0
  * @author Ayub Ali
  * Responsibilities:
- * - Display full event details for selected events.
- * - Load and display the event poster image from a stored URL.
- * - Handle back navigation for seamless user experience.
+ * - Display full event details for signup process
+ * - Load and display the event poster image from a stored URL
+ * - Show current entrant count and capacity
+ * - Handle back navigation for seamless user experience
  */
 
-// Fragment that displays complete details of a selected or random event
-public class EventDetailsFragment extends Fragment {
-    private EventEventdetailsBinding binding;
+public class EventSignUpFragment extends Fragment {
+    private EventEventSignUpBinding binding;
     private Event event;
-    private EventViewModel eventViewModel;
 
-    // Inflates the layout for the event details fragment
+    // Inflates the layout for event details view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = EventEventdetailsBinding.inflate(getLayoutInflater(), container, false);
+        binding = EventEventSignUpBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 
-    // Sets up the UI and initializes the event data
+    // Sets up UI elements and populates data after the view is created
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        eventViewModel = new EventViewModel();
-
-        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
 
         if (getArguments() != null) {
             event = (Event) getArguments().getSerializable("selectedEvent");
-            displayEventDetails();
-        } else {
-            fetchRandomEvent();
         }
-    }
 
-    // Retrieves a random event from Firestore
-    private void fetchRandomEvent() {
-        eventViewModel.fetchEvents(task -> {
-            if (task.isSuccessful() && !eventViewModel.getEvents().isEmpty()) {
-                int randomIndex = new Random().nextInt(eventViewModel.getEvents().size());
-                event = eventViewModel.getEvents().get(randomIndex);
-                displayEventDetails();
-            }
-        });
-    }
-
-    // Displays the event information in the UI
-    private void displayEventDetails() {
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+        // Populate UI with event data if available
         if (event != null) {
             User user = new User();
-            if (user.isAdmin()) {
+            if (user.isAdmin()){
                 binding.scanQr.setVisibility(View.GONE);
             }
 
@@ -86,17 +64,14 @@ public class EventDetailsFragment extends Fragment {
             binding.date.setText(event.getEventDate());
             binding.address.setText(event.getEventLocation());
             binding.winners.setText(event.getMaxWinners() + (Integer.parseInt(event.getMaxWinners()) == 1 ? " Winner" : " Winners"));
-            binding.entrants.setText(event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
+            binding.entrants.setText(event.getEntrants() + " / " +event.getMaxEntrants()+ (event.getEntrants() == 1 ? " Entrant" : " Entrants"));
 
+            // Load the event flyer image using Glide
             Image image = new Image("1234567890", "123456789");
             image.download(new ImageQuery() {
                 @Override
                 public void onSuccess(Image image) {
-                    if (isAdded()) {
-                        Glide.with(binding.getRoot())
-                                .load(image.getImageUrl())
-                                .into(binding.eventFlyer);
-                    }
+                    Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.eventFlyer);
                 }
 
                 @Override
@@ -105,6 +80,7 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 }
+
 /**
  * Code Sources
  *

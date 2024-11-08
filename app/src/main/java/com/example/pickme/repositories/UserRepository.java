@@ -10,6 +10,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,69 +60,75 @@ public class UserRepository {
                 String userAuthId = Objects.requireNonNull(task.getResult().getUser()).getUid();
 
                 // Creates the User object
+//                String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
+
+                String initials = String.valueOf(firstName.charAt(0));
                 Image newImage = new Image(deviceId, deviceId);
-                newImage.generate(task1 -> {
+                newImage.generate(initials, task1 -> {
                     if (task1.isSuccessful()) {
                         newImage.setImageUrl(task1.getResult().getImageUrl());
+                        User newUser = new User(this, userAuthId, firstName, lastName, email, contact, newImage.getImageUrl(), false, deviceId, true, false, true);
+                        newUser.signup(firstName, lastName);
+                        User.setInstance(newUser);
+
+                        // Save user data to Firestore using DeviceID as the document ID
+                        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task2 -> {
+                            newUser.setRegToken(task2.getResult());
+                            db.collection("users").document(deviceId)
+                                    .set(newUser)
+                                    .addOnSuccessListener(aVoid -> callback.onSuccess(newUser))
+                                    .addOnFailureListener(e -> callback.onFailure("Failed to save user data: " + e.getMessage()));
+                        });
                     }
                 });
-                User newUser = new User(this, userAuthId, firstName, lastName, email, contact, newImage.getImageUrl(), false, deviceId, true, false, true);
-                newUser.signup(firstName, lastName);
-                User.setInstance(newUser);
 
-                // Save user data to Firestore using DeviceID as the document ID
-                db.collection("users").document(deviceId)
-                        .set(newUser)
-                        .addOnSuccessListener(aVoid -> callback.onSuccess(newUser))
-                        .addOnFailureListener(e -> callback.onFailure("Failed to save user data: " + e.getMessage()));
             } else {
                 callback.onFailure("Authentication failed!");
             }
         });
     }
 
-    public void updateUser(User user, OnCompleteListener<Void> onCompleteListener) {
-        if (user == null || user.getDeviceId() == null || user.getDeviceId().isEmpty()) {
-            Log.e("UserRepository", "Invalid user or user ID.");
-            return;
+        public void updateUser (User user, OnCompleteListener < Void > onCompleteListener){
+            if (user == null || user.getDeviceId() == null || user.getDeviceId().isEmpty()) {
+                Log.e("UserRepository", "Invalid user or user ID.");
+                return;
+            }
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("firstName", user.getFirstName());
+            updates.put("lastName", user.getLastName());
+            updates.put("emailAddress", user.getEmailAddress());
+            updates.put("contactNumber", user.getContactNumber());
+            updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
+            updates.put("notificationEnabled", user.isNotificationEnabled());
+            updates.put("profilePictureUrl", user.getProfilePictureUrl());
+
+            usersRef.document(user.getDeviceId())
+                    .update(updates)
+                    .addOnCompleteListener(onCompleteListener)
+                    .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
         }
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("firstName", user.getFirstName());
-        updates.put("lastName", user.getLastName());
-        updates.put("emailAddress", user.getEmailAddress());
-        updates.put("contactNumber", user.getContactNumber());
-        updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
-        updates.put("notificationEnabled", user.isNotificationEnabled());
-        updates.put("profilePictureUrl", user.getProfilePictureUrl());
+        public void deleteUser (String deviceId){
+            if (deviceId == null || deviceId.isEmpty()) {
+                Log.e("UserRepository", "DeviceID is required for deleting a user.");
+                return;
+            }
 
-        usersRef.document(user.getDeviceId())
-                .update(updates)
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
-    }
-
-    public void deleteUser(String deviceId) {
-        if (deviceId == null || deviceId.isEmpty()) {
-            Log.e("UserRepository", "DeviceID is required for deleting a user.");
-            return;
+            usersRef.document(deviceId)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> Log.d("UserRepository", "User deleted successfully"))
+                    .addOnFailureListener(e -> Log.e("UserRepository", "Failed to delete user: " + e.getMessage(), e));
         }
 
-        usersRef.document(deviceId)
-                .delete()
-                .addOnSuccessListener(aVoid -> Log.d("UserRepository", "User deleted successfully"))
-                .addOnFailureListener(e -> Log.e("UserRepository", "Failed to delete user: " + e.getMessage(), e));
+        public void getAllUsers (OnCompleteListener < QuerySnapshot > onCompleteListener) {
+            usersRef.get().addOnCompleteListener(onCompleteListener);
+        }
+
+        public interface OnUserCreatedCallback {
+            // Defines an interface for callback.
+            void onSuccess(User user);
+
+            void onFailure(String errorMessage);
+        }
     }
-
-    public void getAllUsers(OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        usersRef.get().addOnCompleteListener(onCompleteListener);
-    }
-
-    public interface OnUserCreatedCallback {
-        // Defines an interface for callback.
-        void onSuccess(User user);
-        void onFailure(String errorMessage);
-    }
-}
-
-
