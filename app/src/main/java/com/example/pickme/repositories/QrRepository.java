@@ -67,3 +67,13 @@ public class QrRepository {
         return qrRef.document(qrID).delete();
     }
 }
+
+/**
+ * Code Sources
+ *
+ * Firebase Documentation:
+ * - Firestore Documentation
+ *
+ * Java Documentation:
+ * - Java error handling with exceptions
+ */

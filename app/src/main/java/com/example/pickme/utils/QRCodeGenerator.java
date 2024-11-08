@@ -135,3 +135,17 @@ public class QRCodeGenerator {
         void onError(String errorMessage);
     }
 }
+
+/**
+ * Code Sources
+ *
+ * ChatGPT-4o:
+ * - Explain how to implement caching of bitmaps in an android app
+ * - What are the best Java libraries for creating QR codes?
+ *
+ * Github:
+ * - ZXing ("Zebra Crossing") Library documentation
+ *
+ * Java Documentation:
+ * - Caching in java
+ */
