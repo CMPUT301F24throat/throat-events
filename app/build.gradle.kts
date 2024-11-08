@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+//    implementation(files("/Users/omarkattan/Library/Android/sdk/platforms/android-34/android.jar"))
 
     // Core Android Libraries
     implementation(libs.appcompat)
@@ -44,18 +45,16 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
 
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
+
     // Firebase Services
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.inappmessaging)
     implementation(libs.firebase.messaging)
-
-    implementation(libs.zxing.core)
-    implementation(libs.zxing.android)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
     implementation(libs.firebase.database)
-    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
@@ -64,23 +63,18 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.circleimageview)
 
-    implementation(libs.play.services.tasks)
-    // Navigation Components
-    implementation(libs.navigation.fragment.ktx)
-    implementation(libs.navigation.ui.ktx)
-
     // Barcode Scanning Libraries
-    implementation(libs.zxing.core.v350)
-    implementation(libs.javase)
+    implementation(libs.zxing.core)
     implementation(libs.zxing.android)
 
     // Play Services for Background Tasks
     implementation(libs.play.services.tasks)
 
-    // Firebase Bills of Materials for Version Alignment
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firestore)
-    implementation(libs.google.firebase.auth)
+    // Navigation Components
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
+    implementation(libs.navigation.dynamic.features.fragment)
+    implementation(libs.navigation.compose)
 
     // Testing Libraries
     testImplementation(libs.junit)
@@ -90,18 +84,4 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.navigation.testing)
-
-    // Jetpack Compose Integration
-    implementation(libs.navigation.compose)
-
-    // Views/Fragments Integration
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
-
-    // Feature module support for Fragments
-    implementation(libs.navigation.dynamic.features.fragment)
-
-    // Noinspection GradleDependency
-    implementation (libs.glide)
-    annotationProcessor (libs.compiler)
 }

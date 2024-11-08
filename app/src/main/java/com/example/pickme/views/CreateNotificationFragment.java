@@ -23,6 +23,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+/**
+ * This fragment handles the create/send screen for notifications
+ *
+ * @author Omar-Kattan-1
+ * @version 1.1
+ */
 public class CreateNotificationFragment extends Fragment {
 
     private FirebaseFirestore db;
@@ -83,8 +89,13 @@ public class CreateNotificationFragment extends Fragment {
                         "Notification Sent",
                         Toast.LENGTH_SHORT).show());
 
-                getActivity().getOnBackPressedDispatcher().onBackPressed();
+                getActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
             }
         });
     }
 }
+
+/*
+ * Sources:
+ * ChatGPT: "how do I make a button behave like the android back button"
+ */

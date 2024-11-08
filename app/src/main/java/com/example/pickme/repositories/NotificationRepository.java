@@ -15,8 +15,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the notifications collection
- * @author sophiecabungcal
- * @version 1.0
+ * @author sophiecabungcal, Omar-Kattan-1
+ * @version 1.1
+ * <b></b>
  * Responsibilities:
  * CRUD operations for notification data
  */
@@ -24,6 +25,9 @@ public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
 
+    /**
+     * Constructor also initializes the Firebase db
+     */
     public NotificationRepository() {
         // temporary anonymous auth
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -35,7 +39,13 @@ public class NotificationRepository {
         });
     }
 
-    // Create a new notification
+    /**
+     * Adds a notification to the db
+     * @see Notification
+     *
+     * @param notification          the notification object to add
+     * @param onCompleteListener    task to be completed once this is done
+     */
     public void addNotification(Notification notification, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {
                     DocumentReference newNotificationRef = notificationsRef.document();
@@ -78,5 +88,10 @@ public class NotificationRepository {
     public void getNotificationsBySenderUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
         notificationsRef.whereEqualTo("senderId", userId).get().addOnCompleteListener(onCompleteListener);
     }
-
 }
+
+/*
+Sources:
+
+Firebase docs: https://firebase.google.com/docs/cloud-messaging/android/client?_gl=1*1c1ztk2*_up*MQ..*_ga*MTExNzcwMDM4LjE3MzA5OTYyMDc.*_ga_CW55HF8NVT*MTczMDk5NjIwNi4xLjAuMTczMDk5NjIwNi4wLjAuMA..
+ */

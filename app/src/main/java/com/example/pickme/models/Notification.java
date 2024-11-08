@@ -5,8 +5,15 @@ import java.util.ArrayList;
 
 /**
  * Represents a notification alert created by a user
+ * <br>
+ * This class holds the following:
+ * <ul>
+ *     <li>Notification Message</li>
+ *     <li>Who it was sent from and when</li>
+ *     <li>Who it's going to</li>
+ * </ul>
  * @author Omar-Kattan-1
- * @version 1.0
+ * @version 1.1
  */
 public class Notification {
     private String notificationID;
@@ -95,6 +102,9 @@ public class Notification {
         this.level = level;
     }
 
+    /**
+     * represents the group of people a notification will be sent to
+     */
     public enum SendLevel{
         Specific,
         Entrants,
