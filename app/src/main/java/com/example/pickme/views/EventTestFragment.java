@@ -26,14 +26,12 @@ public class EventTestFragment extends Fragment {
 
     private EventTestBinding binding;
 
-    // Inflate the layout for this fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = EventTestBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 
-    // Set up navigation and initialize Firebase on view creation
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -46,6 +44,9 @@ public class EventTestFragment extends Fragment {
 
         // Navigate to event list screen for updating events
         binding.updateEvents.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventListFragment));
+
+        // Navigate to event details screen
+        binding.viewEventDetails.setOnClickListener(view1 -> Navigation.findNavController(view).navigate(R.id.action_eventTestFragment_to_eventDetailsFragment));
     }
 }
 
