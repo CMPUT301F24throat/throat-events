@@ -68,6 +68,12 @@
         <action
             android:id="@+id/action_myEventsFragment_to_eventCreationFragment"
             app:destination="@id/eventCreationFragment" />
+        <action
+            android:id="@+id/action_myEventsFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+        <action
+            android:id="@+id/action_myEventsFragment_to_facilityFragment"
+            app:destination="@id/facilityFragment" />
     </fragment>
 
     <fragment

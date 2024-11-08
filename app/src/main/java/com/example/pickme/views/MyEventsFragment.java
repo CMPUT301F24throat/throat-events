@@ -76,6 +76,6 @@ public class MyEventsFragment extends Fragment {
 
     private void navigateToFacilityFragment() {
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-        navController.navigate(R.id.action_global_facilityFragment);
+        navController.navigate(R.id.action_myEventsFragment_to_facilityFragment);
     }
 }

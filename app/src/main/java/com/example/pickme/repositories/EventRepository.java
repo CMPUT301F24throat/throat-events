@@ -76,8 +76,8 @@ public class EventRepository {
     }
 
     // Read all events by organizer user ID
-    public void getEventsByOrganizerUserId(OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        eventsRef.get().addOnCompleteListener(onCompleteListener);
+    public void getEventsByOrganizerUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(onCompleteListener);
     }
 }
 

@@ -29,34 +29,18 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints,RtlCompat" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="My Events - Under Construction"
-        android:textColor="@color/text1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/myEventsHeaderText"
+        app:layout_constraintBottom_toTopOf="@id/fab_add_event"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="230dp"
-        android:layout_height="3dp"
-        android:layout_marginTop="64dp"
-        android:background="@color/icon"
-        app:layout_constraintStart_toEndOf="@+id/myEventsHeaderText"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/divider5"
-        android:layout_width="40dp"
-        android:layout_height="3dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="4dp"
-        android:background="@color/icon"
-        app:layout_constraintEnd_toStartOf="@+id/myEventsHeaderText"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/events_item_view" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_event"
@@ -67,6 +51,10 @@
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/icon"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.958"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.851" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
