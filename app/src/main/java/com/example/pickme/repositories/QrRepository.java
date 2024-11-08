@@ -1,12 +1,11 @@
 package com.example.pickme.repositories;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.pickme.models.QR;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Handles interactions with the QRs collection
@@ -17,25 +16,23 @@ public class QrRepository {
     private final CollectionReference qrRef = db.collection("QRs");
 
     /**
-     * Creates a new QR document in the collection using only the QR association.
+     * Creates a new QR document using a QR object.
      *
-     * @param qrAssociation Associated entity reference for the QR code (e.g., "/events/mli7Z3XcZsBMCHocKmr6")
+     * @param qr The QR object containing the association data
      * @return Task for tracking success/failure
      */
-    public Task<Void> createQR(String qrAssociation) {
-        Map<String, Object> qrData = new HashMap<>();
-        qrData.put("qrAssociation", qrAssociation);
-
-        // Add the document to Firestore with an auto-generated ID
-        return qrRef.add(qrData).continueWithTask(task -> {
+    public Task<DocumentReference> createQR(QR qr) {
+        // Add the QR object to Firestore and let Firestore generate the document ID
+        return qrRef.add(qr).continueWithTask(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                // Get the auto-generated document ID
-                String qrID = task.getResult().getId();
+                DocumentReference docRef = task.getResult();
+                String generatedQrId = docRef.getId();  // Retrieve the auto-generated document ID
 
-                // Update the document with its own ID as the qrID field
-                return task.getResult().update("qrID", qrID);
+                // Set the qrId in the QR object and update Firestore with this value
+                qr.setQrId(generatedQrId);
+                return docRef.update("qrId", generatedQrId).continueWith(updateTask -> docRef);  // Return DocumentReference after update
             } else {
-                throw task.getException();  // Propagate any exception if creation failed
+                throw task.getException();  // Propagate the exception if the add operation failed
             }
         });
     }

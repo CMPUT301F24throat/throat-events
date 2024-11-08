@@ -3,6 +3,7 @@ package com.example.pickme.views;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,16 +27,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
  * Fragment to display a large QR code and event title for a specific event.
  * Responsibilities:
  * - Fetch event details from the database and display the event title.
- * - Generate or retrieve a cached QR code based on eventID and qrType.
+ * - Generate or retrieve a cached QR code based on eventID.
  * - Display the QR code and event title within the layout.
  */
 public class QRCodeViewFragment extends Fragment {
 
     private static final String ARG_EVENT_ID = "eventID";
-    private static final String ARG_QR_TYPE = "qrType";
 
     private String eventID;
-    private String qrType;
 
     private TextView eventTitleTextView;
     private ImageView qrCodeImageView;
@@ -53,17 +52,15 @@ public class QRCodeViewFragment extends Fragment {
 
     /**
      * Static factory method to create a new instance of QRCodeViewFragment with the specified
-     * event ID and QR type.
+     * event ID.
      *
      * @param eventID ID of the event for which the QR code is generated.
-     * @param qrType  Type of the QR code (e.g., "event_info", "event_join").
      * @return A new instance of QRCodeViewFragment with the specified arguments.
      */
-    public static QRCodeViewFragment newInstance(String eventID, String qrType) {
+    public static QRCodeViewFragment newInstance(String eventID) {
         QRCodeViewFragment fragment = new QRCodeViewFragment();
         Bundle args = new Bundle();
         args.putString(ARG_EVENT_ID, eventID);
-        args.putString(ARG_QR_TYPE, qrType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,10 +69,9 @@ public class QRCodeViewFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Retrieve eventID and qrType from arguments if available
+        // Retrieve eventID from arguments if available
         if (getArguments() != null) {
             eventID = getArguments().getString(ARG_EVENT_ID);
-            qrType = getArguments().getString(ARG_QR_TYPE);
         }
 
         // Initialize repositories and QR code generator
@@ -109,42 +105,52 @@ public class QRCodeViewFragment extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
                     DocumentSnapshot document = task.getResult();
-                    String eventTitle = document.getString("title");
+                    // Retrieve "eventTitle" instead of "title"
+                    String eventTitle = document.getString("eventTitle");
                     if (eventTitle != null) {
                         // Update the event title TextView
                         eventTitleTextView.setText(eventTitle);
                     } else {
+                        Log.e("QRCodeViewFragment", "Event title not found in document.");
                         Toast.makeText(getContext(), "Event title not found", Toast.LENGTH_SHORT).show();
                     }
 
                     // Generate and display the QR code
                     displayQRCode();
                 } else {
+                    Log.e("QRCodeViewFragment", "Failed to load event details: " + task.getException());
                     Toast.makeText(getContext(), "Failed to load event details", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
+
     /**
-     * Generates a QR code using QRCodeGenerator for the given eventID and qrType.
+     * Generates a QR code using QRCodeGenerator for the given eventID.
      * Checks if a cached QR code exists; if so, it displays the cached image.
      * Otherwise, generates a new QR code, caches it, and displays it in qrCodeImageView.
      */
     private void displayQRCode() {
-        // Generate QR code for the eventID and qrType, and retrieve the cached image path if available
-        String qrCodeFilePath = qrCodeGenerator.getQRCodeImage(requireContext(), eventID);
-        if (qrCodeFilePath != null) {
-            // Load the QR code bitmap from the cached file path
-            Bitmap qrBitmap = BitmapFactory.decodeFile(qrCodeFilePath);
-            if (qrBitmap != null) {
-                // Set the QR code image in the ImageView
-                qrCodeImageView.setImageBitmap(qrBitmap);
-            } else {
-                Toast.makeText(getContext(), "Failed to load QR code", Toast.LENGTH_SHORT).show();
+        qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
+            @Override
+            public void onQRCodeReady(String filePath) {
+                Bitmap qrBitmap = BitmapFactory.decodeFile(filePath);
+                if (qrBitmap != null) {
+                    qrCodeImageView.setImageBitmap(qrBitmap);
+                    qrCodeImageView.setVisibility(View.VISIBLE); // Make the ImageView visible
+                    qrCodeImageView.setAlpha(0f);
+                    qrCodeImageView.animate().alpha(1f).setDuration(300).start(); // Apply fade-in animation
+                } else {
+                    Toast.makeText(getContext(), "Failed to load QR code", Toast.LENGTH_SHORT).show();
+                }
             }
-        } else {
-            Toast.makeText(getContext(), "Error generating QR code", Toast.LENGTH_SHORT).show();
-        }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }

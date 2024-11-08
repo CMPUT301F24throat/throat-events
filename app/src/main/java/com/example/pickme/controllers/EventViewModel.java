@@ -1,6 +1,7 @@
 package com.example.pickme.controllers;
 
 import com.example.pickme.models.Event;
+import com.example.pickme.models.QR;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.QrRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -84,7 +85,9 @@ public class EventViewModel {
                     onCompleteListener.onComplete(task); // Notify completion
 
                     // Now create the QR code associated with this eventId
-                    qrRepository.createQR("/events/" + eventId)
+                    QR qr = new QR("/events/" + eventId);
+
+                    qrRepository.createQR(qr)
                             .addOnSuccessListener(aVoid -> System.out.println("QR code created successfully"))
                             .addOnFailureListener(e -> System.err.println("Failed to create QR code: " + e.getMessage()));
                 } else {
