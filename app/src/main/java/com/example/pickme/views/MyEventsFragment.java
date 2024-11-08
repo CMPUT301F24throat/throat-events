@@ -14,6 +14,7 @@ import androidx.navigation.Navigation;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.FacilityRepository;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 public class MyEventsFragment extends Fragment {
@@ -36,6 +37,12 @@ public class MyEventsFragment extends Fragment {
         if (user != null) {
             checkUserFacility(user.getUserId());
         }
+
+        FloatingActionButton fabAddEvent = view.findViewById(R.id.fab_add_event);
+        fabAddEvent.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+            navController.navigate(R.id.action_myEventsFragment_to_eventCreationFragment);
+        });
     }
 
     private void checkUserFacility(String userId) {

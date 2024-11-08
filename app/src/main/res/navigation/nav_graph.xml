@@ -64,7 +64,17 @@
         android:id="@+id/myEventsFragment"
         android:name="com.example.pickme.views.MyEventsFragment"
         android:label="My Events"
-        tools:layout="@layout/fragment_my_events" />
+        tools:layout="@layout/fragment_my_events">
+        <action
+            android:id="@+id/action_myEventsFragment_to_eventCreationFragment"
+            app:destination="@id/eventCreationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/eventCreationFragment"
+        android:name="com.example.pickme.views.EventCreationFragment"
+        android:label="Event Creation"
+        tools:layout="@layout/event_eventcreation" />
 
     <fragment
         android:id="@+id/facilityFragment"
