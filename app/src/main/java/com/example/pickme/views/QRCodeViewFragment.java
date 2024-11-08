@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,10 +90,20 @@ public class QRCodeViewFragment extends Fragment {
         eventTitleTextView = view.findViewById(R.id.eventTitle);
         qrCodeImageView = view.findViewById(R.id.qrCodeImage);
 
+        // Set up the back button to perform the default back action
+        ImageButton backButton = view.findViewById(R.id.myImageButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
+
         // Load event details and QR code for display
         loadEventDetails();
         return view;
     }
+
 
     /**
      * Loads event details using EventRepository and updates the event title TextView.
