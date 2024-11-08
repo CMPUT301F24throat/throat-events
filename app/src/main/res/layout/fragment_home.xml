@@ -8,21 +8,42 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_gravity="center"
-        android:gravity="center|top">
+        android:gravity="center|top"
+        android:layout_marginTop="50dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center|top">
+
+            <Button
+                android:id="@+id/btn_EventTesting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Event Testing" />
+
+            <Button
+                android:id="@+id/btn_ImageTesting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Image Testing" />
+
+            <Button
+                android:id="@+id/btn_qrTesting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="QR Code Testing"/>
+
+        </LinearLayout>
 
         <Button
-            android:id="@+id/btn_EventTesting"
+            android:id="@+id/notifTest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Event Testing" />
-
-        <Button
-            android:id="@+id/btn_ImageTesting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Image Testing" />
-
+            android:text="Notif testing" />
     </LinearLayout>
 
 

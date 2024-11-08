@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.example.pickme.R;
 import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventEventdetailsBinding;
 import com.example.pickme.models.Event;
@@ -60,6 +62,20 @@ public class EventDetailsFragment extends Fragment {
         } else {
             fetchRandomEvent();
         }
+
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+
+        // Set up navigation to QRCodeViewFragment
+        binding.goToQrView.setOnClickListener(v -> {
+            if (event != null) {
+                String eventID = event.getEventId();
+                Bundle args = new Bundle();
+                args.putString("eventID", eventID);
+                Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_QRCodeViewFragment, args);
+            } else {
+                Toast.makeText(getContext(), "Event ID not available", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Retrieves a random event from Firestore

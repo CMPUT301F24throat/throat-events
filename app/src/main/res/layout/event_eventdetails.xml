@@ -44,6 +44,7 @@
         app:layout_constraintStart_toEndOf="@id/startGuide"
         app:layout_constraintTop_toBottomOf="@id/topGuide"/>
 
+
     <ImageView
         android:visibility="gone"
         android:id="@+id/scanQr"
@@ -195,6 +196,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:justificationMode="inter_word"/>
+
+            <ImageButton
+                android:id="@+id/goToQrView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="52dp"
+                android:layout_height="50dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/qr_code_2_24px"
+                tools:layout_editor_absoluteX="318dp"
+                tools:layout_editor_absoluteY="3dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

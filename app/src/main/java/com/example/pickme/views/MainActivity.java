@@ -13,6 +13,7 @@ import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * An entry point for the app and is responsible for user authentication.
@@ -35,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
 
         FirebaseApp.initializeApp(this);
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+
+        // Initialize UserRepository instance
         userRepository = new UserRepository();
 
         // Hides the action bar

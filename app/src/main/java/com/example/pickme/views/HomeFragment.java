@@ -18,6 +18,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeFragment extends Fragment {
 
+    private static final String EVENT_ID = "CV33jsHcQ3CW2WbxYBDX";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -46,6 +48,22 @@ public class HomeFragment extends Fragment {
             if (homeProfileButton != null) {
                 homeProfileButton.setVisibility(View.GONE);
             }
+        });
+
+        Button notifTest = view.findViewById(R.id.notifTest);
+        notifTest.setOnClickListener(view3 -> {
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_createNotificationFragment);
+        });
+
+        // Button to navigate to QR Code View Fragment
+        Button qrViewButton = view.findViewById(R.id.btn_qrTesting);
+        qrViewButton.setOnClickListener(v -> {
+            // Create a bundle to pass the eventID to QRCodeViewFragment
+            Bundle args = new Bundle();
+            args.putString("eventID", EVENT_ID);
+
+            // Navigate to QRCodeViewFragment, passing the eventID as an argument
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_QRCodeViewFragment, args);
         });
     }
 }

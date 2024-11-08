@@ -36,9 +36,10 @@ public class User implements Serializable {
 
     // User Preferences & Permissions
     private String deviceId; // Attaches on device to user
-    protected boolean isAdmin; // Permission to allow user admin status.
-    private boolean notificationEnabled; // Permission to allow notifications.
-    private boolean geoLocationEnabled; // Permission to track user's location.
+    private String regToken; //firebase token for notification sending
+    protected boolean isAdmin; // Permission to allow user admin status
+    private boolean notificationEnabled; // Permission to allow notifications
+    private boolean geoLocationEnabled; // Permission to track user's location
 
     // User Timestamps
     private transient Timestamp createdAt; // When was the account created.
@@ -137,6 +138,12 @@ public class User implements Serializable {
         this.updatedAt = Timestamp.now();
     }
 
+    public String getRegToken() { return regToken; }
+
+    public void setRegToken(String token) {
+        this.regToken = token;
+    }
+
     public boolean isAdmin() {
         return isAdmin;
     }
@@ -183,11 +190,11 @@ public class User implements Serializable {
 
     //---------- Validate User Information --------------------
     public static boolean validateFirstName(String firstName) {
-        return firstName == null || !firstName.matches("^[A-Za-z]+(-[A-Za-z]+)*$"); // Credits: ChatGBT: How do I only validate hyphens in the middle.
+        return firstName != null && firstName.matches("^[A-Za-z]+(-[A-Za-z]+)*$"); // Credits: ChatGBT: How do I only validate hyphens in the middle.
     }
 
     public static boolean validateLastName(String lastName) {
-        return lastName == null || !lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
+        return lastName != null && lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
     }
 
     public static boolean validateEmailAddress(String emailAddress) {

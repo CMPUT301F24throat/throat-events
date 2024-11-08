@@ -1,28 +1,36 @@
 package com.example.pickme.models;
 
-import java.time.LocalDateTime;
+import com.google.firebase.Timestamp;
 import java.util.ArrayList;
 
 /**
  * Represents a notification alert created by a user
+ * <br>
+ * This class holds the following:
+ * <ul>
+ *     <li>Notification Message</li>
+ *     <li>Who it was sent from and when</li>
+ *     <li>Who it's going to</li>
+ * </ul>
  * @author Omar-Kattan-1
- * @version 1.0
+ * @version 1.1
  */
 public class Notification {
     private String notificationID;
     private String message;
 
     private boolean read;
-    private LocalDateTime dateTime;
+    private Timestamp timestamp;
 
-    private User sentFrom;
-    private ArrayList<User> sendTo;
+    private String sentFrom;
+    private ArrayList<String> sendTo;
     private SendLevel level;
 
     public Notification(){
         this.read = false;
     }
 
+    //--------- Notification ID -------------
     public void setNotificationId(String notificationID) {
         this.notificationID = notificationID;
     }
@@ -57,31 +65,29 @@ public class Notification {
     }
 
     //---------- DateTime --------------------
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
     public void setDateTimeNow() {
-        this.dateTime = LocalDateTime.now();
+        this.timestamp = Timestamp.now();
     }
 
     //---------- SentFrom --------------------
-    public User getSentFrom() {
+    public String getSentFrom() {
         return sentFrom;
     }
 
-    public void setSentFrom(User sentFrom) {
+    public void setSentFrom(String sentFrom) {
         this.sentFrom = sentFrom;
     }
 
     //---------- SendTo --------------------
-    public ArrayList<User> getSendTo() {
+    public ArrayList<String> getSendTo() {
         return sendTo;
     }
 
-    public void setSendTo(ArrayList<User> sendTo){
-        if(this.level != SendLevel.Specific) return;
-
+    public void setSendTo(ArrayList<String> sendTo){
         this.sendTo = sendTo;
     }
 
@@ -94,6 +100,9 @@ public class Notification {
         this.level = level;
     }
 
+    /**
+     * represents the group of people a notification will be sent to
+     */
     public enum SendLevel{
         Specific,
         Entrants,
