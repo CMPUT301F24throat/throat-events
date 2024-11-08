@@ -17,6 +17,9 @@
             android:id="@+id/action_homeFragment_to_imageTestFragment"
             app:destination="@id/imageTestFragment" />
         <action
+            android:id="@+id/action_homeFragment_to_QRCodeViewFragment"
+            app:destination="@id/QRCodeViewFragment" />
+        <action
             android:id="@+id/action_homeFragment_to_createNotificationFragment"
             app:destination="@id/createNotificationFragment" />
     </fragment>
@@ -49,7 +52,15 @@
         android:id="@+id/eventDetailsFragment"
         android:name="com.example.pickme.views.EventDetailsFragment"
         android:label="EventDetailsFragment"
-        tools:layout="@layout/event_eventdetails" />
+        tools:layout="@layout/event_eventdetails">
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_QRCodeViewFragment"
+            app:destination="@id/QRCodeViewFragment">
+            <argument
+                android:name="eventID"
+                app:argType="string" />
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/eventListFragment"
         android:name="com.example.pickme.views.EventListFragment"
@@ -58,6 +69,17 @@
         <action
             android:id="@+id/action_eventListFragment_to_eventCreationFragment"
             app:destination="@id/eventCreationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QRCodeViewFragment"
+        android:name="com.example.pickme.views.QRCodeViewFragment"
+        android:label="QR Code View"
+        tools:layout="@layout/qr_display_activity" >
+
+        <!-- Define eventID argument for QRCodeViewFragment -->
+        <argument
+            android:name="eventID"
+            app:argType="string" />
     </fragment>
 
     <fragment
