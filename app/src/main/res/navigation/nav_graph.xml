@@ -46,7 +46,15 @@
         android:id="@+id/eventDetailsFragment"
         android:name="com.example.pickme.views.EventDetailsFragment"
         android:label="EventDetailsFragment"
-        tools:layout="@layout/event_eventdetails" />
+        tools:layout="@layout/event_eventdetails">
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_QRCodeViewFragment"
+            app:destination="@id/QRCodeViewFragment">
+            <argument
+                android:name="eventID"
+                app:argType="string" />
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/eventListFragment"
         android:name="com.example.pickme.views.EventListFragment"
