@@ -88,8 +88,6 @@ public class Notification {
     }
 
     public void setSendTo(ArrayList<String> sendTo){
-        if(this.level != SendLevel.Specific) return;
-
         this.sendTo = sendTo;
     }
 
