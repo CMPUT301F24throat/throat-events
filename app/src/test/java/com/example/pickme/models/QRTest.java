@@ -5,13 +5,25 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
+/**
+ * Unit tests for the {@link QR} class, validating the behavior of getters, setters,
+ * constructors, and object initialization.
+ */
 public class QRTest {
 
-    // Helper method to create a QR instance
+    /**
+     * Helper method to create a mock {@link QR} instance with a predefined association.
+     *
+     * @return A {@link QR} instance with "testAssociation" as the association.
+     */
     private QR mockQR() {
         return new QR("testAssociation");
     }
 
+    /**
+     * Tests the {@link QR#getQrAssociation()} method to ensure the association is set correctly
+     * via the constructor and retrieved accurately.
+     */
     @Test
     public void testQrAssociation() {
         QR qr = mockQR();
@@ -24,6 +36,10 @@ public class QRTest {
         assertEquals("newAssociation", anotherQr.getQrAssociation());
     }
 
+    /**
+     * Tests the {@link QR#setQrId(String)} and {@link QR#getQrId()} methods to verify
+     * that the QR ID can be set and retrieved correctly.
+     */
     @Test
     public void testQrIdSetterAndGetter() {
         QR qr = mockQR();
@@ -36,6 +52,10 @@ public class QRTest {
         assertEquals("testQrId", qr.getQrId());
     }
 
+    /**
+     * Tests the default constructor {@link QR#QR()} to ensure that it initializes
+     * the QR ID and association as null.
+     */
     @Test
     public void testQrDefaultConstructor() {
         // Using default constructor
@@ -46,6 +66,10 @@ public class QRTest {
         assertNull("QR association should be null by default", defaultQR.getQrAssociation());
     }
 
+    /**
+     * Tests creating a {@link QR} object with an association and setting a QR ID,
+     * then validates that both values are set and retrieved correctly.
+     */
     @Test
     public void testQrObjectCreation() {
         QR qr = new QR("event123");
