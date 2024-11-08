@@ -66,6 +66,12 @@
         android:label="My Events"
         tools:layout="@layout/fragment_my_events" />
 
+    <fragment
+        android:id="@+id/facilityFragment"
+        android:name="com.example.pickme.views.FacilityFragment"
+        android:label="Facility"
+        tools:layout="@layout/fragment_facility" />
+
     <!-- Global actions -->
     <action
         android:id="@+id/action_global_homeFragment"
@@ -82,4 +88,7 @@
     <action
         android:id="@+id/action_global_userSignUpFragment"
         app:destination="@id/userSignUpFragment" />
+    <action
+        android:id="@+id/action_global_facilityFragment"
+        app:destination="@id/facilityFragment" />
 </navigation>
