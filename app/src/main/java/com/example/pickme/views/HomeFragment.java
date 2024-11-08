@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +16,8 @@ import com.example.pickme.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeFragment extends Fragment {
+
+    private static final String EVENT_ID = "CV33jsHcQ3CW2WbxYBDX";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +47,17 @@ public class HomeFragment extends Fragment {
             if (homeProfileButton != null) {
                 homeProfileButton.setVisibility(View.GONE);
             }
+        });
+
+        // Button to navigate to QR Code View Fragment
+        Button qrViewButton = view.findViewById(R.id.btn_qrTesting);
+        qrViewButton.setOnClickListener(v -> {
+            // Create a bundle to pass the eventID to QRCodeViewFragment
+            Bundle args = new Bundle();
+            args.putString("eventID", EVENT_ID);
+
+            // Navigate to QRCodeViewFragment, passing the eventID as an argument
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_QRCodeViewFragment, args);
         });
     }
 }
