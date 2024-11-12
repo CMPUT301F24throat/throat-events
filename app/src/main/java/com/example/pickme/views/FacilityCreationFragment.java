@@ -18,7 +18,7 @@ import com.example.pickme.models.Facility;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.FacilityRepository;
 
-public class FacilityFragment extends Fragment {
+public class FacilityCreationFragment extends Fragment {
 
     private FacilityRepository facilityRepository;
     private EditText facilityNameEditText;

@@ -61,6 +61,12 @@
         tools:layout="@layout/fragment_inbox" />
 
     <fragment
+        android:id="@+id/eventDetailsFragment"
+        android:name="com.example.pickme.views.EventDetailsFragment"
+        android:label="Event Details"
+        tools:layout="@layout/event_eventdetails" />
+
+    <fragment
         android:id="@+id/myEventsFragment"
         android:name="com.example.pickme.views.MyEventsFragment"
         android:label="My Events"
@@ -72,8 +78,8 @@
             android:id="@+id/action_myEventsFragment_to_eventDetailsFragment"
             app:destination="@id/eventDetailsFragment" />
         <action
-            android:id="@+id/action_myEventsFragment_to_facilityFragment"
-            app:destination="@id/facilityFragment" />
+            android:id="@+id/action_myEventsFragment_to_facilityCreationFragment"
+            app:destination="@id/facilityCreationFragment" />
     </fragment>
 
     <fragment
@@ -83,8 +89,8 @@
         tools:layout="@layout/event_eventcreation" />
 
     <fragment
-        android:id="@+id/facilityFragment"
-        android:name="com.example.pickme.views.FacilityFragment"
+        android:id="@+id/facilityCreationFragment"
+        android:name="com.example.pickme.views.FacilityCreationFragment"
         android:label="Facility"
         tools:layout="@layout/fragment_facility" />
 
@@ -105,6 +111,6 @@
         android:id="@+id/action_global_userSignUpFragment"
         app:destination="@id/userSignUpFragment" />
     <action
-        android:id="@+id/action_global_facilityFragment"
-        app:destination="@id/facilityFragment" />
+        android:id="@+id/action_global_facilityCreationFragment"
+        app:destination="@id/facilityCreationFragment" />
 </navigation>

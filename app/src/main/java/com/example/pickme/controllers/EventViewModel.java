@@ -54,8 +54,8 @@ public class EventViewModel {
     }
 
     // Fetch events from Firestore
-    public void fetchEvents(OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        eventRepository.getEventsByOrganizerUserId(new OnCompleteListener<QuerySnapshot>() {
+    public void fetchEvents(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        eventRepository.getEventsByOrganizerId(userId, new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {

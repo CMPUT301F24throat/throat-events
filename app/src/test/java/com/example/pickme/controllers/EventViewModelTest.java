@@ -83,7 +83,7 @@ public class EventViewModelTest {
             OnCompleteListener<QuerySnapshot> listener = invocation.getArgument(0); // Get the listener argument
             listener.onComplete(mockQuerySnapshotTask); // Simulate the onComplete callback
             return null; // Void method, no return value
-        }).when(mockEventRepository).getEventsByOrganizerUserId(any());
+        }).when(mockEventRepository).getEventsByOrganizerId(any());
 
         // Mock the behavior for addEvent, updateEvent, and deleteEvent using doAnswer() for void methods
         doAnswer(invocation -> {
@@ -133,7 +133,7 @@ public class EventViewModelTest {
 
         eventViewModel.fetchEvents(mockOnCompleteListener);
 
-        verify(mockEventRepository, times(1)).getEventsByOrganizerUserId(any());
+        verify(mockEventRepository, times(1)).getEventsByOrganizerId(any());
         verify(mockOnCompleteListener).onComplete(mockQuerySnapshotTask);
     }
 
@@ -143,7 +143,7 @@ public class EventViewModelTest {
 
         eventViewModel.fetchEvents(mockOnCompleteListener);
 
-        verify(mockEventRepository, times(1)).getEventsByOrganizerUserId(any());
+        verify(mockEventRepository, times(1)).getEventsByOrganizerId(any());
         verify(mockOnCompleteListener).onComplete(mockQuerySnapshotTask);
     }
 
