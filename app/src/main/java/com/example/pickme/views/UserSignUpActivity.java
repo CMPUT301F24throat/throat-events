@@ -47,7 +47,7 @@ public class UserSignUpActivity extends AppCompatActivity {
         String lastName = lastNameEditText.getText().toString().trim();
 
         // Validates the first name using User class's validation function
-        if (User.validateFirstName(firstName)) {
+        if (!User.validateFirstName(firstName)) {
             Toast.makeText(this, "Invalid first name. Please enter a valid first name.", Toast.LENGTH_SHORT).show();
             return;
         }
