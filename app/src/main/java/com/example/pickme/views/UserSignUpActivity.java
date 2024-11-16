@@ -31,7 +31,7 @@ public class UserSignUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_signup_activity); // Ensure this is the correct layout file
+        setContentView(R.layout.user_signup_activity);
 
         // Initialize Views and Data
         firstNameEditText = findViewById(R.id.signupFirstNameEdit);
@@ -60,7 +60,7 @@ public class UserSignUpActivity extends AppCompatActivity {
 
         // Sets up remaining information to ensure a successful initialization.
         String deviceId = getDeviceID();
-        String dummyEmail = "temp@tempmail.com";
+        String dummyEmail = "temp@testmail.com";
         String dummyContact = "0-000-000-0000";
 
         // Create user in Firebase with the provided and dummy data

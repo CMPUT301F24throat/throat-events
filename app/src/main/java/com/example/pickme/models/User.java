@@ -190,11 +190,11 @@ public class User implements Serializable {
 
     //---------- Validate User Information --------------------
     public static boolean validateFirstName(String firstName) {
-        return firstName != null && firstName.matches("^[A-Za-z]"); // Credits: ChatGBT: How do I only validate hyphens in the middle.
+        return firstName != null && firstName.matches("^[A-Za-z]+(-[A-Za-z]+)*$"); // Credits: ChatGBT: How do I only validate hyphens in the middle.
     }
 
     public static boolean validateLastName(String lastName) {
-        return lastName != null && lastName.matches("^[A-Za-z]");
+        return lastName != null && lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
     }
 
     public static boolean validateEmailAddress(String emailAddress) {
