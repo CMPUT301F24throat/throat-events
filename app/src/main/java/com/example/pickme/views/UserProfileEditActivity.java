@@ -139,13 +139,13 @@ public class UserProfileEditActivity extends AppCompatActivity {
         String contactNumber = editProfileContactNumber.getText().toString().trim();
 
         // Validates firstName
-        if (User.validateFirstName(firstName)) {
+        if (!User.validateFirstName(firstName)) {
             Toast.makeText(this, "Please enter a valid first name.", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // Validates lastName
-        if (User.validateLastName(lastName)) {
+        if (!lastName.isEmpty() && !User.validateLastName(lastName)) {
             Toast.makeText(this, "Please enter a valid last name.", Toast.LENGTH_SHORT).show();
             return false;
         }
