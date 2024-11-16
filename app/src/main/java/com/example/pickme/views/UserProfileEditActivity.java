@@ -145,7 +145,7 @@ public class UserProfileEditActivity extends AppCompatActivity {
         }
 
         // Validates lastName
-        if (!User.validateLastName(lastName)) {
+        if (!lastName.isEmpty() && !User.validateLastName(lastName)) {
             Toast.makeText(this, "Please enter a valid last name.", Toast.LENGTH_SHORT).show();
             return false;
         }
