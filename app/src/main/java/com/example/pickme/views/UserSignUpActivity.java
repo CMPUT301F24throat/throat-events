@@ -53,7 +53,7 @@ public class UserSignUpActivity extends AppCompatActivity {
         }
 
         // Validates the optional last name using User class's validation function
-        if (!lastName.isEmpty() && User.validateLastName(lastName)) {
+        if (!lastName.isEmpty() && !User.validateLastName(lastName)) {
             Toast.makeText(this, "Invalid last name. Please enter a valid last name.", Toast.LENGTH_SHORT).show();
             return;
         }
