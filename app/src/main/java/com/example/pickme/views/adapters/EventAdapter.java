@@ -87,7 +87,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
-                    binding.title.setTextColor(R.color.black);
+                    binding.title.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
                 }
 
                 binding.parent.setOnClickListener(v -> listener.onEventClick(event));

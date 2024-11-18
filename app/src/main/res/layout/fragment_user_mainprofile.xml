@@ -145,7 +145,8 @@
                 android:text="Location Access"
                 android:textAlignment="textStart"
                 android:textColor="@color/text2"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="RtlCompat"/>
         </LinearLayout>
 
         <LinearLayout
@@ -183,7 +184,8 @@
                 android:text="Event Notifications"
                 android:textAlignment="textStart"
                 android:textColor="@color/text2"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="RtlCompat"/>
         </LinearLayout>
 
         <LinearLayout
@@ -222,7 +224,8 @@
                 android:text="Admin Access"
                 android:textAlignment="textStart"
                 android:textColor="@color/text2"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="RtlCompat"/>
         </LinearLayout>
 
         <TextView
