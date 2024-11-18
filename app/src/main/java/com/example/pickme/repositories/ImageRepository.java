@@ -36,18 +36,15 @@ import java.util.List;
 public class ImageRepository {
     private final String TAG = "ImageRepository";
 
-    //region Attributes
     // authentication
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
-    private final String auth_uid = auth.getUid();
+    private final String auth_uid;
 
     // image storage
-    private final FirebaseStorage storage = FirebaseStorage.getInstance();
-    private final StorageReference imgStorage = storage.getReference();
+    private final StorageReference imgStorage;
 
     // database access
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference imgCollection = db.collection("images");
+    private final FirebaseFirestore db;
+    private final CollectionReference imgCollection;
 
     /**
      * Callback for handling duplicate checking
@@ -64,11 +61,22 @@ public class ImageRepository {
      * Constructs a new ImageRepository for image CRUD operations.
      */
     public ImageRepository() {
-        // temporary anonymous auth
+        //region Attributes
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth_uid = auth.getUid();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        imgStorage = storage.getReference();
+
+        db = FirebaseFirestore.getInstance();
+        imgCollection = db.collection("images");
+
+        // anonymous auth
         auth.signInAnonymously().addOnSuccessListener(authResult ->
                 Log.d(TAG, "AUTH: uid " + auth_uid + " successful authentication")
         );
     }
+
     //endregion
 
     //region Class methods
@@ -120,6 +128,7 @@ public class ImageRepository {
      * @param uri The image URI to be attached
      */
     public void upload(@NonNull Image i, @NonNull Uri uri, OnCompleteListener<Image> listener) {
+        
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
@@ -140,7 +149,7 @@ public class ImageRepository {
      * @param data The bytes of a bitmap to upload
      */
     public void upload(@NonNull Image i, byte[] data, OnCompleteListener<Image> listener) {
-
+        
         checkDuplicates(i, new duplicateCallback() {
             @Override
             public void hasDuplicate(DocumentReference doc) {
@@ -162,6 +171,7 @@ public class ImageRepository {
      * @param uri The uri to update with
      */
     private void uploadUriToFirebase(Image i, DocumentReference doc, Uri uri, OnCompleteListener<Image> listener) {
+        
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
@@ -190,6 +200,7 @@ public class ImageRepository {
     }
 
     private void uploadBytes(Image i, DocumentReference doc, byte[] data, OnCompleteListener<Image> listener) {
+        
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
@@ -226,6 +237,7 @@ public class ImageRepository {
      * @see com.example.pickme.utils.ImageQuery
      */
     public void download(@NonNull Image i, @NonNull ImageQuery callback) {
+        
 
         String imageAssociation = i.getImageAssociation();
         String imageType = i.getImageType().toString();
@@ -259,6 +271,7 @@ public class ImageRepository {
      * @param i Image object to be deleted
      */
     public void delete(@NonNull Image i, OnCompleteListener<Image> listener) {
+        
 
         String uploaderId = i.getUploaderId();
         String imageAssociation = i.getImageAssociation();
@@ -317,6 +330,7 @@ public class ImageRepository {
      * @param gallery The gridView you want to show the images
      */
     public void getAllImages(@NonNull Context context, @NonNull GridView gallery) {
+        
         // querying images collection for everything
         imgCollection
                 .get()

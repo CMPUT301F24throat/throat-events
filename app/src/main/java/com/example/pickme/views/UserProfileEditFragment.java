@@ -62,12 +62,15 @@ public class UserProfileEditFragment extends Fragment {
         // profile image gallery picker
         ActivityResultLauncher<PickVisualMediaRequest> pickPfp =
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // callback is invoked after the user selects a media item or closes the photo picker
                     if (uri != null) {
                         editProfilePicture.setTag("");
+                        // uploads the image selected
                         img.upload(uri, task -> {
                             if (task.isSuccessful()) {
                                 Image i = task.getResult();
                                 img.setImageUrl(i.getImageUrl());
+                                // preview
                                 Glide.with(editProfilePicture.getRootView())
                                         .load(img.getImageUrl())
                                         .into(editProfilePicture);
@@ -80,6 +83,7 @@ public class UserProfileEditFragment extends Fragment {
                     }
                 });
 
+        // launches the gallery picker when the user clicks the profile picture
         editProfilePicture.setOnClickListener(v -> {
             pickPfp.launch(new PickVisualMediaRequest.Builder()
                     .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
@@ -121,7 +125,9 @@ public class UserProfileEditFragment extends Fragment {
         }
     }
 
+    //---------- Saving Process --------------------
     private boolean validateUserChanges() {
+        // Validates the input fields and returns a boolean.
         String firstName = editProfileFirstName.getText().toString().trim();
         String lastName = editProfileLastName.getText().toString().trim();
         String emailAddress = editProfileEmailAddress.getText().toString().trim();
@@ -137,11 +143,13 @@ public class UserProfileEditFragment extends Fragment {
             return false;
         }
 
+        // Validates emailAddress
         if (!User.validateEmailAddress(emailAddress)) {
             Toast.makeText(getContext(), "Please enter a valid email address.", Toast.LENGTH_SHORT).show();
             return false;
         }
 
+        // Validates contactNumber
         if (!User.validateContactInformation(contactNumber)) {
             Toast.makeText(getContext(), "Please enter a valid contact number.", Toast.LENGTH_SHORT).show();
             return false;
@@ -150,6 +158,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void saveUserData() {
+        // Retrieve and update the current user instance with the new data from input fields
         User user = User.getInstance();
         if (user == null) {
             showToast("User data not available. Cannot save to Firestore.");
@@ -172,6 +181,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void pushUserToFirestore(User user) {
+        // Use UserRepository to handle the update in Firestore
         UserRepository userRepository = new UserRepository();
         userRepository.updateUser(user, task -> {
             if (task.isSuccessful()) {
@@ -184,6 +194,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void updateUserInstanceWithInput(User user) {
+        // Update the user object with data from input fields
         user.setFirstName(editProfileFirstName.getText().toString().trim());
         user.setLastName(editProfileLastName.getText().toString().trim());
         user.setEmailAddress(editProfileEmailAddress.getText().toString().trim());
@@ -203,7 +214,24 @@ public class UserProfileEditFragment extends Fragment {
         Navigation.findNavController(getView()).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
     }
 
+    //---------- Android Popups --------------------
     private void showToast(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
+
 }
+
+ /**
+  * Coding Sources
+  * <p>
+  * ChatGBT
+  * - "How do I set up a Firebase Firestore database collection?"
+  * - "How do I properly setup a Map / Hashmap?"
+  * <p>
+  * Stack Overflow
+  * - "What is the difference between the HashMap and Map objects in Java?"
+  * - "Persistent Data Storage in Android Development"
+  * <p>
+  * Android Developers
+  * - "Data and file storage overview"
+  **/
