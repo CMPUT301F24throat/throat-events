@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the facilities collection
@@ -31,5 +32,27 @@ public class FacilityRepository {
                 });
     }
 
+    // Update facility name and location
+    public void updateFacility(String facilityId, String facilityName, String facilityLocation, OnCompleteListener<Void> onCompleteListener) {
+        facilitiesRef.document(facilityId)
+                .update("facilityName", facilityName, "facilityLocation", facilityLocation)
+                .addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Update failed: " + e.getMessage());
+                });
+    }
+
+
+    // Get facility by ownerId
+    public void getFacilityByOwnerId(String ownerId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        facilitiesRef.whereEqualTo("ownerId", ownerId)
+                .get()
+                .addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Query failed: " + e.getMessage());
+                });
+    }
 }
 

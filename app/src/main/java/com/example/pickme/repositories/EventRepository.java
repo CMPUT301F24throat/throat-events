@@ -14,18 +14,10 @@ import com.google.firebase.firestore.QuerySnapshot;
  * Ensures data integrity through Firestore transactions and handles completion notifications for each operation.
  *
  * @version 2.0
- * @author Ayub Ali
- * Responsibilities:
- * - Perform CRUD operations on event data in Firestore.
- * - Manage transactions for consistent updates and deletion.
- * - Retrieve event data by ID or organizer user ID.
- * - Notify completion or failure of Firestore operations.
  */
-
 public class EventRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference eventsRef = db.collection("events");
-    private final WaitingListRepository waitingListRepository = new WaitingListRepository();
 
     // Create a new event
     public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
@@ -41,10 +33,11 @@ public class EventRepository {
                 });
     }
 
+    // Update an event
     public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
-        DocumentReference newEventRef = eventsRef.document(event.getEventId());
+        DocumentReference eventRef = eventsRef.document(event.getEventId());
         db.runTransaction(transaction -> {
-                    transaction.set(newEventRef, event);
+                    transaction.set(eventRef, event);
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
@@ -53,11 +46,13 @@ public class EventRepository {
                 });
     }
 
+    // Delete an event
     public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
-        db.collection("events")
-                .document(eventId)
-                .delete()
-                .addOnCompleteListener(onCompleteListener);
+        eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Deletion failed: " + e.getMessage());
+                });
     }
 
     // Read an event by ID
@@ -65,19 +60,9 @@ public class EventRepository {
         eventsRef.document(eventId).get().addOnCompleteListener(onCompleteListener);
     }
 
-    // Update an event
-    public void updateEvent(Event event) {
-        eventsRef.document(event.getEventId()).set(event);
-    }
-
-    // Delete an event by ID
-    public void deleteEvent(String eventId) {
-        eventsRef.document(eventId).delete();
-    }
-
     // Read all events by organizer user ID
-    public void getEventsByOrganizerUserId(OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        eventsRef.get().addOnCompleteListener(onCompleteListener);
+    public void getEventsByOrganizerId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(onCompleteListener);
     }
 }
 

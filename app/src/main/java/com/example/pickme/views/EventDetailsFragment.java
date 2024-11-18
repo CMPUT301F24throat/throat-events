@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,15 +11,11 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.example.pickme.R;
-import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventEventdetailsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.utils.ImageQuery;
-
-import java.util.Random;
 
 /**
  * Fragment to display detailed information about a specific event.
@@ -34,12 +29,10 @@ import java.util.Random;
  * - Load and display the event poster image from a stored URL.
  * - Handle back navigation for seamless user experience.
  */
-
 // Fragment that displays complete details of a selected or random event
 public class EventDetailsFragment extends Fragment {
     private EventEventdetailsBinding binding;
     private Event event;
-    private EventViewModel eventViewModel;
 
     // Inflates the layout for the event details fragment
     @Override
@@ -52,7 +45,6 @@ public class EventDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        eventViewModel = new EventViewModel();
 
         binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
 
@@ -60,33 +52,9 @@ public class EventDetailsFragment extends Fragment {
             event = (Event) getArguments().getSerializable("selectedEvent");
             displayEventDetails();
         } else {
-            fetchRandomEvent();
+            // Handle the case where no event is passed
+            Navigation.findNavController(requireView()).navigateUp();
         }
-
-        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
-
-        // Set up navigation to QRCodeViewFragment
-        binding.goToQrView.setOnClickListener(v -> {
-            if (event != null) {
-                String eventID = event.getEventId();
-                Bundle args = new Bundle();
-                args.putString("eventID", eventID);
-                Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_QRCodeViewFragment, args);
-            } else {
-                Toast.makeText(getContext(), "Event ID not available", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    // Retrieves a random event from Firestore
-    private void fetchRandomEvent() {
-        eventViewModel.fetchEvents(task -> {
-            if (task.isSuccessful() && !eventViewModel.getEvents().isEmpty()) {
-                int randomIndex = new Random().nextInt(eventViewModel.getEvents().size());
-                event = eventViewModel.getEvents().get(randomIndex);
-                displayEventDetails();
-            }
-        });
     }
 
     // Displays the event information in the UI

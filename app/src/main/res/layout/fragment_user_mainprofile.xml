@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background1">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/user_profile_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+
+        <Button
+            android:id="@+id/profileMainGoBackButton"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="58dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="32dp"
+            android:contentDescription="Touch to go back"
+            android:fontFamily="sans-serif"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:text="Profile"
+            android:textAlignment="viewStart"
+            android:textAllCaps="false"
+            android:textColor="@color/text1"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:icon="@drawable/ic_arrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilePicture"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_marginStart="90dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="90dp"
+            android:layout_marginBottom="35dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile_picture"
+            app:layout_constraintBottom_toTopOf="@+id/profileFullName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileMainGoBackButton"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/profileFullName"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="1dp"
+            android:contentDescription="Full Name"
+            android:drawableStart="@drawable/ic_profile_name"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="User Full Name"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/text2"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/profileEmailAddress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.489"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profilePicture"
+            tools:ignore="MissingConstraints,RtlCompat" />
+
+        <TextView
+            android:id="@+id/profileContactNumber"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="1dp"
+            android:contentDescription="Contact Number"
+            android:drawableStart="@drawable/ic_profile_phone"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="User Contact Number"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/text2"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/profileLocationLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.489"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileEmailAddress"
+            tools:ignore="MissingConstraints,RtlCompat" />
+
+        <LinearLayout
+            android:id="@+id/profileLocationLayout"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:layout_gravity="start"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="40dp"
+            android:orientation="horizontal"
+            android:background="@drawable/button_squircle_background"
+            app:layout_constraintBottom_toTopOf="@+id/profileNotificationLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.489"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileContactNumber"
+            tools:ignore="MissingConstraints">
+
+            <ImageView
+                android:id="@+id/profileLocationIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_disabled" />
+
+            <TextView
+                android:id="@+id/profileLocationText"
+                style="@style/Widget.AppCompat.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-medium"
+                android:text="Location Access"
+                android:textAlignment="textStart"
+                android:textColor="@color/text2"
+                android:textSize="16sp"
+                tools:ignore="RtlCompat"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/profileNotificationLayout"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:layout_gravity="start"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="40dp"
+            android:orientation="horizontal"
+            android:background="@drawable/button_squircle_background"
+            app:layout_constraintBottom_toTopOf="@+id/profileAdminLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.489"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileLocationLayout"
+            tools:ignore="MissingConstraints">
+
+            <ImageView
+                android:id="@+id/profileNotificationIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_disabled" />
+
+            <TextView
+                android:id="@+id/profileNotificationText"
+                style="@style/Widget.AppCompat.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-medium"
+                android:text="Event Notifications"
+                android:textAlignment="textStart"
+                android:textColor="@color/text2"
+                android:textSize="16sp"
+                tools:ignore="RtlCompat"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/profileAdminLayout"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:layout_gravity="start"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="40dp"
+            android:orientation="horizontal"
+            android:background="@drawable/button_squircle_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.489"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileNotificationLayout"
+            tools:ignore="MissingConstraints">
+
+            <ImageView
+                android:id="@+id/profileAdminIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_disabled" />
+
+            <TextView
+                android:id="@+id/profileAdminText"
+                style="@style/Widget.AppCompat.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-medium"
+                android:text="Admin Access"
+                android:textAlignment="textStart"
+                android:textColor="@color/text2"
+                android:textSize="16sp"
+                tools:ignore="RtlCompat"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/profileEmailAddress"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="1dp"
+            android:contentDescription="Email Address"
+            android:drawableStart="@drawable/ic_profile_mail"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="User Email Address"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/text2"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/profileContactNumber"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.489"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileFullName"
+            tools:ignore="MissingConstraints,RtlCompat" />
+
+        <ImageButton
+            android:id="@+id/profileEditButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="30dp"
+            android:background="@drawable/button_squircle_background"
+            android:contentDescription="Edit Profile"
+            android:elevation="4dp"
+            android:padding="20dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/profileMainGoBackButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
