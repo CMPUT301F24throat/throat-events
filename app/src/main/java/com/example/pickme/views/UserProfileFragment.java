@@ -59,6 +59,12 @@ public class UserProfileFragment extends Fragment {
         editGoBackButton.setOnClickListener(v -> navigateToHomeFragment());
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUserData(); // Reload user data when the fragment resumes
+    }
+
     private void loadUserData() {
         User user = User.getInstance();
 

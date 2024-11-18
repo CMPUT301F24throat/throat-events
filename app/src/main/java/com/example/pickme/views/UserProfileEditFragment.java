@@ -15,6 +15,7 @@ import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -35,6 +36,7 @@ public class UserProfileEditFragment extends Fragment {
     private CircleImageView editProfilePicture;
     private ImageButton removeProfilePicture;
     private Image img;
+    private boolean isChanged = false;
 
     @Nullable
     @Override
@@ -59,27 +61,25 @@ public class UserProfileEditFragment extends Fragment {
 
         loadUserData();
 
+        // Track changes by user
+        View.OnFocusChangeListener changeListener = (v, hasFocus) -> {
+            if (!hasFocus) {
+                isChanged = true;
+            }
+        };
+
+        editProfileFirstName.setOnFocusChangeListener(changeListener);
+        editProfileLastName.setOnFocusChangeListener(changeListener);
+        editProfileEmailAddress.setOnFocusChangeListener(changeListener);
+        editProfileContactNumber.setOnFocusChangeListener(changeListener);
+        editEnableAdminView.setOnCheckedChangeListener((buttonView, isChecked) -> isChanged = true);
+
         // profile image gallery picker
         ActivityResultLauncher<PickVisualMediaRequest> pickPfp =
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-                    // callback is invoked after the user selects a media item or closes the photo picker
                     if (uri != null) {
-                        editProfilePicture.setTag("");
-                        // uploads the image selected
-                        img.upload(uri, task -> {
-                            if (task.isSuccessful()) {
-                                Image i = task.getResult();
-                                img.setImageUrl(i.getImageUrl());
-                                // preview
-                                Glide.with(editProfilePicture.getRootView())
-                                        .load(img.getImageUrl())
-                                        .into(editProfilePicture);
-                            }
-                        });
-
-                        Toast.makeText(getContext(), "Profile picture uploaded!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.d("PhotoPicker", "No media selected");
+                        isChanged = true;
+                        // Handle the selected image URI
                     }
                 });
 
@@ -91,6 +91,7 @@ public class UserProfileEditFragment extends Fragment {
         });
 
         removeProfilePicture.setOnClickListener(v -> {
+            isChanged = true;
             Toast.makeText(getContext(), "Profile picture deleted.", Toast.LENGTH_SHORT).show();
             editProfilePicture.setImageBitmap(null);
             editProfilePicture.setTag("deleted");
@@ -102,10 +103,18 @@ public class UserProfileEditFragment extends Fragment {
             }
         });
 
-        goBackButton.setOnClickListener(v -> navigateToHomeFragment());
+        goBackButton.setOnClickListener(v -> {
+            if (isChanged) {
+                showUnsavedChangesDialog();
+            } else {
+                navigateToUserProfileFragment();
+            }
+        });
     }
 
+
     private void loadUserData() {
+        //Load user data from the User instance and populate the EditText fields with the user's data.
         User user = User.getInstance();
 
         if (user != null) {
@@ -125,40 +134,19 @@ public class UserProfileEditFragment extends Fragment {
         }
     }
 
-    //---------- Saving Process --------------------
     private boolean validateUserChanges() {
-        // Validates the input fields and returns a boolean.
+        //Validate user changes before saving.
         String firstName = editProfileFirstName.getText().toString().trim();
-        String lastName = editProfileLastName.getText().toString().trim();
-        String emailAddress = editProfileEmailAddress.getText().toString().trim();
-        String contactNumber = editProfileContactNumber.getText().toString().trim();
 
-        if (User.validateFirstName(firstName)) {
-            Toast.makeText(getContext(), "Please enter a valid first name.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if (User.validateLastName(lastName)) {
-            Toast.makeText(getContext(), "Please enter a valid last name.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        // Validates emailAddress
-        if (!User.validateEmailAddress(emailAddress)) {
-            Toast.makeText(getContext(), "Please enter a valid email address.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        // Validates contactNumber
-        if (!User.validateContactInformation(contactNumber)) {
-            Toast.makeText(getContext(), "Please enter a valid contact number.", Toast.LENGTH_SHORT).show();
+        if (firstName.isEmpty()) {
+            Toast.makeText(getContext(), "First Name required", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
     }
 
     private void saveUserData() {
-        // Retrieve and update the current user instance with the new data from input fields
+        //Save user data to Firestore.
         User user = User.getInstance();
         if (user == null) {
             showToast("User data not available. Cannot save to Firestore.");
@@ -170,18 +158,17 @@ public class UserProfileEditFragment extends Fragment {
                 Log.d("Image", "generate: New profile picture generated");
                 updateUserInstanceWithInput(user);
                 pushUserToFirestore(user);
-                navigateToHomeFragment();
+                navigateToUserProfileFragment();
             });
 
         } else {
             updateUserInstanceWithInput(user);
             pushUserToFirestore(user);
-            navigateToHomeFragment();
+            navigateToUserProfileFragment();
         }
     }
 
     private void pushUserToFirestore(User user) {
-        // Use UserRepository to handle the update in Firestore
         UserRepository userRepository = new UserRepository();
         userRepository.updateUser(user, task -> {
             if (task.isSuccessful()) {
@@ -194,7 +181,6 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void updateUserInstanceWithInput(User user) {
-        // Update the user object with data from input fields
         user.setFirstName(editProfileFirstName.getText().toString().trim());
         user.setLastName(editProfileLastName.getText().toString().trim());
         user.setEmailAddress(editProfileEmailAddress.getText().toString().trim());
@@ -203,6 +189,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void generateProfilePicture(User user, OnCompleteListener<Image> listener) {
+        // Generate a new profile picture using the user's initials (default pfp)
         String firstName = editProfileFirstName.getText().toString().trim();
         String lastName = editProfileLastName.getText().toString().trim();
         String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
@@ -210,15 +197,22 @@ public class UserProfileEditFragment extends Fragment {
         img.generate(initials, listener);
     }
 
-    private void navigateToHomeFragment() {
+    private void navigateToUserProfileFragment() {
         Navigation.findNavController(getView()).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
     }
 
-    //---------- Android Popups --------------------
+    private void showUnsavedChangesDialog() {
+        // Show a dialog to confirm if the user wants to continue without saving changes.
+        new AlertDialog.Builder(requireContext())
+                .setMessage("Unsaved Changes - Continue without saving?")
+                .setPositiveButton("Yes", (dialog, which) -> navigateToUserProfileFragment())
+                .setNegativeButton("No", null)
+                .show();
+    }
+
     private void showToast(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
-
 }
 
  /**
