@@ -21,7 +21,7 @@
         android:paddingTop="5dp"
         android:paddingEnd="10dp"
         android:paddingBottom="5dp"
-        android:text="Home"
+        android:text="@string/home"
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textColor="@color/text1"
@@ -34,7 +34,7 @@
         tools:ignore="MissingConstraints,RtlCompat"/>
 
     <TextView
-        android:id="@+id/homeRecentText"
+        android:id="@+id/homeInboxText"
         style="@style/Widget.AppCompat.TextView"
         android:layout_width="360dp"
         android:layout_height="26dp"
@@ -48,7 +48,7 @@
         android:paddingTop="1dp"
         android:paddingEnd="10dp"
         android:paddingBottom="1dp"
-        android:text="My Inbox"
+        android:text="@string/my_inbox"
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textColor="@color/text1"
@@ -87,7 +87,7 @@
         android:paddingTop="1dp"
         android:paddingEnd="10dp"
         android:paddingBottom="1dp"
-        android:text="Events"
+        android:text="@string/events"
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textColor="@color/text1"
@@ -123,7 +123,7 @@
         android:background="@color/icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/homeRecentText"
+        app:layout_constraintTop_toBottomOf="@+id/homeInboxText"
         tools:ignore="MissingConstraints" />
 
     <de.hdodenhof.circleimageview.CircleImageView

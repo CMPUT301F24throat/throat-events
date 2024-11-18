@@ -19,7 +19,7 @@
         android:paddingTop="5dp"
         android:paddingEnd="10dp"
         android:paddingBottom="5dp"
-        android:text="My Events"
+        android:text="@string/my_events"
         android:textAllCaps="false"
         android:textColor="@color/text1"
         android:textSize="25sp"

@@ -19,7 +19,7 @@
         android:paddingTop="5dp"
         android:paddingEnd="10dp"
         android:paddingBottom="5dp"
-        android:text="My Inbox"
+        android:text="@string/my_inbox"
         android:textAllCaps="false"
         android:textColor="@color/text1"
         android:textSize="25sp"
