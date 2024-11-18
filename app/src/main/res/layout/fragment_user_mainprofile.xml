@@ -103,65 +103,91 @@
             android:textAllCaps="false"
             android:textColor="@color/text2"
             android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/profileLocationSwitch"
+            app:layout_constraintBottom_toTopOf="@+id/profileLocationLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.489"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profileEmailAddress"
             tools:ignore="MissingConstraints,RtlCompat" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/profileLocationSwitch"
+        <LinearLayout
+            android:id="@+id/profileLocationLayout"
             android:layout_width="330dp"
             android:layout_height="50dp"
             android:layout_gravity="start"
             android:layout_marginStart="40dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="40dp"
-            android:fontFamily="sans-serif-medium"
-            android:layoutDirection="rtl"
-            android:switchTextAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:text="Enable Location Access"
-            android:textAlignment="textStart"
-            android:textColor="@color/text2"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/profileNotificationOrganizerSwitch"
+            android:orientation="horizontal"
+            android:background="@drawable/button_squircle_background"
+            app:layout_constraintBottom_toTopOf="@+id/profileNotificationLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.489"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profileContactNumber"
-            app:switchPadding="8dp"
-            app:thumbTint="@color/icon"
-            app:trackTint="@color/background2"
-            tools:ignore="MissingConstraints" />
+            tools:ignore="MissingConstraints">
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/profileNotificationOrganizerSwitch"
+            <ImageView
+                android:id="@+id/profileLocationIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_disabled" />
+
+            <TextView
+                android:id="@+id/profileLocationText"
+                style="@style/Widget.AppCompat.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-medium"
+                android:text="Location Access"
+                android:textAlignment="textStart"
+                android:textColor="@color/text2"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/profileNotificationLayout"
             android:layout_width="330dp"
             android:layout_height="50dp"
             android:layout_gravity="start"
             android:layout_marginStart="40dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="40dp"
-            android:fontFamily="sans-serif-medium"
-            android:layoutDirection="rtl"
-            android:switchTextAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:text="Event Notifications"
-            android:textAlignment="textStart"
-            android:textColor="@color/text2"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/profileNotificationAdminSwitch"
+            android:orientation="horizontal"
+            android:background="@drawable/button_squircle_background"
+            app:layout_constraintBottom_toTopOf="@+id/profileAdminLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.489"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileLocationSwitch"
-            app:switchPadding="8dp"
-            app:thumbTint="@color/icon"
-            app:trackTint="@color/background2"
-            tools:ignore="MissingConstraints" />
+            app:layout_constraintTop_toBottomOf="@+id/profileLocationLayout"
+            tools:ignore="MissingConstraints">
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/profileNotificationAdminSwitch"
+            <ImageView
+                android:id="@+id/profileNotificationIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_disabled" />
+
+            <TextView
+                android:id="@+id/profileNotificationText"
+                style="@style/Widget.AppCompat.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-medium"
+                android:text="Event Notifications"
+                android:textAlignment="textStart"
+                android:textColor="@color/text2"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/profileAdminLayout"
             android:layout_width="330dp"
             android:layout_height="50dp"
             android:layout_gravity="start"
@@ -169,22 +195,35 @@
             android:layout_marginTop="2dp"
             android:layout_marginEnd="40dp"
             android:layout_marginBottom="40dp"
-            android:fontFamily="sans-serif-medium"
-            android:layoutDirection="rtl"
-            android:switchTextAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:text="Admin Notifications"
-            android:textAlignment="textStart"
-            android:textColor="@color/text2"
-            android:textSize="16sp"
+            android:orientation="horizontal"
+            android:background="@drawable/button_squircle_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.489"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileNotificationOrganizerSwitch"
-            app:switchPadding="8dp"
-            app:thumbTint="@color/icon"
-            app:trackTint="@color/background2"
-            tools:ignore="MissingConstraints" />
+            app:layout_constraintTop_toBottomOf="@+id/profileNotificationLayout"
+            tools:ignore="MissingConstraints">
+
+            <ImageView
+                android:id="@+id/profileAdminIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_disabled" />
+
+            <TextView
+                android:id="@+id/profileAdminText"
+                style="@style/Widget.AppCompat.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-medium"
+                android:text="Admin Access"
+                android:textAlignment="textStart"
+                android:textColor="@color/text2"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/profileEmailAddress"
