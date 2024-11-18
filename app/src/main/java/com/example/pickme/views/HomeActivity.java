@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -17,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -74,6 +76,7 @@ public class HomeActivity extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     // FCM SDK (and your app) can post notifications.
+                    subToAll();
                 } else {
                     // TODO: Inform user that that your app will not show notifications.
                 }
@@ -85,6 +88,7 @@ public class HomeActivity extends AppCompatActivity {
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
                     PackageManager.PERMISSION_GRANTED) {
                 // FCM SDK (and your app) can post notifications.
+                subToAll();
             }
             else if(shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 new AlertDialog.Builder(HomeActivity.this)
@@ -103,6 +107,16 @@ public class HomeActivity extends AppCompatActivity {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
+    }
+
+    private void subToAll(){
+        FirebaseMessaging.getInstance().subscribeToTopic("ALL_USERS")
+            .addOnCompleteListener(task -> {
+                if(task.isSuccessful())
+                    Log.i("FCM", "Subscribed to ALL_USERS");
+                else
+                    Log.i("FCM", "Failed sub to ALL_USERS");
+            });
     }
 }
 
