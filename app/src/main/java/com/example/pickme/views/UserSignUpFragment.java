@@ -94,3 +94,9 @@ public class UserSignUpFragment extends Fragment {
         Navigation.findNavController(getView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
     }
 }
+/**
+ * Coding Sources
+ * <p>
+ * Stack Overflow
+ * - "What is the difference between a Fragment and Intent/Activity?"
+ **/
