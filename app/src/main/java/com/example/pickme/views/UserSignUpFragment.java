@@ -1,42 +1,42 @@
 package com.example.pickme.views;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.example.pickme.R;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
 
-/**
- * Handles the sign-up process for new users entering our app.
- *
- * @author Kenneth (aesoji)
- * @version 1.0
- *
- * Responsibilities:
- * - Creates a new document for the user.
- * - Information will always contain their firstName, deviceId, and userAuthId.
- */
-public class UserSignUpActivity extends AppCompatActivity {
+public class UserSignUpFragment extends Fragment {
 
     private EditText firstNameEditText, lastNameEditText;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_signup_activity); // Ensure this is the correct layout file
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.user_signup, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         // Initialize Views and Data
-        firstNameEditText = findViewById(R.id.signupFirstNameEdit);
-        lastNameEditText = findViewById(R.id.signupLastNameEdit);
-        Button submitButton = findViewById(R.id.signupSubmitButton);
+        firstNameEditText = view.findViewById(R.id.signupFirstNameEdit);
+        lastNameEditText = view.findViewById(R.id.signupLastNameEdit);
+        Button submitButton = view.findViewById(R.id.signupSubmitButton);
 
         // Sets up the response to if the user wants to proceed.
         submitButton.setOnClickListener(v -> validateInformation());
@@ -46,50 +46,40 @@ public class UserSignUpActivity extends AppCompatActivity {
         String firstName = firstNameEditText.getText().toString().trim();
         String lastName = lastNameEditText.getText().toString().trim();
 
-        // Validates the first name using User class's validation function
         if (User.validateFirstName(firstName)) {
-            Toast.makeText(this, "Invalid first name. Please enter a valid first name.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Invalid first name. Please enter a valid first name.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Validates the optional last name using User class's validation function
         if (!lastName.isEmpty() && User.validateLastName(lastName)) {
-            Toast.makeText(this, "Invalid last name. Please enter a valid last name.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Invalid last name. Please enter a valid last name.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Sets up remaining information to ensure a successful initialization.
         String deviceId = getDeviceID();
         String dummyEmail = "temp@tempmail.com";
         String dummyContact = "0-000-000-0000";
 
-        // Create user in Firebase with the provided and dummy data
         createUser(firstName, lastName.isEmpty() ? "" : lastName, dummyEmail, dummyContact, deviceId);
     }
 
     private String getDeviceID() {
-        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     private void createUser(String firstName, String lastName, String email, String contact, String deviceId) {
-        // Creates the user in our firebase.
         UserRepository userRepository = new UserRepository();
         userRepository.addUser(firstName, lastName, email, contact, deviceId, new UserRepository.OnUserCreatedCallback() {
             @Override
             public void onSuccess(User user) {
-                Toast.makeText(UserSignUpActivity.this, firstName + " " + (lastName.isEmpty() ? "" : lastName) + " has been added successfully!", Toast.LENGTH_SHORT).show();
-
-                // Navigate to HomeActivity after successful save
-                Intent intent = new Intent(UserSignUpActivity.this, HomeActivity.class);
-                intent.putExtra("user_data", user);
-                startActivity(intent);
+                Toast.makeText(getContext(), firstName + " " + (lastName.isEmpty() ? "" : lastName) + " has been added successfully!", Toast.LENGTH_SHORT).show();
+                navigateToHomeFragment();
                 clearText();
-                finish();
             }
 
             @Override
             public void onFailure(String errorMessage) {
-                Toast.makeText(UserSignUpActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
                 Log.e("UserRepository", "Error: " + errorMessage);
             }
         });
@@ -99,8 +89,11 @@ public class UserSignUpActivity extends AppCompatActivity {
         firstNameEditText.setText("");
         lastNameEditText.setText("");
     }
-}
 
+    private void navigateToHomeFragment() {
+        Navigation.findNavController(getView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
+    }
+}
 /**
  * Coding Sources
  * <p>

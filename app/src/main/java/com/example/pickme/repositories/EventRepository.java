@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -14,18 +15,10 @@ import com.google.firebase.firestore.QuerySnapshot;
  * Ensures data integrity through Firestore transactions and handles completion notifications for each operation.
  *
  * @version 2.0
- * @author Ayub Ali
- * Responsibilities:
- * - Perform CRUD operations on event data in Firestore.
- * - Manage transactions for consistent updates and deletion.
- * - Retrieve event data by ID or organizer user ID.
- * - Notify completion or failure of Firestore operations.
  */
-
 public class EventRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference eventsRef = db.collection("events");
-    private final WaitingListRepository waitingListRepository = new WaitingListRepository();
 
     // Create a new event
     public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
@@ -33,6 +26,11 @@ public class EventRepository {
                     DocumentReference newEventRef = eventsRef.document();
                     event.setEventId(newEventRef.getId());
                     transaction.set(newEventRef, event);
+
+                    // Create an empty waitingList subcollection
+                    CollectionReference waitingListRef = newEventRef.collection("waitingList");
+                    transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
+
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
@@ -41,10 +39,11 @@ public class EventRepository {
                 });
     }
 
+    // Update an event
     public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
-        DocumentReference newEventRef = eventsRef.document(event.getEventId());
+        DocumentReference eventRef = eventsRef.document(event.getEventId());
         db.runTransaction(transaction -> {
-                    transaction.set(newEventRef, event);
+                    transaction.set(eventRef, event);
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
@@ -53,11 +52,13 @@ public class EventRepository {
                 });
     }
 
+    // Delete an event
     public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
-        db.collection("events")
-                .document(eventId)
-                .delete()
-                .addOnCompleteListener(onCompleteListener);
+        eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Deletion failed: " + e.getMessage());
+                });
     }
 
     // Read an event by ID
@@ -65,20 +66,19 @@ public class EventRepository {
         eventsRef.document(eventId).get().addOnCompleteListener(onCompleteListener);
     }
 
-    // Update an event
-    public void updateEvent(Event event) {
-        eventsRef.document(event.getEventId()).set(event);
-    }
-
-    // Delete an event by ID
-    public void deleteEvent(String eventId) {
-        eventsRef.document(eventId).delete();
-    }
-
     // Read all events by organizer user ID
-    public void getEventsByOrganizerUserId(OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        eventsRef.get().addOnCompleteListener(onCompleteListener);
+    public void getEventsByOrganizerId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(onCompleteListener);
     }
+
+    // Get an event's waiting list current number of entrants
+    public void getEventWaitingListCount(String eventId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        eventsRef.document(eventId).collection("waitingList")
+                .whereNotEqualTo(FieldPath.documentId(), "emptyDoc") // Exclude the empty document
+                .get().addOnCompleteListener(onCompleteListener);
+    }
+
+    //TODO: Get event waiting list, get event status, get event waiting list status
 }
 
 /**

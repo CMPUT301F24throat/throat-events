@@ -6,7 +6,7 @@
     <item name="view7" type="id" />
     <item name="homeEventsText" type="id" />
     <item name="view5" type="id" />
-    <item name="homeRecentText" type="id" />
+    <item name="homeInboxText" type="id" />
     <item name="homeHomeText" type="id" />
     <item name="shareButton" type="id" />
 </resources>

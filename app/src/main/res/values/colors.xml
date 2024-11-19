@@ -4,13 +4,14 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background1">#383838</color>
     <color name="background2">#252525</color>
+    <color name="background3">#333232</color>
     <color name="highlight1">#F55B5B</color>
     <color name="highlight2">#62D0A2</color>
     <color name="icon">#D8D8D8</color>
     <color name="border">#757575</color>
     <color name="dialogBG1">#515151</color>
     <color name="buttonDefault">#1F1F1F</color>
-    <color name="text1">#FFFFFF</color>
+    <color name="text1">#FFFAFA</color>
     <color name="text2">#D8D8D8</color>
     <color name="text3">#838383</color>
 </resources>
