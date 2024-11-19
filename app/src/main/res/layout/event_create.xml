@@ -31,8 +31,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="MissingConstraints" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/deleteEvent"
@@ -59,8 +58,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/back"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="MissingConstraints"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <EditText
             android:id="@+id/title"
@@ -84,6 +82,7 @@
             android:layout_marginTop="8dp"
             android:drawableStart="@drawable/ic_calendar"
             android:drawablePadding="8dp"
+            android:inputType="date"
             android:hint="*Date"
             android:textColor="@color/text1"
             android:textColorHint="@color/text3"
@@ -116,6 +115,7 @@
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/rounded_button__no_border"
+                android:inputType="datetime"
                 android:hint="  *Start Time"
                 android:textColor="@color/text1"
                 android:textColorHint="@color/text3"
@@ -143,6 +143,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/rounded_button__no_border"
                 android:hint="  *End Time"
+                android:inputType="datetime"
                 android:textColor="@color/text1"
                 android:textColorHint="@color/text3"
                 android:textSize="14sp"
@@ -247,7 +248,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="@drawable/ic_button_bg_main"
-            android:drawableStart="@drawable/ic_camera"
+            app:drawableStartCompat="@drawable/ic_camera"
             android:drawablePadding="8dp"
             android:gravity="center"
             android:paddingHorizontal="8dp"
