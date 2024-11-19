@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.example.pickme.databinding.EventEventdetailsBinding;
+import com.example.pickme.databinding.EventDetailsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
@@ -31,13 +31,13 @@ import com.example.pickme.utils.ImageQuery;
  */
 // Fragment that displays complete details of a selected or random event
 public class EventDetailsFragment extends Fragment {
-    private EventEventdetailsBinding binding;
+    private EventDetailsBinding binding;
     private Event event;
 
     // Inflates the layout for the event details fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = EventEventdetailsBinding.inflate(getLayoutInflater(), container, false);
+        binding = EventDetailsBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 

@@ -9,33 +9,27 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Handles interactions with the waiting list entrants subcollection
- * waitingListEntrant subcollection is a subcollection of the waitingList subcollection of the events collection
- * @author sophiecabungcal
- * @version 1.0
- * Responsibilities:
- * CRUD operations for waiting list data
+ * waitingListEntrant subcollection is a subcollection of the events collection
  */
 public class WaitingListEntrantRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Get the reference to the waitingListEntrants subcollection for a specific waitingList document
-    public CollectionReference getWaitingListEntrantsRef(String eventId, String waitingListId) {
+    // Get the reference to the waitingListEntrants subcollection for a specific event
+    public CollectionReference getWaitingListEntrantsRef(String eventId) {
         return db.collection("events")
                 .document(eventId)
-                .collection("waitingList")
-                .document(waitingListId)
-                .collection("waitingListEntrants");
+                .collection("waitingList");
     }
 
     // Get the reference to a specific waitingListEntrant document
-    public DocumentReference getWaitingListEntrantDocRef(String eventId, String waitingListId, String entrantId) {
-        return getWaitingListEntrantsRef(eventId, waitingListId).document(entrantId);
+    public DocumentReference getWaitingListEntrantDocRef(String eventId, String entrantId) {
+        return getWaitingListEntrantsRef(eventId).document(entrantId);
     }
 
     // Create a new waitingListEntrant
-    public void addWaitingListEntrant(String eventId, String waitingListId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Object> onCompleteListener) {
+    public void addWaitingListEntrant(String eventId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {
-                    DocumentReference newWaitingListEntrantRef = getWaitingListEntrantsRef(eventId, waitingListId).document();
+                    DocumentReference newWaitingListEntrantRef = getWaitingListEntrantsRef(eventId).document();
                     waitingListEntrant.setWaitListEntrantId(newWaitingListEntrantRef.getId());
                     transaction.set(newWaitingListEntrantRef, waitingListEntrant);
                     return null;
@@ -47,17 +41,17 @@ public class WaitingListEntrantRepository {
     }
 
     // Read a waitingListEntrant by ID
-    public void getWaitingListEntrantById(String eventId, String waitingListId, String entrantId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
-        getWaitingListEntrantDocRef(eventId, waitingListId, entrantId).get().addOnCompleteListener(onCompleteListener);
+    public void getWaitingListEntrantById(String eventId, String entrantId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
+        getWaitingListEntrantDocRef(eventId, entrantId).get().addOnCompleteListener(onCompleteListener);
     }
 
     // Update a waitingListEntrant
-    public void updateWaitingListEntrant(String eventId, String waitingListId, String entrantId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        getWaitingListEntrantDocRef(eventId, waitingListId, entrantId).set(waitingListEntrant).addOnCompleteListener(onCompleteListener);
+    public void updateWaitingListEntrant(String eventId, String entrantId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
+        getWaitingListEntrantDocRef(eventId, entrantId).set(waitingListEntrant).addOnCompleteListener(onCompleteListener);
     }
 
     // Delete a waitingListEntrant by ID
-    public void deleteWaitingListEntrant(String eventId, String waitingListId, String entrantId, OnCompleteListener<Void> onCompleteListener) {
-        getWaitingListEntrantDocRef(eventId, waitingListId, entrantId).delete().addOnCompleteListener(onCompleteListener);
+    public void deleteWaitingListEntrant(String eventId, String entrantId, OnCompleteListener<Void> onCompleteListener) {
+        getWaitingListEntrantDocRef(eventId, entrantId).delete().addOnCompleteListener(onCompleteListener);
     }
 }

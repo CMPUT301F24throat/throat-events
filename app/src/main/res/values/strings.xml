@@ -15,4 +15,5 @@
     <string name="my_inbox">My Inbox</string>
     <string name="home">Home</string>
     <string name="my_events">My Events</string>
+    <string name="required_field">* Required Field</string>
 </resources>
