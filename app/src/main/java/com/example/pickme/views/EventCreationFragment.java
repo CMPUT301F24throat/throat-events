@@ -22,7 +22,7 @@ import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.controllers.EventViewModel;
-import com.example.pickme.databinding.EventEventcreationBinding;
+import com.example.pickme.databinding.EventCreateBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
@@ -49,7 +49,7 @@ import java.util.Random;
  * - Navigate to appropriate screens based on user actions.
  */
 public class EventCreationFragment extends Fragment {
-    private EventEventcreationBinding binding;
+    private EventCreateBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
     private Event event;
@@ -60,7 +60,7 @@ public class EventCreationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = EventEventcreationBinding.inflate(getLayoutInflater(), container, false);
+        binding = EventCreateBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 

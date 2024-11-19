@@ -19,7 +19,7 @@
         android:id="@+id/userProfileFragment"
         android:name="com.example.pickme.views.UserProfileFragment"
         android:label="User Profile"
-        tools:layout="@layout/fragment_user_mainprofile">
+        tools:layout="@layout/user_profile">
         <action
             android:id="@+id/action_userProfileFragment_to_userProfileEditFragment"
             app:destination="@id/userProfileEditFragment" />
@@ -32,7 +32,7 @@
         android:id="@+id/userProfileEditFragment"
         android:name="com.example.pickme.views.UserProfileEditFragment"
         android:label="Edit Profile"
-        tools:layout="@layout/fragment_user_editprofile">
+        tools:layout="@layout/user_profile__edit">
         <action
             android:id="@+id/action_userProfileEditFragment_to_userProfileFragment"
             app:destination="@id/userProfileFragment" />
@@ -42,7 +42,7 @@
         android:id="@+id/userSignUpFragment"
         android:name="com.example.pickme.views.UserSignUpFragment"
         android:label="Sign Up"
-        tools:layout="@layout/fragment_user_signup">
+        tools:layout="@layout/user_signup">
         <action
             android:id="@+id/action_userSignUpFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
@@ -64,7 +64,7 @@
         android:id="@+id/eventDetailsFragment"
         android:name="com.example.pickme.views.EventDetailsFragment"
         android:label="Event Details"
-        tools:layout="@layout/event_eventdetails" />
+        tools:layout="@layout/event_details" />
 
     <fragment
         android:id="@+id/myEventsFragment"
@@ -86,13 +86,13 @@
         android:id="@+id/eventCreationFragment"
         android:name="com.example.pickme.views.EventCreationFragment"
         android:label="Event Creation"
-        tools:layout="@layout/event_eventcreation" />
+        tools:layout="@layout/event_create" />
 
     <fragment
         android:id="@+id/facilityCreationFragment"
         android:name="com.example.pickme.views.FacilityCreationFragment"
         android:label="Facility"
-        tools:layout="@layout/fragment_facility" />
+        tools:layout="@layout/facility_create" />
 
     <!-- Global actions -->
     <action

@@ -28,7 +28,7 @@ public class FacilityCreationFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_facility, container, false);
+        return inflater.inflate(R.layout.facility_create, container, false);
     }
 
     @Override

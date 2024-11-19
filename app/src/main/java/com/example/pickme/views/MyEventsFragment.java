@@ -56,8 +56,8 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
             checkUserFacility(user.getUserId());
         }
 
-        FloatingActionButton fabAddEvent = view.findViewById(R.id.fab_add_event);
-        fabAddEvent.setOnClickListener(v -> {
+        FloatingActionButton addEventBtn = view.findViewById(R.id.fab_add_event);
+        addEventBtn.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
             navController.navigate(R.id.action_myEventsFragment_to_eventCreationFragment);
         });
@@ -67,7 +67,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
             if (result.getBoolean("eventCreated")) {
                 Toast.makeText(requireActivity(), "Event successfully created", Toast.LENGTH_SHORT).show();
                 if (user != null) {
-                    fetchEvents(user.getUserId());
+                    loadUserEvents(user.getUserId());
                 }
             }
         });
@@ -85,7 +85,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
                 }
                 if (facilityExists) {
                     // Facility exists, proceed to show MyEventsFragment view
-                    fetchEvents(userId);
+                    loadUserEvents(userId);
                 } else {
                     // Facility does not exist, navigate to FacilityCreationFragment
                     navigateToFacilityCreationFragment();
@@ -97,7 +97,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
-    private void fetchEvents(String userId) {
+    private void loadUserEvents(String userId) {
         eventRepository.getEventsByOrganizerId(userId, task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 eventList.clear();
