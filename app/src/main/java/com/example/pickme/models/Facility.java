@@ -16,6 +16,8 @@ public class Facility {
     private String ownerId;
     // the name of the facility [non-nullable]
     private String facilityName;
+    // the location of the facility [nullable]
+    private String location;
     // the date/time the facility was created [non-nullable]
     private final Timestamp createdAt;
     // the date/time the facility was last updated [non-nullable]
@@ -25,9 +27,10 @@ public class Facility {
         this.createdAt = Timestamp.now();
     }
 
-    public Facility(String ownerId, String facilityName) {
+    public Facility(String ownerId, String facilityName, String location) {
         this.ownerId = ownerId;
         this.facilityName = facilityName;
+        this.location = location;
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
     }
@@ -57,6 +60,13 @@ public class Facility {
     public String getFacilityName() {
         return facilityName;
     }
+
+    public void setLocation(String location) {
+        this.location = location;
+        this.updatedAt = Timestamp.now();
+    }
+
+    public String getLocation() { return location;}
 
     public Timestamp getCreatedAt() {
         return createdAt;

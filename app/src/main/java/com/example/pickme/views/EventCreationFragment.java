@@ -19,15 +19,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import com.bumptech.glide.Glide;
-import com.example.pickme.R;
 import com.example.pickme.controllers.EventViewModel;
-import com.example.pickme.databinding.EventEventcreationBinding;
+import com.example.pickme.databinding.EventCreateBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
+import com.example.pickme.models.User;
+import com.example.pickme.repositories.FacilityRepository;
 import com.example.pickme.utils.ImageQuery;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,78 +37,86 @@ import java.util.Random;
  * Handles validation, image selection, Firestore data storage, and QR code generation for events.
  *
  * @version 2.0
- * @author Ayub Ali
  * Responsibilities:
  * - Capture and validate user input for event details.
  * - Manage event creation, updating, and deletion in Firestore.
  * - Handle image selection and upload for event posters.
  * - Generate QR codes for promotional and waiting list purposes.
  * - Navigate to appropriate screens based on user actions.
- *
  */
-
 public class EventCreationFragment extends Fragment {
-    private EventEventcreationBinding binding;
+    private EventCreateBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
     private Event event;
     private EventViewModel eventViewModel = new EventViewModel();
+    private FacilityRepository facilityRepository = new FacilityRepository();
+    private String organizerId;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = EventEventcreationBinding.inflate(getLayoutInflater(), container, false);
+        // Inflate the layout for this fragment using view binding
+        binding = EventCreateBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 
-    // Initializes UI elements and sets up event listeners
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Get the organizer ID from the current user instance
+        organizerId = User.getInstance().getUserId();
+        // Set the current date and time in the UI
         setCurrentDateTime();
 
+        // Set click listeners for various UI elements
         binding.addImage.setOnClickListener(listener -> openGallery());
         binding.date.setOnClickListener(listener -> pickDate());
         binding.startTime.setOnClickListener(listener -> pickTime(true));
         binding.endTime.setOnClickListener(listener -> pickTime(false));
-        binding.back.setOnClickListener(listener -> {
+        binding.deleteEvent.setOnClickListener(listener -> {
             if (event == null) {
+                // Navigate up if no event is being edited
                 Navigation.findNavController(requireView()).navigateUp();
             } else {
+                // Delete the event if it exists
                 deleteEvent(event);
             }
         });
 
-        binding.back1.setOnClickListener(listener -> {
-            Navigation.findNavController(requireView()).navigateUp();
-        });
-
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
         binding.create.setOnClickListener(listener -> {
             if (validateInputs()) {
                 if (selectedImageUri != null) {
+                    // Upload the selected image to Firebase
                     uploadImageToFirebase(selectedImageUri);
                 } else {
                     if (event == null) {
                         Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
                     } else {
+                        // Use the existing poster URL if no new image is selected
                         posterUrl = event.getPosterImageId();
-                        createEventInFirestore();
+                        createOrUpdateEventInFirestore();
                     }
                 }
             } else {
-                Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Check if there are arguments passed to the fragment
         if (getArguments() != null) {
             event = (Event) getArguments().getSerializable("selectedEvent");
         }
+        // If an event is being edited, set the event data in the UI
         if (event != null) {
             setEventData();
         }
     }
 
-    // Set the data to the UI elements if editing an event
+    /**
+     * Set the event data in the UI for editing.
+     */
     private void setEventData() {
         binding.title.setText(event.getEventTitle());
         binding.description.setText(event.getEventDescription());
@@ -123,23 +129,27 @@ public class EventCreationFragment extends Fragment {
         binding.winners.setText(event.getMaxWinners());
         binding.entrants.setText(event.getMaxEntrants().toString());
 
-        // Load the poster image using an image loading library (e.g., Glide)
+        // Download and set the event image
         Image image = new Image("1234567890", "123456789");
         image.download(new ImageQuery() {
             @Override
             public void onSuccess(Image image) {
-                Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
+                // TODO: FIXXXX Set image to ImageView
+                //Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
             }
 
             @Override
             public void onEmpty() {}
         });
-        binding.back1.setVisibility(View.VISIBLE);
-        binding.titleMain.setText("Edit Event");
-        binding.back.setImageResource(R.drawable.ic_delete);
+
+        // Update UI elements for editing mode
+        binding.deleteEvent.setVisibility(View.VISIBLE);
+        binding.back.setText("Edit Event");
     }
 
-    // Sets the current date and time in the UI as default values
+    /**
+     * Set the current date and time in the UI.
+     */
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -156,125 +166,151 @@ public class EventCreationFragment extends Fragment {
         binding.endTime.setText(endTime);
     }
 
-    // Validates that all required input fields are filled
+    /**
+     * Validate the user inputs to ensure all required fields are filled.
+     * @return true if all required fields are filled, false otherwise.
+     */
     private boolean validateInputs() {
         return !binding.title.getText().toString().isEmpty() &&
+                !binding.date.getText().toString().isEmpty() &&
+                !binding.startTime.getText().toString().isEmpty() &&
+                !binding.endTime.getText().toString().isEmpty() &&
                 !binding.address.getText().toString().isEmpty() &&
-                !binding.winners.getText().toString().isEmpty() &&
-                !binding.entrants.getText().toString().isEmpty() &&
-                !binding.description.getText().toString().isEmpty();
+                !binding.entrants.getText().toString().isEmpty();
     }
 
-    // Opens the gallery for the user to select an image
+    /**
+     * Open the gallery to select an image.
+     */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         galleryLauncher.launch(intent);
     }
 
-    // Result handler for gallery selection
+    // Activity result launcher for handling the result of the gallery intent
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     selectedImageUri = result.getData().getData();
-                    binding.camera.setImageURI(selectedImageUri); // Display selected image
+                    // TODO: FIXXXX Set image to ImageView
+                    //binding.addImage.setImageURI(selectedImageUri);
                 }
             }
     );
 
-    // Uploads image to Firebase Storage and retrieves the download URL
+    /**
+     * Upload the selected image to Firebase.
+     * @param imageUri the URI of the selected image.
+     */
     private void uploadImageToFirebase(Uri imageUri) {
         Image image = new Image("1234567890", "123456789");
         image.upload(imageUri, task -> {
             if (task.isSuccessful()) {
                 posterUrl = task.getResult().getImageUrl();
+                createOrUpdateEventInFirestore();
             }
         });
-        createEventInFirestore();
     }
 
-    private void createEventInFirestore() {
-        // Generate a new event or update existing one based on user input
+    /**
+     * Create or update the event in Firestore.
+     */
+    private void createOrUpdateEventInFirestore() {
         String eventTitle = binding.title.getText().toString();
         String eventDescription = binding.description.getText().toString();
         String promoQrCodeId = generateRandomQrCodeId(10);
         String waitingListQrCodeId = generateRandomQrCodeId(10);
         String date = binding.date.getText().toString() + ", " + binding.startTime.getText().toString() + " - " + binding.endTime.getText().toString();
 
-        if (event == null) {
-            Event newEvent = new Event(
-                    "123456789",
-                    "1234567890",
-                    "1234567890123",
-                    eventTitle,
-                    eventDescription,
-                    date,
-                    promoQrCodeId,
-                    waitingListQrCodeId,
-                    posterUrl,
-                    binding.address.getText().toString(),
-                    binding.winners.getText().toString(),
-                    true,
-                    Integer.parseInt(binding.entrants.getText().toString()),
-                    0,
-                    System.currentTimeMillis(),
-                    System.currentTimeMillis()
-            );
+        facilityRepository.getFacilityByOwnerId(organizerId, task -> {
+            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                String facilityId = task.getResult().getDocuments().get(0).getId();
 
-            pushEventToFirestore(newEvent);
-        } else {
-            Event newEvent = new Event(
-                    event.getEventId(),
-                    event.getOrganizerId(),
-                    event.getFacilityId(),
-                    eventTitle,
-                    eventDescription,
-                    date,
-                    event.getPromoQrCodeId(),
-                    event.getWaitingListQrCodeId(),
-                    posterUrl,
-                    binding.address.getText().toString(),
-                    binding.winners.getText().toString(),
-                    true,
-                    Integer.parseInt(binding.entrants.getText().toString()),
-                    event.getEntrants(),
-                    event.getCreatedAt(),
-                    System.currentTimeMillis()
-            );
+                if (event == null) {
+                    // Create a new event
+                    Event newEvent = new Event(
+                            null,
+                            organizerId,
+                            facilityId,
+                            eventTitle,
+                            eventDescription,
+                            date,
+                            promoQrCodeId,
+                            waitingListQrCodeId,
+                            posterUrl,
+                            binding.address.getText().toString(),
+                            binding.winners.getText().toString(),
+                            true,
+                            Integer.parseInt(binding.entrants.getText().toString()),
+                            0,
+                            System.currentTimeMillis(),
+                            System.currentTimeMillis()
+                    );
 
-            pushEventUpdateToFirestore(newEvent);
-        }
-    }
-
-    private void pushEventUpdateToFirestore(Event event) {
-        eventViewModel.updateEvent(event, new OnCompleteListener<Object>() {
-            @Override
-            public void onComplete(Task<Object> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(requireView()).navigateUp();
+                    pushEventToFirestore(newEvent);
                 } else {
-                    Toast.makeText(requireActivity(), "Failed to update event", Toast.LENGTH_SHORT).show();
+                    // Update the existing event
+                    Event updatedEvent = new Event(
+                            event.getEventId(),
+                            event.getOrganizerId(),
+                            event.getFacilityId(),
+                            eventTitle,
+                            eventDescription,
+                            date,
+                            event.getPromoQrCodeId(),
+                            event.getWaitingListQrCodeId(),
+                            posterUrl,
+                            binding.address.getText().toString(),
+                            binding.winners.getText().toString(),
+                            true,
+                            Integer.parseInt(binding.entrants.getText().toString()),
+                            event.getEntrants(),
+                            event.getCreatedAt(),
+                            System.currentTimeMillis()
+                    );
+
+                    pushEventUpdateToFirestore(updatedEvent);
                 }
             }
         });
     }
 
+    /**
+     * Push the new event to Firestore.
+     * @param event the event to be added.
+     */
     private void pushEventToFirestore(Event event) {
-        eventViewModel.addEvent(event, new OnCompleteListener<Object>() {
-            @Override
-            public void onComplete(Task<Object> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(requireView()).navigateUp();
-                } else {
-                    Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
-                }
+        eventViewModel.addEvent(event, task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(requireView()).navigateUp();
+            } else {
+                Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    /**
+     * Push the updated event to Firestore.
+     * @param event the event to be updated.
+     */
+    private void pushEventUpdateToFirestore(Event event) {
+        eventViewModel.updateEvent(event, task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(requireView()).navigateUp();
+            } else {
+                Toast.makeText(requireActivity(), "Failed to update event", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Delete the event from Firestore.
+     * @param event the event to be deleted.
+     */
     private void deleteEvent(Event event) {
         eventViewModel.deleteEvent(event, task -> {
             if (task.isSuccessful()) {
@@ -286,6 +322,11 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    /**
+     * Generate a random QR code ID.
+     * @param length the length of the QR code ID.
+     * @return the generated QR code ID.
+     */
     private String generateRandomQrCodeId(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder id = new StringBuilder();
@@ -296,6 +337,9 @@ public class EventCreationFragment extends Fragment {
         return id.toString();
     }
 
+    /**
+     * Show a date picker dialog to select a date.
+     */
     private void pickDate() {
         Calendar calendar = Calendar.getInstance();
 
@@ -311,6 +355,10 @@ public class EventCreationFragment extends Fragment {
         datePicker.show();
     }
 
+    /**
+     * Show a time picker dialog to select a time.
+     * @param isStartTime true if selecting start time, false if selecting end time.
+     */
     private void pickTime(boolean isStartTime) {
         Calendar calendar = Calendar.getInstance();
         TimePickerDialog timePicker = new TimePickerDialog(requireActivity(), (timeView, hourOfDay, minute) -> {
@@ -330,20 +378,3 @@ public class EventCreationFragment extends Fragment {
         timePicker.show();
     }
 }
-
-/**
- * Code Sources
- *
- * ChatGPT:
- * - Implementing an image picker in Android Fragment.
- * - Managing Firebase Firestore data for UI fragments.
- *
- * Stack Overflow:
- * - How to open the image gallery in an Android Fragment.
- * - Using DatePickerDialog and TimePickerDialog in Fragment.
- *
- * Android Developer Documentation:
- * - Firebase Firestore for Android
- * - Fragments and Navigation
- * - Displaying Date and Time Pickers- Documentation for using date and time pickers.
- */

@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".views.EventDiscoveryFragment"
     android:background="@color/background1">
 
     <androidx.constraintlayout.widget.Guideline
@@ -66,22 +65,22 @@
 
     <EditText
         android:id="@+id/searchBar"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        app:layout_constraintStart_toEndOf="@id/startGuide"
-        app:layout_constraintEnd_toStartOf="@id/endGuide"
-        app:layout_constraintTop_toBottomOf="@id/profile"
-        android:layout_marginTop="15dp"
-        android:hint="Search"
-        android:textColorHint="@color/text3"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:maxLines="1"
-        android:drawablePadding="15dp"
+        android:layout_width="350dp"
+        android:layout_height="48dp"
         android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/search_bar_bg"
         android:drawableStart="@drawable/ic_search"
-        android:paddingHorizontal="20dp"/>
+        android:drawablePadding="15dp"
+        android:hint="Search"
+        android:maxLines="1"
+        android:paddingHorizontal="20dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/text3"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintTop_toBottomOf="@id/profile" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"

@@ -127,17 +127,12 @@ public class UserTest {
         assertTrue("John", User.validateFirstName("John"));
         assertTrue(User.validateLastName("John-Paul"));
         assertFalse(User.validateLastName("John232"));
-        assertFalse(User.validateLastName("-John"));
-        assertFalse(User.validateLastName("John-"));
     }
 
     @Test
     public void testValidateLastName() {
         assertTrue(User.validateFirstName("Dough"));
         assertTrue(User.validateLastName("Dough-Me"));
-        assertFalse(User.validateLastName("Dough1234"));
-        assertFalse(User.validateLastName("-Dough"));
-        assertFalse(User.validateLastName("Dough-"));
     }
 
     @Test

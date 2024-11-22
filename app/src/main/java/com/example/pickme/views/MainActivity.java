@@ -1,64 +1,78 @@
 package com.example.pickme.views;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 import com.example.pickme.R;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-/**
- * An entry point for the app and is responsible for user authentication.
- *
- * @author Kenneth (aesoji)
- * @version 1.2
- *
- * Responsibilities:
- * - Checks for user existence in our Firebase Firestore based on a unique device ID.
- * - Navigates the user to HomeActivity for existing users or UserSignUpActivity for new users.
- **/
 public class MainActivity extends AppCompatActivity {
 
     private UserRepository userRepository;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        EdgeToEdge.enable(this);
 
+        // Initialize Firebase
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
-        // Initialize UserRepository instance
         userRepository = new UserRepository();
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setVisibility(View.GONE); // Initially hide the bottom navigation
 
-        // Hides the action bar
-        androidx.appcompat.app.ActionBar supportActionBar = getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.hide();
-        }
-
-        // Checks user in the Firestore
         String deviceID = getDocumentationDeviceId();
         if (deviceID != null && !deviceID.isEmpty()) {
             checkUserInFirestore(deviceID);
         }
+
+        // Set up NavController
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+        // Set up bottom navigation item selection listener
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.navigation_home) {
+                navController.navigate(R.id.action_global_homeFragment);
+                return true;
+            } else if (itemId == R.id.navigation_qr_camera) {
+                navController.navigate(R.id.action_global_qrCameraFragment);
+                return true;
+            } else if (itemId == R.id.navigation_inbox) {
+                navController.navigate(R.id.action_global_inboxFragment);
+                return true;
+            } else if (itemId == R.id.navigation_my_events) {
+                navController.navigate(R.id.action_global_myEventsFragment);
+                return true;
+            }
+            return false;
+        });
     }
 
+    // Get the device ID
     public String getDocumentationDeviceId() {
-        // Retrieves the user's unique DeviceId.
         return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
+    // Check if the user exists in Firestore
     private void checkUserInFirestore(String deviceID) {
         userRepository.getUserByDeviceId(deviceID, task -> {
             if (!task.isSuccessful() || task.getResult() == null) {
@@ -78,72 +92,41 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // User proven to exist, load their information.
-            loadUserInformation(user, document);
+            User.setInstance(user);
+            navigateToHomeFragment();
         });
     }
 
-    //---------- Activity Redirection --------------------
-    private void loadUserInformation(User user, DocumentSnapshot document) {
-        // Navigates to HomeActivity for existing users via deserialization.
-        User.setInstance(user);
-        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-        intent.putExtra("user_data", user);
-        startActivity(intent);
-        finish();
+    // Navigate to the HomeFragment and show the bottom navigation
+    private void navigateToHomeFragment() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        navController.navigate(R.id.action_global_homeFragment);
+        bottomNavigationView.setVisibility(View.VISIBLE); // Show the bottom navigation
     }
 
-    private void loadUserSignIn() {
-        // Navigates to the SignInActivity for new users or first-time login.
-        Intent intent = new Intent(MainActivity.this, UserSignUpActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    //---------- Error Cases --------------------
+    // Handle Firestore access errors
     private void handleFirestoreError(Exception exception) {
-        // Handles a Firestore accessing errors.
         Log.e("Firestore", "Error accessing Firestore: ", exception);
     }
 
+    // Handle the case where the user is not found in Firestore
     private void handleUserNotFound() {
-        // Handles the case when a user document does not exist in Firestore.
-        Log.d("Firestore", "Device-specific user not found, redirecting to SignInActivity.");
-        loadUserSignIn();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        navController.navigate(R.id.action_global_userSignUpFragment);
     }
 
+    // Handle deserialization errors
     private void handleDeserializationError() {
-        // Handles errors related to deserialization of the user object.
         Log.e("Firestore", "User object is null after deserialization.");
     }
 
+    // Check if the user document is valid
     private boolean isUserDocumentValid(DocumentSnapshot document) {
-        // Checks if the Firestore document is valid.
         return document != null && document.exists();
     }
 
+    // Check if the user object is deserialized correctly
     private boolean isUserDeserialized(User user) {
-        // Checks if the document can be successfully deserialized from Firestore.
         return user != null;
     }
 }
-
-/**
- * Coding Sources
- * <p>
- * ChatGBT
- * - "It's more intuitive to compare DeviceId's since it's one device per person. How do we set our Firebase and code to align?"
- * - "How do we load Firebase information if we already have an account created?"
- * - "What are some Firebase Firestore errors regarding documenting DeviceIds that I should be aware of?"
- * - "How does lambda insertion tasks work?"
- * <p>
- * Stack Overflow
- * - "How do i hid the action bar Android Studio?"
- * - "Android: Difference between Parcelable and Serializable?"
- * <p>
- * Firebase Documentation
- * - Authentication > Admin > Manage Users
- * <p>
- * Android Developers
- * - "Display content edge-to-edge in your app"
- **/
