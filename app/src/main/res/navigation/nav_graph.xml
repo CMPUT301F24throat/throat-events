@@ -52,7 +52,16 @@
         android:id="@+id/qrCameraFragment"
         android:name="com.example.pickme.views.QRCameraFragment"
         android:label="QR Camera"
-        tools:layout="@layout/fragment_qr_camera" />
+        tools:layout="@layout/fragment_qr_camera">
+        <!-- Add navigation to EventDetailsFragment -->
+        <action
+            android:id="@+id/action_qrCameraFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment">
+            <argument
+                android:name="eventID"
+                app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/inboxFragment"
@@ -106,9 +115,7 @@
         android:id="@+id/QRCodeViewFragment"
         android:name="com.example.pickme.views.QRCodeViewFragment"
         android:label="QR Code View"
-        tools:layout="@layout/qr_display_activity" >
-
-        <!-- Define eventID argument for QRCodeViewFragment -->
+        tools:layout="@layout/qr_display_activity">
         <argument
             android:name="eventID"
             app:argType="string" />
