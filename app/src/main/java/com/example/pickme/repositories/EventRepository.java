@@ -29,7 +29,7 @@ public class EventRepository {
 
                     // Create an empty waitingList subcollection
                     CollectionReference waitingListRef = newEventRef.collection("waitingList");
-                    transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
+                    //transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
 
                     return null;
                 }).addOnCompleteListener(onCompleteListener)

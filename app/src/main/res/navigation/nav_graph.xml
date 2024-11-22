@@ -64,7 +64,15 @@
         android:id="@+id/eventDetailsFragment"
         android:name="com.example.pickme.views.EventDetailsFragment"
         android:label="Event Details"
-        tools:layout="@layout/event_details" />
+        tools:layout="@layout/event_details">
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_QRCodeViewFragment"
+            app:destination="@id/QRCodeViewFragment">
+            <argument
+                android:name="eventID"
+                app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/myEventsFragment"
@@ -93,6 +101,18 @@
         android:name="com.example.pickme.views.FacilityCreationFragment"
         android:label="Facility"
         tools:layout="@layout/facility_create" />
+
+    <fragment
+        android:id="@+id/QRCodeViewFragment"
+        android:name="com.example.pickme.views.QRCodeViewFragment"
+        android:label="QR Code View"
+        tools:layout="@layout/qr_display_activity" >
+
+        <!-- Define eventID argument for QRCodeViewFragment -->
+        <argument
+            android:name="eventID"
+            app:argType="string" />
+    </fragment>
 
     <!-- Global actions -->
     <action
