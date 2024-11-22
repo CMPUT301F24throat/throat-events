@@ -16,4 +16,6 @@
     <string name="home">Home</string>
     <string name="my_events">My Events</string>
     <string name="required_field">* Required Field</string>
+    <string name="qr_camera">QR Camera</string>
+    <string name="admin_tools">Admin Tools</string>
 </resources>

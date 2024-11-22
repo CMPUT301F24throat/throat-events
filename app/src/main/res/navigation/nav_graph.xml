@@ -83,6 +83,12 @@
     </fragment>
 
     <fragment
+        android:id="@+id/adminToolsFragment"
+        android:name="com.example.pickme.views.AdminToolsFragment"
+        android:label="Admin Tools"
+        tools:layout="@layout/fragment_admin_tools" />
+
+    <fragment
         android:id="@+id/eventCreationFragment"
         android:name="com.example.pickme.views.EventCreationFragment"
         android:label="Event Creation"
