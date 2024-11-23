@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,13 +18,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.pickme.R;
-import com.example.pickme.repositories.QrRepository;
-import com.google.zxing.ResultPoint;
+import com.example.pickme.models.Event;
+import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.utils.EventFetcher;
 import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
-
-import java.util.List;
 
 public class QRCameraFragment extends Fragment {
 
@@ -33,10 +31,7 @@ public class QRCameraFragment extends Fragment {
     private static final String TAG = "QRCameraFragment";
 
     private DecoratedBarcodeView barcodeScannerView;
-    private TextView scanResultTextView;
-    private QrRepository qrRepository;
-    private boolean isNavigationComplete = false;
-    private boolean isFirebaseInquiryComplete = true;
+    private boolean isProcessingScan = false; // Flag to prevent multiple processing
 
     @Nullable
     @Override
@@ -45,9 +40,6 @@ public class QRCameraFragment extends Fragment {
 
         // Initialize the scanner view
         barcodeScannerView = view.findViewById(R.id.barcodeScannerView);
-        scanResultTextView = view.findViewById(R.id.scanResult);
-
-        qrRepository = new QrRepository();
 
         // Check for camera feature
         if (!requireContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
@@ -71,13 +63,14 @@ public class QRCameraFragment extends Fragment {
         super.onResume();
         if (barcodeScannerView != null) {
             barcodeScannerView.resume();
+            isProcessingScan = false; // Reset the scan flag to allow new scans
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (barcodeScannerView != null && isFirebaseInquiryComplete) {
+        if (barcodeScannerView != null) {
             barcodeScannerView.pause();
         }
     }
@@ -87,92 +80,53 @@ public class QRCameraFragment extends Fragment {
         barcodeScannerView.decodeContinuous(new BarcodeCallback() {
             @Override
             public void barcodeResult(BarcodeResult result) {
-                if (result.getText() != null) {
+                if (result.getText() != null && !isProcessingScan) { // Only process if not already scanning
                     Log.d(TAG, "Scanned QR Code: " + result.getText());
+                    isProcessingScan = true; // Set flag to prevent further scans
                     fetchEventDetails(result.getText());
                 }
-            }
-
-            @Override
-            public void possibleResultPoints(List<ResultPoint> resultPoints) {
-                Log.d(TAG, "Possible result points detected");
             }
         });
     }
 
     private void fetchEventDetails(String qrID) {
-        Log.d(TAG, "Starting Firestore query for QR ID: " + qrID);
+        Log.d(TAG, "Starting fetcher for QR ID: " + qrID);
 
-        isFirebaseInquiryComplete = false;
+        // Create an instance of EventFetcher with the EventRepository
+        EventFetcher eventFetcher = new EventFetcher(new EventRepository());
 
-        qrRepository.readQRByID(qrID).addOnCompleteListener(task -> {
-            if (!isAdded() || getView() == null) {
-                Log.w(TAG, "Fragment is not active; skipping Firestore result handling");
-                isFirebaseInquiryComplete = true;
-                return;
+        eventFetcher.getEventByEventId(qrID, new EventFetcher.EventCallback() {
+            @Override
+            public void onEventFetched(Event event) {
+                Log.d(TAG, "Event fetched: " + event.getEventTitle());
+                navigateToEventDetails(event); // Pass the Event object
             }
 
-            if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                Log.d(TAG, "Firestore Query Result: " + task.getResult().getDocuments());
-
-                String qrAssociation = task.getResult().getDocuments().get(0).getString("qrAssociation");
-                if (qrAssociation != null && qrAssociation.contains("/events/")) {
-                    String eventID = qrAssociation.substring(qrAssociation.lastIndexOf("/") + 1);
-                    Log.d(TAG, "Extracted Event ID: " + eventID);
-
-                    completeCameraTaskAndNavigate(eventID);
-                } else {
-                    Log.d(TAG, "Invalid qrAssociation format: " + qrAssociation);
-                    Toast.makeText(requireContext(), "QR code association is invalid", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Log.d(TAG, "No matching QR code found in Firestore for ID: " + qrID);
-                Toast.makeText(requireContext(), "QR code not associated with an event", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onError(String errorMessage) {
+                Log.e(TAG, "Error fetching event: " + errorMessage);
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                isProcessingScan = false; // Allow scanning again for the next QR code
             }
-
-            isFirebaseInquiryComplete = true;
-        }).addOnFailureListener(e -> {
-            if (!isAdded() || getView() == null) {
-                Log.w(TAG, "Fragment is not active; skipping Firestore error handling");
-                isFirebaseInquiryComplete = true;
-                return;
-            }
-
-            Log.e(TAG, "Firestore query error", e);
-            Toast.makeText(requireContext(), "Error fetching event details", Toast.LENGTH_SHORT).show();
-
-            isFirebaseInquiryComplete = true;
         });
     }
 
-    private void completeCameraTaskAndNavigate(String eventID) {
-        if (barcodeScannerView != null) {
-            barcodeScannerView.pause();
-        }
-        navigateToEventDetails(eventID);
-    }
-
-    private void navigateToEventDetails(String eventID) {
-        if (isNavigationComplete) {
-            Log.d(TAG, "Navigation already completed, skipping...");
-            return;
-        }
-
-        if (eventID != null && !eventID.isEmpty()) {
+    private void navigateToEventDetails(Event event) {
+        if (event != null) {
             if (isAdded() && getView() != null) {
-                isNavigationComplete = true;
                 Bundle args = new Bundle();
-                args.putString("eventID", eventID);
+                args.putSerializable("selectedEvent", event); // Pass the Event object as a Serializable
                 NavController navController = Navigation.findNavController(requireView());
 
-                Log.d(TAG, "Navigating to EventDetailsFragment with Event ID: " + eventID);
+                Log.d(TAG, "Navigating to EventDetailsFragment with Event: " + event.getEventTitle());
                 navController.navigate(R.id.action_qrCameraFragment_to_eventDetailsFragment, args);
             } else {
                 Log.e(TAG, "Fragment not attached or view is unavailable for navigation");
             }
         } else {
-            Log.e(TAG, "Event ID is null or empty");
-            Toast.makeText(requireContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Event object is null");
+            Toast.makeText(requireContext(), "Event details missing", Toast.LENGTH_SHORT).show();
+            isProcessingScan = false; // Allow scanning again if navigation fails
         }
     }
 
