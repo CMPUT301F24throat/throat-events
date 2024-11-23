@@ -21,6 +21,7 @@ import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
+import com.example.pickme.utils.NotificationHelper;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -52,27 +53,26 @@ public class HomeFragment extends Fragment {
             homeProfileButton.setOnClickListener(v -> {
                 Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_userProfileFragment);
             });
+            askNotificationPermission();
+
+            new NotificationHelper().cleanNotifications();
         } else {
             // Handle the case where the user is null
             homeProfileButton.setVisibility(View.GONE);
         }
 
-        askNotificationPermission();
     }
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // FCM SDK (and your app) can post notifications.
-                } else {
-                    // Inform user that your app will not show notifications.
-                }
+                User.getInstance().setNotificationEnabled(isGranted);
             });
 
     private void askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) ==
                     PackageManager.PERMISSION_GRANTED) {
+                User.getInstance().setNotificationEnabled(true);
                 // FCM SDK (and your app) can post notifications.
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 new AlertDialog.Builder(requireContext())
@@ -83,6 +83,7 @@ public class HomeFragment extends Fragment {
                             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
                         })
                         .setNegativeButton("No Thanks", (dialog, which) -> {
+                            User.getInstance().setNotificationEnabled(false);
                             // No action needed
                         }).show();
             } else {

@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,14 @@ import com.example.pickme.R;
 import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.NotificationRepository;
+import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.NotificationHelper;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This fragment handles the create/send screen for notifications
@@ -43,12 +49,12 @@ public class CreateNotificationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState){
-        return layoutInflater.inflate(R.layout.notif_create_activity, container, false);
+        return layoutInflater.inflate(R.layout.notif_create_fragment, container, false);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstaneState){
-        super.onViewCreated(view, savedInstaneState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
+        super.onViewCreated(view, savedInstanceState);
 
         backArrow = view.findViewById(R.id.back_arrow);
         sendButton = view.findViewById(R.id.sendButton);
@@ -80,18 +86,43 @@ public class CreateNotificationFragment extends Fragment {
                 notification.setSentFrom(User.getInstance().getUserId());
                 notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
                 notification.setDateTimeNow();
+                notification.setEventID(getArguments().getString("EventID"));
 
-                NotificationRepository repo = new NotificationRepository();
+                createSendList(notification, l -> {
 
-                repo.addNotification(notification, task ->
-                        Toast.makeText(
-                        view.getContext(),
-                        "Notification Sent",
-                        Toast.LENGTH_SHORT).show());
+                    NotificationRepository repo = new NotificationRepository();
 
-                getActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
+                    repo.addNotification(notification, task ->{
+                            Toast.makeText(
+                            view.getContext(),
+                            "Notification Sent",
+                            Toast.LENGTH_SHORT).show();
+
+                            new NotificationHelper().sendNotification(notification);
+                        });
+
+                    getActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
+                });
+
             }
         });
+    }
+
+    private void createSendList(Notification notification, OnCompleteListener<Void> onCompleteListener){
+        UserRepository userRepository = new UserRepository();
+
+        switch(notification.getLevel()){
+            case All:
+                userRepository.getAllUsers(query -> {
+                    List<DocumentSnapshot> docs = query.getResult().getDocuments();
+                    for(DocumentSnapshot doc : docs){
+                        Log.i("DOC", "DOC ID: " + doc.getId());
+                        notification.getSendTo().add(doc.getId());
+                    }
+
+                    onCompleteListener.onComplete(null);
+                });
+        }
     }
 }
 

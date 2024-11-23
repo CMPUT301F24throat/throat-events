@@ -60,8 +60,8 @@ public class NotificationRepository {
     }
 
     // Read a notification by ID
-    public void getNotificationById(String notificationId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
-        notificationsRef.document(notificationId).get().addOnCompleteListener(onCompleteListener);
+    public void getNotificationById(String notificationId, OnSuccessListener<DocumentSnapshot> onSuccessListener) {
+        notificationsRef.document(notificationId).get().addOnSuccessListener(onSuccessListener);
     }
 
     // Update a notification

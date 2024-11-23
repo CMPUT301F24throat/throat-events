@@ -64,7 +64,11 @@
         android:id="@+id/eventDetailsFragment"
         android:name="com.example.pickme.views.EventDetailsFragment"
         android:label="Event Details"
-        tools:layout="@layout/event_details" />
+        tools:layout="@layout/event_details" >
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_createNotif"
+            app:destination="@id/createNotif" />
+    </fragment>
 
     <fragment
         android:id="@+id/myEventsFragment"
@@ -93,6 +97,13 @@
         android:name="com.example.pickme.views.FacilityCreationFragment"
         android:label="Facility"
         tools:layout="@layout/facility_create" />
+
+    <fragment
+        android:id="@+id/createNotif"
+        android:name="com.example.pickme.views.CreateNotificationFragment"
+        android:label="Create Notif"
+        tools:layout="@layout/notif_create_fragment">
+    </fragment>
 
     <!-- Global actions -->
     <action

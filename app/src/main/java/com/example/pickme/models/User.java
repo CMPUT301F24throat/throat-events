@@ -3,9 +3,11 @@ package com.example.pickme.models;
 import androidx.annotation.NonNull;
 
 import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.UserNotification;
 import com.google.firebase.Timestamp;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Class that can represent, validate, and stores a user in the app.
@@ -33,6 +35,7 @@ public class User implements Serializable {
     private String contactNumber; // Contact number of user.
     private String profilePictureUrl = defaultProfilePictureUrl; // Customizable user profile picture.
     private boolean isOnline; // Checks if the user is currently online.
+    private ArrayList<UserNotification> userNotifications = new ArrayList<UserNotification>();
 
     // User Preferences & Permissions
     private String deviceId; // Attaches on device to user
@@ -126,6 +129,18 @@ public class User implements Serializable {
 
     public void setOnline(boolean isOnline) {
         this.isOnline = isOnline;
+    }
+
+    public ArrayList<UserNotification> getUserNotifications() {
+        return userNotifications;
+    }
+
+    public void setUserNotifications(ArrayList<UserNotification> userNotifications) {
+        this.userNotifications = userNotifications;
+    }
+
+    public void addUserNotification(UserNotification userNotification){
+        this.userNotifications.add(userNotification);
     }
 
     //---------- Get/Set User Preferences & Permissions --------------------
