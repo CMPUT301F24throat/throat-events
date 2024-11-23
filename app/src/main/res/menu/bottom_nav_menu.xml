@@ -3,17 +3,22 @@
     <item
         android:id="@+id/navigation_home"
         android:icon="@drawable/ic_home"
-        android:title="Home" />
+        android:title="@string/home" />
     <item
         android:id="@+id/navigation_qr_camera"
         android:icon="@drawable/ic_camera"
-        android:title="QR Camera" />
+        android:title="@string/qr_camera" />
     <item
         android:id="@+id/navigation_inbox"
         android:icon="@drawable/ic_profile_mail"
-        android:title="Inbox" />
+        android:title="@string/my_inbox" />
     <item
         android:id="@+id/navigation_my_events"
         android:icon="@drawable/ic_calendar"
-        android:title="My Events" />
+        android:title="@string/my_events" />
+    <item
+        android:id="@+id/navigation_admin_tools"
+        android:icon="@drawable/ic_eye"
+        android:title="@string/admin_tools"
+        android:visible="false" /> <!-- Hidden by default, only visible when admin user -->
 </menu>
