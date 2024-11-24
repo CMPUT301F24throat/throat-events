@@ -58,8 +58,8 @@ public class Notification {
         return read;
     }
 
-    public void markRead() {
-        this.read = true;
+    public void markRead(boolean read) {
+        this.read = read;
     }
 
     public void markUnread(){

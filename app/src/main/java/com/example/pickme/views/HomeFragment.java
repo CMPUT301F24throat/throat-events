@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -20,8 +21,13 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
+import com.example.pickme.repositories.NotificationRepository;
 import com.example.pickme.utils.NotificationHelper;
+import com.example.pickme.utils.NotificationList;
+import com.example.pickme.utils.UserNotification;
+import com.example.pickme.views.adapters.NotificationAdapter;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -53,9 +59,32 @@ public class HomeFragment extends Fragment {
             homeProfileButton.setOnClickListener(v -> {
                 Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_userProfileFragment);
             });
+
+            //notification setup
             askNotificationPermission();
 
             new NotificationHelper().cleanNotifications();
+
+            NotificationAdapter notificationAdapter = new NotificationAdapter(getContext(), NotificationList.getInstance());
+
+            ListView notifList = view.findViewById(R.id.notifList);
+            notifList.setAdapter(notificationAdapter);
+
+            NotificationRepository notificationRepository = new NotificationRepository();
+            notificationRepository.addSnapshotListener();
+            notificationRepository.attachAdapter(notificationAdapter);
+
+            NotificationList.getInstance().clear();
+            for(UserNotification userNotification : user.getUserNotifications()){
+                new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+                    Notification notification = documentSnapshot.toObject(Notification.class);
+                    notification.markRead(userNotification.isRead());
+
+                    NotificationList.getInstance().add(notification);
+                    notificationAdapter.notifyDataSetChanged();
+                });
+            }
+
         } else {
             // Handle the case where the user is null
             homeProfileButton.setVisibility(View.GONE);

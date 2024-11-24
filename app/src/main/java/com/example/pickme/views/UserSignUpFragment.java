@@ -46,12 +46,12 @@ public class UserSignUpFragment extends Fragment {
         String firstName = firstNameEditText.getText().toString().trim();
         String lastName = lastNameEditText.getText().toString().trim();
 
-        if (User.validateFirstName(firstName)) {
+        if (!User.validateFirstName(firstName)) {
             Toast.makeText(getContext(), "Invalid first name. Please enter a valid first name.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (!lastName.isEmpty() && User.validateLastName(lastName)) {
+        if (!lastName.isEmpty() && !User.validateLastName(lastName)) {
             Toast.makeText(getContext(), "Invalid last name. Please enter a valid last name.", Toast.LENGTH_SHORT).show();
             return;
         }

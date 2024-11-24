@@ -3,11 +3,15 @@ package com.example.pickme.repositories;
 import android.util.Log;
 
 import com.example.pickme.models.Notification;
+import com.example.pickme.models.User;
+import com.example.pickme.utils.NotificationList;
+import com.example.pickme.views.adapters.NotificationAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,6 +28,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
+    NotificationAdapter notificationAdapter;
+    static boolean listening = false;
 
     /**
      * Constructor also initializes the Firebase db
@@ -87,6 +93,52 @@ public class NotificationRepository {
     // Read notifications by sender user ID
     public void getNotificationsBySenderUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
         notificationsRef.whereEqualTo("senderId", userId).get().addOnCompleteListener(onCompleteListener);
+    }
+
+    public void addSnapshotListener(){
+        if(listening)
+            return;
+
+        NotificationList notificationList = NotificationList.getInstance();
+        User user = User.getInstance();
+
+        Log.i("NOTIF", "adding listener");
+
+        notificationsRef.addSnapshotListener((query, error) -> {
+
+            if(!listening){
+                listening = true;
+                return;
+            }
+
+            if(error != null){
+                Log.e("NOTIF", "Listen failed: ", error);
+                return;
+            }
+
+            if(query != null){
+                for(DocumentChange change : query.getDocumentChanges()){
+                    Notification notification = change.getDocument().toObject(Notification.class);
+
+                    if(!notification.getSendTo().contains(user.getDeviceId()))
+                        continue;
+
+                    if(change.getType() == DocumentChange.Type.ADDED)
+                        notificationList.add(notification);
+                    else if(change.getType() == DocumentChange.Type.REMOVED)
+                        notificationList.remove(notification);
+
+                }
+            }
+
+            if(notificationAdapter != null)
+                this.notificationAdapter.notifyDataSetChanged();
+        });
+
+    }
+
+    public void attachAdapter(NotificationAdapter notificationAdapter){
+        this.notificationAdapter = notificationAdapter;
     }
 }
 

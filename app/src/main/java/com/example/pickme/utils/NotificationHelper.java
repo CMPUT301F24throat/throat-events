@@ -98,9 +98,8 @@ public class NotificationHelper extends FirebaseMessagingService{
 
                 Notification notification = documentSnapshot.toObject(Notification.class);
 
-                if(notification.getEventID() == null) {
+                if(notification == null || notification.getEventID() == null) {
                     user.getUserNotifications().remove(userNotification);
-                    return;
                 }
 
                 new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs"); });

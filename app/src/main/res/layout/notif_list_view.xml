@@ -38,16 +38,15 @@
         app:layout_constraintTop_toBottomOf="@id/eventName"
         android:layout_marginTop="5dp"
         app:layout_constraintStart_toStartOf="@id/eventName"
-        android:paddingEnd="10dp"
+        android:paddingEnd="40dp"
 
         android:text="Message"
         android:textSize="20sp"
         android:textColor="@color/text2"
 
-        android:ellipsize="none"
+        android:ellipsize="end"
         android:scrollHorizontally="false"
-        android:singleLine="false"
-        android:maxLines="3"
+        android:maxLines="1"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
