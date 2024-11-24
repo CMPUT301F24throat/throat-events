@@ -1,7 +1,11 @@
 package com.example.pickme.views;
 
+
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,6 +42,20 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "channelID";
+            String channelName = "My Channel";
+            String channelDescription = "Channel for app notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+
+            NotificationManager notificationManager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -71,7 +89,7 @@ public class HomeFragment extends Fragment {
             notifList.setAdapter(notificationAdapter);
 
             NotificationRepository notificationRepository = new NotificationRepository();
-            notificationRepository.addSnapshotListener();
+            notificationRepository.addSnapshotListener(getContext());
             notificationRepository.attachAdapter(notificationAdapter);
 
             NotificationList.getInstance().clear();

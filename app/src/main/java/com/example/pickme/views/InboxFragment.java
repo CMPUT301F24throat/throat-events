@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme.R;
 import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
+import com.example.pickme.repositories.NotificationRepository;
+import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.NotificationList;
 import com.example.pickme.utils.UserNotification;
 import com.example.pickme.views.adapters.NotifRecAdapter;
@@ -36,57 +38,15 @@ public class InboxFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         NotificationList notifications = NotificationList.getInstance();
-//        notifications.clear();
-
-//        ArrayList<Notification> notifications = new ArrayList<Notification>();
 
         NotifRecAdapter notificationAdapter = new NotifRecAdapter(getContext(), notifications);
         RecyclerView recyclerView = view.findViewById(R.id.notifRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(notificationAdapter);
+        new NotificationRepository().attachRecAdapter(notificationAdapter);
 
         ItemTouchHelper itemTouchHelper = getItemTouchHelper(recyclerView, notifications, notificationAdapter);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-
-//        ListView listView = view.findViewById(R.id.notificationsList);
-
-//        listView.setAdapter(notificationAdapter);
-
-//        User user = User.getInstance();
-
-//        NotificationRepository notificationRepository = new NotificationRepository();
-//        notificationRepository.addSnapshotListener();
-//        notificationRepository.attachAdapter(notificationAdapter);
-//
-//        for(UserNotification userNotification : user.getUserNotifications()){
-//            Log.i("NOTIF", "NotifID: " + userNotification.getNotificationID());
-//            notificationRepository.getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
-//                Log.i("NOTIF", "DOCID: " + documentSnapshot.getId());
-//
-//                Notification notification = documentSnapshot.toObject(Notification.class);
-//                if(userNotification.isRead())
-//                    notification.markRead();
-//
-//                notifications.add(notification);
-//
-//                notificationAdapter.notifyDataSetChanged();
-//            });
-//        }
-
-//        Notification notif1 = new Notification();
-//        notif1.setEventID("RFcDhogc3mHnI0uleHnt");
-//        notif1.setMessage("Test notif 1");
-//
-//        Notification notif2 = new Notification();
-//        notif2.setEventID("RFcDhogc3mHnI0uleHnt");
-//        notif2.setMessage("a super duper duper duper duper duper duper duper duper duper duper long message just to see what happens");
-//        notif2.markRead();
-//
-//        notifications.add(notif1);
-//        notifications.add(notif2);
-
-
-
     }
 
     @NonNull
@@ -94,42 +54,42 @@ public class InboxFragment extends Fragment {
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                // No drag-and-drop support in this example
+                // No drag-and-drop support
                 return false;
             }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition(); // Get the swiped item's position
+
+                Notification notification = notifications.get(position);
+                User user = User.getInstance();
                 if (direction == ItemTouchHelper.LEFT) {
-                    Notification notification = notifications.get(position);
                     notifications.remove(notification);
 
-                    User user = User.getInstance();
+                    notificationAdapter.notifyItemRemoved(position);
+
                     for(UserNotification userNotification : user.getUserNotifications()){
                         if(userNotification.getNotificationID().equals(notification.getNotificationId())){
                             user.getUserNotifications().remove(userNotification);
                             break;
                         }
                     }
-//                    Toast.makeText(recyclerView.getContext(), "Swiped Left: " + notifications.get(position), Toast.LENGTH_SHORT).show();
 
                 } else if (direction == ItemTouchHelper.RIGHT) {
-                    Notification notification = notifications.get(position);
                     notification.markRead(!notification.isRead());
 
-                    User user = User.getInstance();
+                    notificationAdapter.notifyItemChanged(position);
+
                     for(UserNotification userNotification : user.getUserNotifications()){
                         if(userNotification.getNotificationID().equals(notification.getNotificationId())){
                             userNotification.setRead(notification.isRead());
                             break;
                         }
                     }
-//                    Toast.makeText(recyclerView.getContext(), "Swiped Right: " + notifications.get(position), Toast.LENGTH_SHORT).show();
                 }
 
-                notificationAdapter.notifyDataSetChanged();
-
+                new UserRepository().updateUser(user, task -> {});
             }
 
             @Override
@@ -183,3 +143,7 @@ public class InboxFragment extends Fragment {
     }
 
 }
+
+/* Sources
+ChatGPT: How do I draw something when I swipe a recyclerView
+ */

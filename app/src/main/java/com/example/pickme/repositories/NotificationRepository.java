@@ -1,10 +1,18 @@
 package com.example.pickme.repositories;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
 import com.example.pickme.utils.NotificationList;
+import com.example.pickme.views.adapters.NotifRecAdapter;
 import com.example.pickme.views.adapters.NotificationAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,7 +36,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
-    NotificationAdapter notificationAdapter;
+    private NotificationAdapter notificationAdapter;
+    private NotifRecAdapter notifRecAdapter;
     static boolean listening = false;
 
     /**
@@ -95,7 +104,7 @@ public class NotificationRepository {
         notificationsRef.whereEqualTo("senderId", userId).get().addOnCompleteListener(onCompleteListener);
     }
 
-    public void addSnapshotListener(){
+    public void addSnapshotListener(Context context){
         if(listening)
             return;
 
@@ -123,8 +132,22 @@ public class NotificationRepository {
                     if(!notification.getSendTo().contains(user.getDeviceId()))
                         continue;
 
-                    if(change.getType() == DocumentChange.Type.ADDED)
+                    if(change.getType() == DocumentChange.Type.ADDED){
                         notificationList.add(notification);
+                        new EventRepository().getEventById(notification.getEventID(), task ->{
+                                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
+                                    .setSmallIcon(android.R.drawable.ic_menu_info_details)
+                                    .setContentTitle(task.getResult().get("eventTitle", String.class))
+                                    .setContentText(notification.getMessage());
+
+                                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                    notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
+                                }
+
+                                });
+
+                    }
                     else if(change.getType() == DocumentChange.Type.REMOVED)
                         notificationList.remove(notification);
 
@@ -133,12 +156,19 @@ public class NotificationRepository {
 
             if(notificationAdapter != null)
                 this.notificationAdapter.notifyDataSetChanged();
+
+            if(notifRecAdapter != null)
+                notifRecAdapter.notifyDataSetChanged();
         });
 
     }
 
     public void attachAdapter(NotificationAdapter notificationAdapter){
         this.notificationAdapter = notificationAdapter;
+    }
+
+    public void attachRecAdapter(NotifRecAdapter notifRecAdapter){
+        this.notifRecAdapter = notifRecAdapter;
     }
 }
 
