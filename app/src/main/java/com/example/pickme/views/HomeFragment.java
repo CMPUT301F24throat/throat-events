@@ -24,16 +24,32 @@ import com.example.pickme.models.User;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * HomeFragment class that represents the home screen of the application.
+ * It handles the display of the user's profile picture and requests notification permissions.
+ */
 public class HomeFragment extends Fragment {
 
     private ImageButton homeProfileButton;
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
+    /**
+     * Called immediately after onCreateView has returned, but before any saved state has been restored in to the view.
+     * @param view The View returned by onCreateView.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -60,6 +76,9 @@ public class HomeFragment extends Fragment {
         askNotificationPermission();
     }
 
+    /**
+     * ActivityResultLauncher to handle the result of the notification permission request.
+     */
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -69,6 +88,10 @@ public class HomeFragment extends Fragment {
                 }
             });
 
+    /**
+     * Requests notification permission from the user.
+     * If the permission is not granted, it shows a dialog explaining why the permission is needed.
+     */
     private void askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) ==
