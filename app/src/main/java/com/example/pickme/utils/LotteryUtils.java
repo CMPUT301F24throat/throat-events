@@ -109,7 +109,7 @@ public class LotteryUtils {
      * @param eventId The ID of the event.
      * @param onCompleteListener The listener to handle the completion of the task.
      */
-    private void getNumToDraw(Event event, String eventId, OnCompleteListener<Integer> onCompleteListener) {
+    public void getNumToDraw(Event event, String eventId, OnCompleteListener<Integer> onCompleteListener) {
         waitingListUtils.getAcceptedEntrants(eventId, acceptedEntrantsTask -> {
             if (acceptedEntrantsTask.isSuccessful() && acceptedEntrantsTask.getResult() != null) {
                 List<WaitingListEntrant> acceptedEntrants = acceptedEntrantsTask.getResult();

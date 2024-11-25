@@ -2,15 +2,17 @@ package com.example.pickme.repositories;
 
 import com.example.pickme.models.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Facilitates CRUD operations and interactions with the Firestore events collection.
@@ -23,7 +25,12 @@ public class EventRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference eventsRef = db.collection("events");
 
-    // Create a new event
+    /**
+     * Creates a new event in the Firestore database.
+     *
+     * @param event The event to be added.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
     public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {
                     DocumentReference newEventRef = eventsRef.document();
@@ -42,7 +49,12 @@ public class EventRepository {
                 });
     }
 
-    // Update an event
+    /**
+     * Updates an existing event in the Firestore database.
+     *
+     * @param event The event to be updated.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
     public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
         DocumentReference eventRef = eventsRef.document(event.getEventId());
         db.runTransaction(transaction -> {
@@ -55,7 +67,12 @@ public class EventRepository {
                 });
     }
 
-    // Delete an event
+    /**
+     * Deletes an event from the Firestore database.
+     *
+     * @param eventId The ID of the event to be deleted.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
     public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
         eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
@@ -64,14 +81,52 @@ public class EventRepository {
                 });
     }
 
-    // Read an event by ID
-    public void getEventById(String eventId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
-        eventsRef.document(eventId).get().addOnCompleteListener(onCompleteListener);
+    /**
+     * Retrieves a list of events organized by a specific user.
+     *
+     * @param userId The ID of the organizer.
+     * @param includePastEvents Whether to include past events in the result.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    public void getEventsByOrganizerId(String userId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<Event> events = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                    Event event = document.toObject(Event.class);
+                    if (event != null) {
+                        if (includePastEvents || !hasEventPassed(event)) {
+                            events.add(event);
+                        }
+                    }
+                }
+                onCompleteListener.onComplete(Tasks.forResult(events));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
     }
 
-    // Read all events by organizer user ID
-    public void getEventsByOrganizerId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(onCompleteListener);
+    /**
+     * Retrieves an event by its ID.
+     *
+     * @param eventId The ID of the event to be retrieved.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    public void getEventById(String eventId, OnCompleteListener<Event> onCompleteListener) {
+        eventsRef.document(eventId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Event event = document.toObject(Event.class);
+                    onCompleteListener.onComplete(Tasks.forResult(event));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
     }
 
     /**
@@ -89,8 +144,124 @@ public class EventRepository {
             throw new IllegalArgumentException("Invalid event date format.");
         }
     }
-}
 
+    /**
+     * Retrieves all events from the Firestore database.
+     *
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    public void getAllEvents(OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<Event> events = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                    Event event = document.toObject(Event.class);
+                    if (event != null) {
+                        events.add(event);
+                    }
+                }
+                onCompleteListener.onComplete(Tasks.forResult(events));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
+    }
+
+    /**
+     * Retrieves events within a specific date range.
+     *
+     * @param startDate The start date of the range.
+     * @param endDate The end date of the range.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    public void getEventsByDateRange(Date startDate, Date endDate, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereGreaterThanOrEqualTo("eventDate", startDate)
+                .whereLessThanOrEqualTo("eventDate", endDate)
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        List<Event> events = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                            Event event = document.toObject(Event.class);
+                            if (event != null) {
+                                events.add(event);
+                            }
+                        }
+                        onCompleteListener.onComplete(Tasks.forResult(events));
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                    }
+                });
+    }
+
+    /**
+     * Retrieves events based on their location.
+     *
+     * @param location The location to filter events by.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    public void getEventsByLocation(String location, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereEqualTo("location", location).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<Event> events = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                    Event event = document.toObject(Event.class);
+                    if (event != null) {
+                        events.add(event);
+                    }
+                }
+                onCompleteListener.onComplete(Tasks.forResult(events));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
+    }
+
+    /**
+     * Retrieves events based on their status.
+     *
+     * @param status The status to filter events by.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    public void getEventsByStatus(String status, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereEqualTo("status", status).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<Event> events = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                    Event event = document.toObject(Event.class);
+                    if (event != null) {
+                        events.add(event);
+                    }
+                }
+                onCompleteListener.onComplete(Tasks.forResult(events));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
+    }
+
+    /**
+     * Retrieves events based on their category.
+     *
+     * @param category The category to filter events by.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    public void getEventsByCategory(String category, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereEqualTo("category", category).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<Event> events = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                    Event event = document.toObject(Event.class);
+                    if (event != null) {
+                        events.add(event);
+                    }
+                }
+                onCompleteListener.onComplete(Tasks.forResult(events));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
+    }
+}
 /**
  * Code Sources
  *
