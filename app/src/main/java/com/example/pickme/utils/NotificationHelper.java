@@ -96,22 +96,25 @@ public class NotificationHelper extends FirebaseMessagingService{
             }
 
             new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
-                if(documentSnapshot == null)
+                if(documentSnapshot == null){
                     user.getUserNotifications().remove(userNotification);
+                    new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs; doc was null"); });
+                    return;
+                }
 
                 Notification notification = documentSnapshot.toObject(Notification.class);
 
                 if(notification == null || notification.getEventID() == null) {
                     user.getUserNotifications().remove(userNotification);
+                    new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs; notif was null"); });
+                    return;
                 }
-
-                new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs"); });
 
                 new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
                     if(documentSnapshot1.getResult() == null) {
                         user.getUserNotifications().remove(userNotification);
                         new UserRepository().updateUser(user, task -> {
-                            Log.i("NOTIF", "Cleaned Notifs");
+                            Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
                         });
                     }
                 });
