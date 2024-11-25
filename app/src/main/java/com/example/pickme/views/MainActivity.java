@@ -73,6 +73,19 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        // Add destination change listener to show/hide bottom navigation
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.homeFragment ||
+                    destination.getId() == R.id.qrCameraFragment ||
+                    destination.getId() == R.id.inboxFragment ||
+                    destination.getId() == R.id.myEventsFragment ||
+                    destination.getId() == R.id.adminToolsFragment) {
+                bottomNavigationView.setVisibility(View.VISIBLE);
+            } else {
+                bottomNavigationView.setVisibility(View.GONE);
+            }
+        });
     }
 
     /**
