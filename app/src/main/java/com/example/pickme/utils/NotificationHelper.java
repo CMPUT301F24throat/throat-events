@@ -13,7 +13,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Manages local and push notifications
@@ -85,41 +87,119 @@ public class NotificationHelper extends FirebaseMessagingService{
         }
     }
 
-    public void cleanNotifications(){
+    public void cleanNotifications(Runnable toRun) {
         User user = User.getInstance();
+        List<UserNotification> notificationsToRemove = new ArrayList<>();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-        Iterator<UserNotification> iterator = user.getUserNotifications().iterator();
-        while (iterator.hasNext()) {
-            UserNotification userNotification = iterator.next();
+        for (UserNotification userNotification : user.getUserNotifications()) {
             if (userNotification.getNotificationID() == null) {
-                iterator.remove(); // Safe removal
+                notificationsToRemove.add(userNotification);
                 continue;
             }
 
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            futures.add(future);
+
             new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
                 if (documentSnapshot == null) {
-                    iterator.remove(); // Safe removal
-                    new UserRepository().updateUser(user, task -> Log.i("NOTIF", "Cleaned Notifs; doc was null"));
+                    notificationsToRemove.add(userNotification);
+                    new UserRepository().updateUser(user, task -> {
+                        Log.i("NOTIF", "Cleaned Notifs; doc was null");
+                        future.complete(null);
+                    });
                     return;
                 }
 
                 Notification notification = documentSnapshot.toObject(Notification.class);
                 if (notification == null || notification.getEventID() == null) {
-                    iterator.remove(); // Safe removal
-                    new UserRepository().updateUser(user, task -> Log.i("NOTIF", "Cleaned Notifs; notif was null"));
+                    notificationsToRemove.add(userNotification);
+                    new UserRepository().updateUser(user, task -> {
+                        Log.i("NOTIF", "Cleaned Notifs; notif was null");
+                        future.complete(null);
+                    });
                     return;
                 }
 
                 new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
                     if (documentSnapshot1.getResult() == null) {
-                        iterator.remove(); // Safe removal
-                        new UserRepository().updateUser(user, task -> Log.i("NOTIF", "Cleaned Notifs; no event with that ID"));
+                        notificationsToRemove.add(userNotification);
+                        new UserRepository().updateUser(user, task -> {
+                            Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
+                            future.complete(null);
+                        });
+                    } else {
+                        future.complete(null);
                     }
                 });
             });
         }
 
+        // Wait for all futures to complete
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            user.getUserNotifications().removeAll(notificationsToRemove);
+            new UserRepository().updateUser(user, task -> {
+                Log.i("NOTIF", "Cleaned Notifs");
+                toRun.run();
+            });
+
+        });
     }
+
+
+//    public void cleanNotifications(){
+//        User user = User.getInstance();
+//
+//        Iterator<UserNotification> iterator = user.getUserNotifications().iterator();
+//        while (iterator.hasNext()) {
+//            UserNotification userNotification = iterator.next();
+//            AtomicInteger moveOn = new AtomicInteger();
+//            moveOn.set(0);
+//            if (userNotification.getNotificationID() == null) {
+//                iterator.remove(); // Safe removal
+//                continue;
+//            }
+//
+//            new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+//                if (documentSnapshot == null) {
+//                    iterator.remove(); // Safe removal
+//                    new UserRepository().updateUser(user, task ->{
+//                        Log.i("NOTIF", "Cleaned Notifs; doc was null");
+//                        moveOn.set(3);
+//                    });
+//                    return;
+//                }
+//                else
+//                    moveOn.getAndIncrement();
+//
+//                Notification notification = documentSnapshot.toObject(Notification.class);
+//                if (notification == null || notification.getEventID() == null) {
+//                    iterator.remove(); // Safe removal
+//                    new UserRepository().updateUser(user, task -> {
+//                        Log.i("NOTIF", "Cleaned Notifs; notif was null");
+//                        moveOn.set(3);
+//                    });
+//                    return;
+//                }
+//                else
+//                    moveOn.getAndIncrement();
+//
+//                new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
+//                    if (documentSnapshot1.getResult() == null) {
+//                        iterator.remove(); // Safe removal
+//                        new UserRepository().updateUser(user, task -> {
+//                            Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
+//                            moveOn.set(3);
+//                        });
+//                        return;
+//                    }
+//                    else
+//                        moveOn.getAndIncrement();
+//                });
+//
+//            });
+//            while(moveOn.get() < 3);
+//        }
 
 //    public void cleanNotifications(){
 //        User user = User.getInstance();

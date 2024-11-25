@@ -81,27 +81,30 @@ public class HomeFragment extends Fragment {
             //notification setup
             askNotificationPermission();
 
-            new NotificationHelper().cleanNotifications();
+            new NotificationHelper().cleanNotifications(() -> {
 
-            NotificationAdapter notificationAdapter = new NotificationAdapter(getContext(), NotificationList.getInstance());
+                NotificationAdapter notificationAdapter = new NotificationAdapter(getContext(), NotificationList.getInstance());
 
-            ListView notifList = view.findViewById(R.id.notifList);
-            notifList.setAdapter(notificationAdapter);
+                ListView notifList = view.findViewById(R.id.notifList);
+                notifList.setAdapter(notificationAdapter);
 
-            NotificationRepository notificationRepository = new NotificationRepository();
-            notificationRepository.addSnapshotListener(getContext());
-            notificationRepository.attachAdapter(notificationAdapter);
+                NotificationRepository notificationRepository = new NotificationRepository();
+                notificationRepository.addSnapshotListener(getContext());
+                notificationRepository.attachAdapter(notificationAdapter);
 
-            NotificationList.getInstance().clear();
-            for(UserNotification userNotification : user.getUserNotifications()){
-                new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
-                    Notification notification = documentSnapshot.toObject(Notification.class);
-                    notification.markRead(userNotification.isRead());
+                NotificationList.getInstance().clear();
+                for(UserNotification userNotification : user.getUserNotifications()){
+                    new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+                        Notification notification = documentSnapshot.toObject(Notification.class);
+                        notification.markRead(userNotification.isRead());
 
-                    NotificationList.getInstance().add(notification);
-                    notificationAdapter.notifyDataSetChanged();
-                });
-            }
+                        NotificationList.getInstance().add(notification);
+                        notificationAdapter.notifyDataSetChanged();
+                    });
+                }
+
+            });
+
 
         } else {
             // Handle the case where the user is null
