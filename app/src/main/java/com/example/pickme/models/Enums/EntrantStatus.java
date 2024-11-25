@@ -1,6 +1,6 @@
 package com.example.pickme.models.Enums;
 
-public enum Status {
+public enum EntrantStatus {
     // User has joined the waiting list and is waiting for acceptance
     WAITING,
 

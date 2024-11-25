@@ -1,6 +1,6 @@
 package com.example.pickme.models;
 
-import com.example.pickme.models.Enums.Status;
+import com.example.pickme.models.Enums.EntrantStatus;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -18,8 +18,8 @@ public class WaitingListEntrant {
     private String entrantId;
     // the location of the entrant [nullable]
     private GeoPoint geoLocation;
-    // the status of the entrant on the waiting list [non-nullable]
-    private Status status;
+    // the entrantStatus of the entrant on the waiting list [non-nullable]
+    private EntrantStatus entrantStatus;
     // boolean value representing whether the entrant has been notified [non-nullable]
     private boolean notified;
     // the date/time the entrant joined the waiting list [non-nullable]
@@ -31,10 +31,10 @@ public class WaitingListEntrant {
         this.createdAt = Timestamp.now();
     }
 
-    public WaitingListEntrant(String entrantId, GeoPoint geoLocation, Status status) {
+    public WaitingListEntrant(String entrantId, GeoPoint geoLocation, EntrantStatus entrantStatus) {
         this.entrantId = entrantId;
         this.geoLocation = geoLocation;
-        this.status = status;
+        this.entrantStatus = entrantStatus;
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
     }
@@ -65,13 +65,13 @@ public class WaitingListEntrant {
         return geoLocation;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStatus(EntrantStatus entrantStatus) {
+        this.entrantStatus = entrantStatus;
         this.updatedAt = Timestamp.now();
     }
 
-    public Status getStatus() {
-        return status;
+    public EntrantStatus getStatus() {
+        return entrantStatus;
     }
 
     public void setNotified(boolean notified) {

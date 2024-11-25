@@ -5,9 +5,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 /**
+ * DEPRECATED!!!! USE WaitingListUtils.java INSTEAD
  * Handles interactions with the waiting list entrants subcollection
  * waitingListEntrant subcollection is a subcollection of the events collection
  */
@@ -53,5 +56,12 @@ public class WaitingListEntrantRepository {
     // Delete a waitingListEntrant by ID
     public void deleteWaitingListEntrant(String eventId, String entrantId, OnCompleteListener<Void> onCompleteListener) {
         getWaitingListEntrantDocRef(eventId, entrantId).delete().addOnCompleteListener(onCompleteListener);
+    }
+
+    // Get all waitingListEntrants in an event's waitingList subcollection
+    public void getAllWaitingListEntrants(String eventId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        getWaitingListEntrantsRef(eventId)
+                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
+                .get().addOnCompleteListener(onCompleteListener);
     }
 }
