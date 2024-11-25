@@ -8,6 +8,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Facilitates CRUD operations and interactions with the Firestore events collection.
  * Manages event data transactions, including adding, updating, deleting, and retrieving events.
@@ -70,6 +74,21 @@ public class EventRepository {
         eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(onCompleteListener);
     }
 
+    /**
+     * Checks if the event date has passed.
+     *
+     * @param event The event to check.
+     * @return true if the event date has passed, false otherwise.
+     */
+    public boolean hasEventPassed(Event event) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a");
+        try {
+            Date eventDate = dateFormat.parse(event.getEventDate());
+            return eventDate.before(new Date());
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Invalid event date format.");
+        }
+    }
 }
 
 /**

@@ -1,5 +1,6 @@
 package com.example.pickme.utils;
 
+import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingList;
 import com.example.pickme.models.WaitingListEntrant;
@@ -157,4 +158,84 @@ public class WaitingListUtils {
                 });
     }
 
+    /**
+     * Retrieves entrants from the waiting list based on their status.
+     *
+     * @param eventId The ID of the event.
+     * @param status The status of the entrants to be retrieved.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getEntrantsByStatus(String eventId, EntrantStatus status, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+        eventsRef.document(eventId).collection("waitingList")
+                .whereEqualTo("entrantStatus", status)
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        List<WaitingListEntrant> entrants = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                            WaitingListEntrant entrant = document.toObject(WaitingListEntrant.class);
+                            if (entrant != null) {
+                                entrants.add(entrant);
+                            }
+                        }
+                        onCompleteListener.onComplete(Tasks.forResult(entrants));
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                    }
+                });
+    }
+
+    /**
+     * Retrieves entrants from the waiting list who accepted their
+     * invite (ie. status is ACCEPTED).
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getAcceptedEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+        getEntrantsByStatus(eventId, EntrantStatus.ACCEPTED, onCompleteListener);
+    }
+
+    /**
+     * Retrieves selected entrants from the waiting list who have not yet accepted or declined
+     * their invite (ie. status is SELECTED).
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getPendingEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+        getEntrantsByStatus(eventId, EntrantStatus.SELECTED, onCompleteListener);
+    }
+
+    /**
+     * Retrieves entrants from the waiting list who rejected their
+     * invite (ie. status is REJECTED).
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getRejectedEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+        getEntrantsByStatus(eventId, EntrantStatus.REJECTED, onCompleteListener);
+    }
+
+    /**
+     * Retrieves entrants from the waiting list who cancelled their spot
+     * (ie. status is CANCELLED).
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getCancelledEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+        getEntrantsByStatus(eventId, EntrantStatus.CANCELLED, onCompleteListener);
+    }
+
+    /**
+     * Retrieves entrants from the waiting list who are still waiting to be selected
+     * (ie. status is WAITING).
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getWaitingEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+        getEntrantsByStatus(eventId, EntrantStatus.WAITING, onCompleteListener);
+    }
 }

@@ -5,7 +5,7 @@ public enum WaitingListStatus {
     OPEN,
 
     // Waiting list is closed and no longer accepting entrants
-    EXPIRED,
+    CLOSED,
 
     // Waiting list is full and no longer accepting entrants
     FULL

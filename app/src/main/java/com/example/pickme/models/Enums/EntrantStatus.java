@@ -10,7 +10,7 @@ public enum EntrantStatus {
     // User was selected to attend the event but REJECTED from accepting the invite
     REJECTED,
 
-    // User was not selected and in the waiting list but chose to cancel their spot
+    // User's spot in the waiting list was cancelled
     CANCELLED,
 
     // User was selected to attend the event and ACCEPTED the invite
