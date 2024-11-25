@@ -88,7 +88,7 @@ public class NotificationHelper extends FirebaseMessagingService{
     public void cleanNotifications(){
         User user = User.getInstance();
 
-        ArrayList<UserNotification> userNotifications = user.getUserNotifications();
+        ArrayList<UserNotification> userNotifications = new ArrayList<>(user.getUserNotifications());
         for(UserNotification userNotification : userNotifications){
             if(userNotification.getNotificationID() == null){
                 user.getUserNotifications().remove(userNotification);
