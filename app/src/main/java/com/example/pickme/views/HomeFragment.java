@@ -38,7 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class HomeFragment extends Fragment {
 
     private ImageButton homeProfileButton;
-    private NotificationRepository notificationRepository = new NotificationRepository();
+    private NotificationRepository notificationRepository = NotificationRepository.getInstance();
 
     @Nullable
     @Override
@@ -95,7 +95,7 @@ public class HomeFragment extends Fragment {
 //                NotificationList.getInstance().clear();
                 if(NotificationList.getInstance().isEmpty()){
                     for(UserNotification userNotification : user.getUserNotifications()){
-                        new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+                        NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
                             Notification notification = documentSnapshot.toObject(Notification.class);
                             notification.markRead(userNotification.isRead());
 

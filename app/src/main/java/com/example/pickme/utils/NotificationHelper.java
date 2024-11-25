@@ -104,7 +104,7 @@ public class NotificationHelper extends FirebaseMessagingService{
             CompletableFuture<Void> future = new CompletableFuture<>();
             futures.add(future);
 
-            new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+            NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
                 if (documentSnapshot == null) {
                     notificationsToRemove.add(userNotification);
                     new UserRepository().updateUser(user, task -> {

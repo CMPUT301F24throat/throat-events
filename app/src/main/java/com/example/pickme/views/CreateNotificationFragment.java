@@ -89,7 +89,7 @@ public class CreateNotificationFragment extends Fragment {
 
                 createSendList(notification, () -> {
 
-                    NotificationRepository repo = new NotificationRepository();
+                    NotificationRepository repo = NotificationRepository.getInstance();
 
                     repo.addNotification(notification, task ->{
                             Toast.makeText(

@@ -41,10 +41,19 @@ public class NotificationRepository {
     private NotifRecAdapter notifRecAdapter;
     static boolean listening = false;
 
+    static NotificationRepository instance;
+
+    public static NotificationRepository getInstance(){
+        if(instance == null)
+            instance = new NotificationRepository();
+
+        return instance;
+    }
+
     /**
      * Constructor also initializes the Firebase db
      */
-    public NotificationRepository() {
+    private NotificationRepository() {
         // temporary anonymous auth
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {

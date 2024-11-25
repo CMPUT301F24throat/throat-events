@@ -27,7 +27,7 @@ import com.example.pickme.views.adapters.NotifRecAdapter;
 
 public class InboxFragment extends Fragment {
 
-    NotificationRepository notificationRepository = new NotificationRepository();
+    NotificationRepository notificationRepository = NotificationRepository.getInstance();
 
     @Nullable
     @Override
