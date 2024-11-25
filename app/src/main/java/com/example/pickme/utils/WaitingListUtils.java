@@ -159,6 +159,34 @@ public class WaitingListUtils {
     }
 
     /**
+     * Updates the entrant status of a waiting list entrant.
+     *
+     * @param eventId The ID of the event.
+     * @param userId The ID of the user.
+     * @param newStatus The new status to be set for the entrant.
+     */
+    public void updateEntrantStatus(String eventId, String userId, EntrantStatus newStatus) {
+        CollectionReference waitingListRef = eventsRef.document(eventId).collection("waitingList");
+
+        waitingListRef.whereEqualTo("entrantId", userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                DocumentReference entrantRef = waitingListRef.document(document.getId());
+
+                entrantRef.update("entrantStatus", newStatus).addOnCompleteListener(updateTask -> {
+                    if (updateTask.isSuccessful()) {
+                        System.out.println("Entrant status updated successfully.");
+                    } else {
+                        System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+                    }
+                });
+            } else {
+                System.err.println("User is not an entrant in the waiting list.");
+            }
+        });
+    }
+
+    /**
      * Retrieves entrants from the waiting list based on their status.
      *
      * @param eventId The ID of the event.

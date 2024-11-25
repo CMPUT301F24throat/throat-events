@@ -16,6 +16,7 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.utils.ImageQuery;
+import com.example.pickme.utils.WaitingListUtils;
 
 /**
  * Fragment to display Signup information about a specific event.
@@ -34,6 +35,7 @@ import com.example.pickme.utils.ImageQuery;
 public class EventSignUpFragment extends Fragment {
     private EventSignupBinding binding;
     private Event event;
+    private WaitingListUtils waitingListUtils;
 
     // Inflates the layout for event details view
     @Override
@@ -64,7 +66,19 @@ public class EventSignUpFragment extends Fragment {
             binding.date.setText(event.getEventDate());
             binding.address.setText(event.getEventLocation());
             binding.winners.setText(event.getMaxWinners() + (Integer.parseInt(event.getMaxWinners()) == 1 ? " Winner" : " Winners"));
-            binding.entrants.setText(event.getEntrants() + " / " +event.getMaxEntrants()+ (event.getEntrants() == 1 ? " Entrant" : " Entrants"));
+
+            waitingListUtils.getWaitingEntrants(event.getEventId(), task -> {
+                if (task.isSuccessful()) {
+                    int numEntrants = task.getResult().size();
+                    if (event.getMaxEntrants() != null) {
+                        binding.entrants.setText(numEntrants + " / " + event.getMaxEntrants() + (numEntrants == 1 ? " Entrant" : " Entrants"));
+                    } else {
+                        binding.entrants.setText(numEntrants + (numEntrants == 1 ? " Entrant" : " Entrants"));
+                    }
+                } else {
+                    binding.entrants.setText("Error loading entrants");
+                }
+            });
 
             // Load the event flyer image using Glide
             Image image = new Image("1234567890", "123456789");

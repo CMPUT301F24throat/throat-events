@@ -1,18 +1,31 @@
 package com.example.pickme.models.Enums;
 
+/**
+ * Enum representing the status of an entrant in the system.
+ */
 public enum EntrantStatus {
-    // User has joined the waiting list and is waiting for acceptance
+    /**
+     * User has joined the waiting list and is waiting for acceptance.
+     */
     WAITING,
 
-    // User was selected to attend the event - does not imply acceptance
+    /**
+     * User was selected to attend the event - does not imply acceptance.
+     */
     SELECTED,
 
-    // User was selected to attend the event but REJECTED from accepting the invite
+    /**
+     * User was selected to attend the event but rejected from accepting the invite.
+     */
     REJECTED,
 
-    // User's spot in the waiting list was cancelled
+    /**
+     * User's spot in the waiting list was cancelled.
+     */
     CANCELLED,
 
-    // User was selected to attend the event and ACCEPTED the invite
+    /**
+     * User was selected to attend the event and accepted the invite.
+     */
     ACCEPTED
 }
