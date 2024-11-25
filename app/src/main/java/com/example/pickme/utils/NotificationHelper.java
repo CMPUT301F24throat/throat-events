@@ -13,6 +13,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.ArrayList;
+
 /**
  * Manages local and push notifications
  * @author Omar-Kattan-1
@@ -86,7 +88,8 @@ public class NotificationHelper extends FirebaseMessagingService{
     public void cleanNotifications(){
         User user = User.getInstance();
 
-        for(UserNotification userNotification : user.getUserNotifications()){
+        ArrayList<UserNotification> userNotifications = user.getUserNotifications();
+        for(UserNotification userNotification : userNotifications){
             if(userNotification.getNotificationID() == null){
                 user.getUserNotifications().remove(userNotification);
                 continue;
