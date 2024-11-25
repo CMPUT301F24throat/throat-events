@@ -115,11 +115,44 @@ public class LotteryUtils {
                 List<WaitingListEntrant> acceptedEntrants = acceptedEntrantsTask.getResult();
                 int numAcceptedEntrants = acceptedEntrants.size();
                 int numWinners = Integer.parseInt(event.getMaxWinners());
-                int numToDraw = numAcceptedEntrants < numWinners ? numWinners - numAcceptedEntrants : 0;
-                onCompleteListener.onComplete(Tasks.forResult(numToDraw));
+
+                waitingListUtils.getWaitingEntrants(eventId, waitingEntrantsTask -> {
+                    if (waitingEntrantsTask.isSuccessful() && waitingEntrantsTask.getResult() != null) {
+                        List<WaitingListEntrant> waitingEntrants = waitingEntrantsTask.getResult();
+                        int numToDraw = determineNumToDraw(waitingEntrants, numAcceptedEntrants, numWinners);
+
+                        onCompleteListener.onComplete(Tasks.forResult(numToDraw));
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(waitingEntrantsTask.getException()));
+                    }
+                });
             } else {
                 onCompleteListener.onComplete(Tasks.forException(acceptedEntrantsTask.getException()));
             }
         });
+    }
+
+    /**
+     * Determines the number of entrants to draw in the lottery.
+     *
+     * @param waitingEntrants The list of entrants currently waiting.
+     * @param numAcceptedEntrants The number of entrants that have already been accepted.
+     * @param numWinners The maximum number of winners allowed.
+     * @return The number of entrants to draw.
+     */
+    private static int determineNumToDraw(List<WaitingListEntrant> waitingEntrants, int numAcceptedEntrants, int numWinners) {
+        int numWaitingEntrants = waitingEntrants.size();
+        int numToDraw;
+
+        if (numAcceptedEntrants == numWinners) {
+            numToDraw = 0;  // If num of accepted entrants is equal to num of winners, no need to draw
+        } else if (numAcceptedEntrants == 0 && numWaitingEntrants > numWinners) {
+            numToDraw = numWinners;  // If no entrants have been accepted and there are more waiting entrants than winners, draw max num of winners
+        } else if (numAcceptedEntrants != 0 && numWaitingEntrants > numWinners) {
+            numToDraw = numWinners - numAcceptedEntrants;  // If there are already accepted entrants and there are more waiting entrants than winners, draw the difference
+        } else {
+            numToDraw = numWaitingEntrants;  // If there are less waiting entrants than winners, draw all waiting entrants
+        }
+        return numToDraw;
     }
 }

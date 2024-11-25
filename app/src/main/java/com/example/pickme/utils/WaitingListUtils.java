@@ -5,6 +5,7 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingList;
 import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -195,6 +196,7 @@ public class WaitingListUtils {
      */
     public void getEntrantsByStatus(String eventId, EntrantStatus status, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
         eventsRef.document(eventId).collection("waitingList")
+                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
                 .whereEqualTo("entrantStatus", status)
                 .get().addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
@@ -265,5 +267,30 @@ public class WaitingListUtils {
      */
     public void getWaitingEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
         getEntrantsByStatus(eventId, EntrantStatus.WAITING, onCompleteListener);
+    }
+
+    /**
+     * Retrieves the pending entrants (with EntrantStatus.SELECTED) and changes their status to EntrantStatus.CANCELLED.
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void cancelPendingEntrants(String eventId, OnCompleteListener<Void> onCompleteListener) {
+        getPendingEntrants(eventId, pendingEntrantsTask -> {
+            if (pendingEntrantsTask.isSuccessful() && pendingEntrantsTask.getResult() != null) {
+                List<WaitingListEntrant> pendingEntrants = pendingEntrantsTask.getResult();
+                List<Task<Void>> updateTasks = new ArrayList<>();
+
+                for (WaitingListEntrant entrant : pendingEntrants) {
+                    DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrant.getWaitListEntrantId());
+                    Task<Void> updateTask = entrantRef.update("entrantStatus", EntrantStatus.CANCELLED);
+                    updateTasks.add(updateTask);
+                }
+
+                Tasks.whenAll(updateTasks).addOnCompleteListener(onCompleteListener);
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(pendingEntrantsTask.getException()));
+            }
+        });
     }
 }
