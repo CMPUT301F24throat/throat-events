@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat;
 import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
 import com.example.pickme.utils.NotificationList;
+import com.example.pickme.utils.UserNotification;
 import com.example.pickme.views.adapters.NotifRecAdapter;
 import com.example.pickme.views.adapters.NotificationAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -134,6 +135,7 @@ public class NotificationRepository {
 
                     if(change.getType() == DocumentChange.Type.ADDED){
                         notificationList.add(notification);
+                        user.addUserNotification(new UserNotification(notification.getNotificationId()));
                         new EventRepository().getEventById(notification.getEventID(), task ->{
                                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
                                     .setSmallIcon(android.R.drawable.ic_menu_info_details)

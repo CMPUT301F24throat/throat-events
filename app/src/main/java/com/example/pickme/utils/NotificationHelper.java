@@ -99,6 +99,8 @@ public class NotificationHelper extends FirebaseMessagingService{
                 continue;
             }
 
+            Log.i("NOTIF", "parsing ID: " + userNotification.getNotificationID());
+
             CompletableFuture<Void> future = new CompletableFuture<>();
             futures.add(future);
 
