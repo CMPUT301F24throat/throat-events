@@ -14,11 +14,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utility class for managing waiting lists in the Firestore database.
+ */
 public class WaitingListUtils {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference eventsRef = db.collection("events");
 
-    // Method to get an event's waiting list
+    /**
+     * Retrieves an event along with its waiting list.
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
     public void getEventWithWaitingList(String eventId, OnCompleteListener<WaitingList> onCompleteListener) {
         DocumentReference eventRef = eventsRef.document(eventId);
         CollectionReference waitingListRef = eventRef.collection("waitingList");
@@ -52,7 +60,13 @@ public class WaitingListUtils {
         });
     }
 
-    // Method to get an entrant from the waiting list
+    /**
+     * Retrieves a specific entrant from the waiting list.
+     *
+     * @param eventId The ID of the event.
+     * @param entrantId The ID of the entrant.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
     public void getEntrantFromWaitingList(String eventId, String entrantId, OnCompleteListener<WaitingListEntrant> onCompleteListener) {
         DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
         entrantRef.get().addOnCompleteListener(task -> {
@@ -65,7 +79,12 @@ public class WaitingListUtils {
         });
     }
 
-    // Method to get all entrants from the waiting list
+    /**
+     * Retrieves all entrants from the waiting list.
+     *
+     * @param eventId The ID of the event.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
     public void getAllEntrantsFromWaitingList(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
         eventsRef.document(eventId).collection("waitingList")
                 .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
@@ -85,7 +104,13 @@ public class WaitingListUtils {
                 });
     }
 
-    // Add a new entrant to the waiting list
+    /**
+     * Adds a new entrant to the waiting list.
+     *
+     * @param eventId The ID of the event.
+     * @param waitingListEntrant The entrant to be added.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
     public void addEntrantToWaitingList(String eventId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
         DocumentReference newEntrantRef = eventsRef.document(eventId).collection("waitingList").document();
         waitingListEntrant.setWaitListEntrantId(newEntrantRef.getId());
@@ -97,7 +122,14 @@ public class WaitingListUtils {
                 });
     }
 
-    // Edit an entrant in the waiting list
+    /**
+     * Edits an existing entrant in the waiting list.
+     *
+     * @param eventId The ID of the event.
+     * @param entrantId The ID of the entrant.
+     * @param waitingListEntrant The updated entrant information.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
     public void editEntrantInWaitingList(String eventId, String entrantId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
         DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
         entrantRef.set(waitingListEntrant)
@@ -108,7 +140,13 @@ public class WaitingListUtils {
                 });
     }
 
-    // Remove an entrant from the waiting list
+    /**
+     * Removes an entrant from the waiting list.
+     *
+     * @param eventId The ID of the event.
+     * @param entrantId The ID of the entrant.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
     public void deleteEntrantFromWaitingList(String eventId, String entrantId, OnCompleteListener<Void> onCompleteListener) {
         DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
         entrantRef.delete()
