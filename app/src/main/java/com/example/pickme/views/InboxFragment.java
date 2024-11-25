@@ -27,6 +27,8 @@ import com.example.pickme.views.adapters.NotifRecAdapter;
 
 public class InboxFragment extends Fragment {
 
+    NotificationRepository notificationRepository = new NotificationRepository();
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class InboxFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.notifRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(notificationAdapter);
-        new NotificationRepository().attachRecAdapter(notificationAdapter);
+        notificationRepository.attachRecAdapter(notificationAdapter);
 
         ItemTouchHelper itemTouchHelper = getItemTouchHelper(recyclerView, notifications, notificationAdapter);
         itemTouchHelper.attachToRecyclerView(recyclerView);

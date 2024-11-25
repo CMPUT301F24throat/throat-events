@@ -38,6 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class HomeFragment extends Fragment {
 
     private ImageButton homeProfileButton;
+    private NotificationRepository notificationRepository = new NotificationRepository();
 
     @Nullable
     @Override
@@ -88,19 +89,20 @@ public class HomeFragment extends Fragment {
                 ListView notifList = view.findViewById(R.id.notifList);
                 notifList.setAdapter(notificationAdapter);
 
-                NotificationRepository notificationRepository = new NotificationRepository();
                 notificationRepository.addSnapshotListener(getContext());
                 notificationRepository.attachAdapter(notificationAdapter);
 
-                NotificationList.getInstance().clear();
-                for(UserNotification userNotification : user.getUserNotifications()){
-                    new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
-                        Notification notification = documentSnapshot.toObject(Notification.class);
-                        notification.markRead(userNotification.isRead());
+//                NotificationList.getInstance().clear();
+                if(NotificationList.getInstance().isEmpty()){
+                    for(UserNotification userNotification : user.getUserNotifications()){
+                        new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+                            Notification notification = documentSnapshot.toObject(Notification.class);
+                            notification.markRead(userNotification.isRead());
 
-                        NotificationList.getInstance().add(notification);
-                        notificationAdapter.notifyDataSetChanged();
-                    });
+                            NotificationList.getInstance().add(notification);
+                            notificationAdapter.notifyDataSetChanged();
+                        });
+                    }
                 }
 
             });

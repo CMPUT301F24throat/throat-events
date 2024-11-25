@@ -152,13 +152,14 @@ public class NotificationRepository {
                         notificationList.remove(notification);
 
                 }
+
+                if(notificationAdapter != null)
+                    this.notificationAdapter.notifyDataSetChanged();
+
+                if(notifRecAdapter != null)
+                    this.notifRecAdapter.notifyDataSetChanged();
             }
 
-            if(notificationAdapter != null)
-                this.notificationAdapter.notifyDataSetChanged();
-
-            if(notifRecAdapter != null)
-                notifRecAdapter.notifyDataSetChanged();
         });
 
     }

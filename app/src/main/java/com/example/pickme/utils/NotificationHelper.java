@@ -94,6 +94,7 @@ public class NotificationHelper extends FirebaseMessagingService{
 
         for (UserNotification userNotification : user.getUserNotifications()) {
             if (userNotification.getNotificationID() == null) {
+                Log.i("NOTIF", "notif id was null");
                 notificationsToRemove.add(userNotification);
                 continue;
             }

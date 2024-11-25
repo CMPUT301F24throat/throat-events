@@ -22,7 +22,6 @@ import com.example.pickme.models.User;
 import com.example.pickme.repositories.NotificationRepository;
 import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.NotificationHelper;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -88,7 +87,7 @@ public class CreateNotificationFragment extends Fragment {
                 notification.setDateTimeNow();
                 notification.setEventID(getArguments().getString("EventID"));
 
-                createSendList(notification, l -> {
+                createSendList(notification, () -> {
 
                     NotificationRepository repo = new NotificationRepository();
 
@@ -108,7 +107,7 @@ public class CreateNotificationFragment extends Fragment {
         });
     }
 
-    private void createSendList(Notification notification, OnCompleteListener<Void> onCompleteListener){
+    private void createSendList(Notification notification, Runnable task){
         UserRepository userRepository = new UserRepository();
 
         switch(notification.getLevel()){
@@ -120,7 +119,7 @@ public class CreateNotificationFragment extends Fragment {
                         notification.getSendTo().add(doc.getId());
                     }
 
-                    onCompleteListener.onComplete(null);
+                    task.run();
                 });
         }
     }
