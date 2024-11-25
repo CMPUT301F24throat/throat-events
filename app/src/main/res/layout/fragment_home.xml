@@ -142,7 +142,7 @@
     <ListView
         android:id="@+id/notifList"
         android:layout_width="360dp"
-        android:layout_height="220dp"
+        android:layout_height="230dp"
         android:isScrollContainer="false"
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
