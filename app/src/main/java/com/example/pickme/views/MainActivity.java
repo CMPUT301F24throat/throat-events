@@ -93,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             User.setInstance(user);
+            // Show the Admin Tools menu item if the user is an admin
+            if (user.isAdmin()) {
+                bottomNavigationView.getMenu().findItem(R.id.navigation_admin_tools).setVisible(true);
+            }
             navigateToHomeFragment();
         });
     }
