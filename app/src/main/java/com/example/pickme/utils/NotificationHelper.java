@@ -13,7 +13,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Manages local and push notifications
@@ -88,45 +88,84 @@ public class NotificationHelper extends FirebaseMessagingService{
     public void cleanNotifications(){
         User user = User.getInstance();
 
-        ArrayList<UserNotification> userNotifications = new ArrayList<>(user.getUserNotifications());
-        for(UserNotification userNotification : userNotifications){
-            if(userNotification.getNotificationID() == null){
-                user.getUserNotifications().remove(userNotification);
+        Iterator<UserNotification> iterator = user.getUserNotifications().iterator();
+        while (iterator.hasNext()) {
+            UserNotification userNotification = iterator.next();
+            if (userNotification.getNotificationID() == null) {
+                iterator.remove(); // Safe removal
                 continue;
             }
 
             new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
-                if(documentSnapshot == null){
-                    user.getUserNotifications().remove(userNotification);
-                    new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs; doc was null"); });
+                if (documentSnapshot == null) {
+                    iterator.remove(); // Safe removal
+                    new UserRepository().updateUser(user, task -> Log.i("NOTIF", "Cleaned Notifs; doc was null"));
                     return;
                 }
 
                 Notification notification = documentSnapshot.toObject(Notification.class);
-
-                if(notification == null || notification.getEventID() == null) {
-                    user.getUserNotifications().remove(userNotification);
-                    new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs; notif was null"); });
+                if (notification == null || notification.getEventID() == null) {
+                    iterator.remove(); // Safe removal
+                    new UserRepository().updateUser(user, task -> Log.i("NOTIF", "Cleaned Notifs; notif was null"));
                     return;
                 }
 
                 new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
-                    if(documentSnapshot1.getResult() == null) {
-                        user.getUserNotifications().remove(userNotification);
-                        new UserRepository().updateUser(user, task -> {
-                            Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
-                        });
+                    if (documentSnapshot1.getResult() == null) {
+                        iterator.remove(); // Safe removal
+                        new UserRepository().updateUser(user, task -> Log.i("NOTIF", "Cleaned Notifs; no event with that ID"));
                     }
                 });
             });
-
-
         }
 
-//        user.getUserNotifications().removeIf(userNotification -> userNotification.getNotificationID() == null);
-//
-//        new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs"); });
     }
+
+//    public void cleanNotifications(){
+//        User user = User.getInstance();
+//
+//        ArrayList<UserNotification> toRemove = new ArrayList<UserNotification>();
+//        for(UserNotification userNotification : user.getUserNotifications()){
+//            if(userNotification.getNotificationID() == null){
+////                user.getUserNotifications().remove(userNotification);
+//                toRemove.add(userNotification);
+//                continue;
+//            }
+//
+//            new NotificationRepository().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+//                if(documentSnapshot == null){
+////                    user.getUserNotifications().remove(userNotification);
+////                    new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs; doc was null"); });
+//                    toRemove.add(userNotification);
+//                    return;
+//                }
+//
+//                Notification notification = documentSnapshot.toObject(Notification.class);
+//
+//                if(notification == null || notification.getEventID() == null) {
+////                    user.getUserNotifications().remove(userNotification);
+////                    new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs; notif was null"); });
+//                    toRemove.add(userNotification);
+//                    return;
+//                }
+//
+//                new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
+//                    if(documentSnapshot1.getResult() == null) {
+//                        user.getUserNotifications().remove(userNotification);
+//                        new UserRepository().updateUser(user, task -> {
+//                            Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
+//                        });
+//                    }
+//                });
+//            });
+//
+//
+//        }
+//
+////        user.getUserNotifications().removeIf(userNotification -> userNotification.getNotificationID() == null);
+////
+////        new UserRepository().updateUser(user, task -> { Log.i("NOTIF", "Cleaned Notifs"); });
+//    }
 
 
 }
