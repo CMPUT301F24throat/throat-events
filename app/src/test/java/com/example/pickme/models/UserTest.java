@@ -18,7 +18,7 @@ import org.mockito.MockitoAnnotations;
  *
  * @version 1.0
  * @author Kenneth Agonoy
- *
+ * <p>
  * Responsibilities:
  * - Test that a user is created with the correct attributes.
  * - Ensures users input correct values.
