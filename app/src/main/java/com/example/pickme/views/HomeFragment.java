@@ -145,10 +145,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadInboxEvents() {
+        emptyInboxText.setVisibility(View.VISIBLE);
         // TODO: Load inbox of user
     }
 
     private void loadMyEvents() {
+        emptyEventsText.setVisibility(View.VISIBLE);
         // TODO: load the events the user is on the waitlist for / upcoming
     }
 }
