@@ -223,16 +223,16 @@ public class Event implements Serializable {
 
 }
 
-/**
- * Code Sources
- *
- * ChatGPT
- * - "Explanation on handling event properties using classes in Java."
- * - "Firestore documentation on serializable classes in Android."
- *
- * Stack Overflow
- * - "Java Serializable vs Parcelable for data classes."
- *
- * Android Developers
- * - "Best practices for defining data classes in Android."
+/*
+  Code Sources
+  <p>
+  ChatGPT
+  - "Explanation on handling event properties using classes in Java."
+  - "Firestore documentation on serializable classes in Android."
+  <p>
+  Stack Overflow
+  - "Java Serializable vs Parcelable for data classes."
+  <p>
+  Android Developers
+  - "Best practices for defining data classes in Android."
  */

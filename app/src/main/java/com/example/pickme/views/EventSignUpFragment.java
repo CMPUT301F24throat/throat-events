@@ -95,18 +95,18 @@ public class EventSignUpFragment extends Fragment {
     }
 }
 
-/**
- * Code Sources
- *
- * ChatGPT:
- * - How to navigate fragments and handle back navigation in Android.
- *
- * Stack Overflow:
- * - Using Glide to load images into ImageView in a Fragment
- * - Passing data between fragments using Android Architecture Components
- *
- * Android Developer Documentation:
- * - Fragment Lifecycle - Guidelines for managing fragment lifecycle.
- * - Navigating with Fragments - Handling fragment navigation.
- * - Using Glide for Image Loading - Documentation on image loading with Glide.
+/*
+  Code Sources
+  <p>
+  ChatGPT:
+  - How to navigate fragments and handle back navigation in Android.
+  <p>
+  Stack Overflow:
+  - Using Glide to load images into ImageView in a Fragment
+  - Passing data between fragments using Android Architecture Components
+  <p>
+  Android Developer Documentation:
+  - Fragment Lifecycle - Guidelines for managing fragment lifecycle.
+  - Navigating with Fragments - Handling fragment navigation.
+  - Using Glide for Image Loading - Documentation on image loading with Glide.
  */

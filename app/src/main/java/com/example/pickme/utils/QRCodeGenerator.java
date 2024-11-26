@@ -136,16 +136,16 @@ public class QRCodeGenerator {
     }
 }
 
-/**
- * Code Sources
- *
- * ChatGPT-4o:
- * - Explain how to implement caching of bitmaps in an android app
- * - What are the best Java libraries for creating QR codes?
- *
- * Github:
- * - ZXing ("Zebra Crossing") Library documentation
- *
- * Java Documentation:
- * - Caching in java
+/*
+  Code Sources
+  <p>
+  ChatGPT-4o:
+  - Explain how to implement caching of bitmaps in an android app
+  - What are the best Java libraries for creating QR codes?
+  <p>
+  Github:
+  - ZXing ("Zebra Crossing") Library documentation
+  <p>
+  Java Documentation:
+  - Caching in java
  */

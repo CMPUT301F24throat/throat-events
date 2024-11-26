@@ -17,10 +17,16 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
+import com.example.pickme.views.adapters.EventAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -31,6 +37,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class HomeFragment extends Fragment {
 
     private ImageButton homeProfileButton;
+    private RecyclerView recyclerViewInbox;
+    private RecyclerView recyclerViewEvents;
+    private EventAdapter inboxAdapter;
+    private EventAdapter eventsAdapter;
+    private List<Event> inboxList = new ArrayList<>();
+    private List<Event> eventsList = new ArrayList<>();
+    private View emptyInboxText;
+    private View emptyEventsText;
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -54,7 +68,21 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Find Views
+        recyclerViewInbox = view.findViewById(R.id.recyclerViewInbox);
+        recyclerViewEvents = view.findViewById(R.id.recyclerViewEvents);
+        emptyInboxText = view.findViewById(R.id.emptyInboxText);
+        emptyEventsText = view.findViewById(R.id.emptyEventsText);
         CircleImageView homeProfileButton = view.findViewById(R.id.homeProfileButton);
+
+        inboxAdapter = new EventAdapter(inboxList, requireActivity(), event -> {
+            // TODO: Handle inbox item click
+        });
+        eventsAdapter = new EventAdapter(eventsList, requireActivity(), event -> {
+            // TODO: Handle events item click
+        });
+        recyclerViewInbox.setAdapter(inboxAdapter);
+        recyclerViewEvents.setAdapter(eventsAdapter);
 
         User user = User.getInstance();
         if (user != null) {
@@ -74,6 +102,8 @@ public class HomeFragment extends Fragment {
         }
 
         askNotificationPermission();
+        loadInboxEvents();
+        loadMyEvents();
     }
 
     /**
@@ -113,4 +143,18 @@ public class HomeFragment extends Fragment {
             }
         }
     }
+
+    private void loadInboxEvents() {
+        // TODO: Load inbox of user
+    }
+
+    private void loadMyEvents() {
+        // TODO: load the events the user is on the waitlist for / upcoming
+    }
 }
+/*
+  Code Sources
+  <p>
+  StackOverflow:
+  - Android Studio: Group elements together
+ */

@@ -262,18 +262,18 @@ public class EventRepository {
         });
     }
 }
-/**
- * Code Sources
- *
- * Firebase Documentation:
- * - Firestore Transactions and Batched Writes
- * - CRUD Operations in Firestore
- * - Firestore Exception Handling
- *
- * Stack Overflow:
- * - How to use runTransaction for Firestore CRUD operations
- * - Firestore transaction error handling and best practices
- *
- * Java Documentation:
- * - Handling Completion Listeners in Firebase Documentation on using `OnCompleteListener` with Firestore operations.
+/*
+  Code Sources
+  <p>
+  Firebase Documentation:
+  - Firestore Transactions and Batched Writes
+  - CRUD Operations in Firestore
+  - Firestore Exception Handling
+  <p>
+  Stack Overflow:
+  - How to use runTransaction for Firestore CRUD operations
+  - Firestore transaction error handling and best practices
+  <p>
+  Java Documentation:
+  - Handling Completion Listeners in Firebase Documentation on using `OnCompleteListener` with Firestore operations.
  */
