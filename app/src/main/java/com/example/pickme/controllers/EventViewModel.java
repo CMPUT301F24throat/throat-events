@@ -6,9 +6,9 @@ import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.QrRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages the logic and state for event-related operations.
@@ -59,17 +59,14 @@ public class EventViewModel {
     }
 
     // Fetch events from Firestore
-    public void fetchEvents(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        eventRepository.getEventsByOrganizerId(userId, new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    events.clear(); // Clear existing events
-                    events.addAll(task.getResult().toObjects(Event.class)); // Add fetched events to the list
-                    onCompleteListener.onComplete(task); // Notify completion
-                } else {
-                    onCompleteListener.onComplete(task); // Notify failure
-                }
+    public void fetchEvents(String userId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventRepository.getEventsByOrganizerId(userId, includePastEvents, task -> {
+            if (task.isSuccessful()) {
+                events.clear(); // Clear existing events
+                events.addAll(task.getResult()); // Add fetched events to the list
+                onCompleteListener.onComplete(task); // Notify completion
+            } else {
+                onCompleteListener.onComplete(task); // Notify failure
             }
         });
     }
