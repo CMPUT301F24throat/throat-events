@@ -117,6 +117,10 @@ public class NotificationHelper {
                                 future.complete(null);
                             });
                         } else {
+                    if (!documentSnapshot1.isSuccessful() || documentSnapshot1.getResult() == null) {
+                        notificationsToRemove.add(userNotification);
+                        new UserRepository().updateUser(user, task -> {
+                            Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
                             future.complete(null);
                         }
                     }
