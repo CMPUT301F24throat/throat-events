@@ -129,7 +129,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         android:layout_marginBottom="200dp"
-        android:backgroundTint="@color/buttonDefault"
+        android:backgroundTint="@color/buttonBG1"
         android:contentDescription="Touch to get started!"
         android:fontFamily="sans-serif"
         android:paddingStart="5dp"

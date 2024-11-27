@@ -98,7 +98,7 @@
         android:id="@+id/sendButton"
         android:layout_width="340dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/buttonDefault"
+        android:backgroundTint="@color/buttonBG1"
 
         android:text="Send"
         android:textColor="@color/text1"

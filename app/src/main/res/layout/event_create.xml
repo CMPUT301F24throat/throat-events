@@ -281,7 +281,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="80dp"
-            android:backgroundTint="@color/buttonDefault"
+            android:backgroundTint="@color/buttonBG1"
             android:contentDescription="Touch to create event"
             android:fontFamily="sans-serif"
             android:paddingStart="5dp"
