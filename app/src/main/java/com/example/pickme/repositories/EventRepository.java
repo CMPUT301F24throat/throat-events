@@ -35,7 +35,6 @@ public class EventRepository {
     public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {
                     DocumentReference newEventRef = eventsRef.document();
-                    event.setEventId(newEventRef.getId());
                     transaction.set(newEventRef, event);
 
                     // Create an empty waitingList subcollection

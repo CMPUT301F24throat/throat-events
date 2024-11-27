@@ -48,6 +48,7 @@ public class EventCreationFragment extends Fragment {
     private static final String TAG = "TAG";
     private EventCreateBinding binding;
     private String posterUrl;
+    private String eventId;
     private Uri selectedImageUri;
     private Event event;
     private EventViewModel eventViewModel = new EventViewModel();
@@ -88,19 +89,18 @@ public class EventCreationFragment extends Fragment {
         binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
         binding.create.setOnClickListener(listener -> {
             if (validateInputs()) {
-                createOrUpdateEventInFirestore();
-//                if (selectedImageUri != null) {
-//                    // Upload the selected image to Firebase
-//                    uploadImageToFirebase(selectedImageUri);
-//                } else {
-//                    if (event == null) {
-//                        Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        // Use the existing poster URL if no new image is selected
-//                        posterUrl = event.getPosterImageId();
-//                        createOrUpdateEventInFirestore();
-//                    }
-//                }
+                if (selectedImageUri != null) {
+                    // Upload the selected image to Firebase
+                    uploadImageToFirebase(selectedImageUri);
+                } else {
+                    if (event == null) {
+                        Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Use the existing poster URL if no new image is selected
+                        posterUrl = event.getPosterImageId();
+                        createOrUpdateEventInFirestore();
+                    }
+                }
             } else {
                 Toast.makeText(requireActivity(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             }
@@ -207,7 +207,8 @@ public class EventCreationFragment extends Fragment {
      * @param imageUri the URI of the selected image.
      */
     private void uploadImageToFirebase(Uri imageUri) {
-        Image image = new Image("1234567890", "123456789");
+        eventId = generateRandomQrCodeId(10);
+        Image image = new Image(organizerId, eventId);
         image.upload(imageUri, task -> {
             if (task.isSuccessful()) {
                 posterUrl = task.getResult().getImageUrl();
@@ -233,7 +234,7 @@ public class EventCreationFragment extends Fragment {
                 if (event == null) {
                     // Create a new event
                     Event newEvent = new Event(
-                            null,
+                            eventId,
                             organizerId,
                             facilityId,
                             eventTitle,
