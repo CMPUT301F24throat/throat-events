@@ -44,6 +44,7 @@ import java.util.Random;
  * - Generate QR codes for promotional and waiting list purposes.
  * - Navigate to appropriate screens based on user actions.
  */
+
 public class EventCreationFragment extends Fragment {
     private static final String TAG = "TAG";
     private EventCreateBinding binding;
