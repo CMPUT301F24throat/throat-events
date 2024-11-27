@@ -45,6 +45,7 @@ import java.util.Random;
  * - Navigate to appropriate screens based on user actions.
  */
 public class EventCreationFragment extends Fragment {
+    private static final String TAG = "TAG";
     private EventCreateBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;

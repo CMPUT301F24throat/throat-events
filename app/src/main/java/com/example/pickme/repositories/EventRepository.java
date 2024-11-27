@@ -1,5 +1,9 @@
 package com.example.pickme.repositories;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
+
+import android.util.Log;
+
 import com.example.pickme.models.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -8,6 +12,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
 
 /**
  * Facilitates CRUD operations and interactions with the Firestore events collection.
@@ -29,12 +35,13 @@ public class EventRepository {
 
                     // Create an empty waitingList subcollection
                     CollectionReference waitingListRef = newEventRef.collection("waitingList");
-                    transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
+                    transaction.set(waitingListRef.document(), new HashMap<>()); // Add an empty document to initialize the subcollection
 
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
                     // Handle the error
+                    Log.d(TAG, "pushEventToFirestore: "+e.getCause());
                     System.err.println("Transaction failed: " + e.getMessage());
                 });
     }
