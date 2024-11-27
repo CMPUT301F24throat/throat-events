@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Manages local and push notifications
  * @author Omar-Kattan-1
- *
+ * <p>
  * Responsibilities:
  * Create and send notifications to users
  * Handle notification preferences (opt-in/opt-out)
@@ -253,7 +253,7 @@ public class NotificationHelper extends FirebaseMessagingService{
 
 }
 
-/**
- * Sources:
- * FirebaseMessaging: {@link https://firebase.google.com/docs/cloud-messaging/android/client?_gl=1*1c1ztk2*_up*MQ..*_ga*MTExNzcwMDM4LjE3MzA5OTYyMDc.*_ga_CW55HF8NVT*MTczMDk5NjIwNi4xLjAuMTczMDk5NjIwNi4wLjAuMA..}
+/*
+  Sources:
+  FirebaseMessaging: {@link https://firebase.google.com/docs/cloud-messaging/android/client?_gl=1*1c1ztk2*_up*MQ..*_ga*MTExNzcwMDM4LjE3MzA5OTYyMDc.*_ga_CW55HF8NVT*MTczMDk5NjIwNi4xLjAuMTczMDk5NjIwNi4wLjAuMA..}
  */

@@ -53,7 +53,7 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
 
         // Fetch event details asynchronously
         new EventRepository().getEventById(notification.getEventID(), task -> {
-            String eventTitle = task.getResult().get("eventTitle", String.class);
+            String eventTitle = task.getResult().getEventTitle();
             holder.eventName.setText(eventTitle);
         });
 

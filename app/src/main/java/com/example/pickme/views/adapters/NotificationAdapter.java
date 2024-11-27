@@ -40,7 +40,7 @@ public class NotificationAdapter extends ArrayAdapter<Notification> {
         TextView message = convertView.findViewById(R.id.notifMessage);
 
         new EventRepository().getEventById(notification.getEventID(), task -> {
-            eventName.setText(task.getResult().get("eventTitle", String.class));
+            eventName.setText(task.getResult().getEventTitle());
         });
 
         message.setText(notification.getMessage());

@@ -33,7 +33,7 @@ public class EventTest {
         event = new Event("1", "organizer123", "facility456", "Sample Event",
                 "An event description", "October 5 2024, 7:00 PM", "promo123",
                 "waitingList123", "poster123", "123 Main St", "5",
-                true, 100, 10, System.currentTimeMillis(), System.currentTimeMillis());
+                true, 100, System.currentTimeMillis(), System.currentTimeMillis());
     }
 
     @Test
@@ -154,23 +154,23 @@ public class EventTest {
     }
 }
 
-/**
- * Code Sources
- *
- * ChatGPT:
- * - JUnit 4: Testing exception handling for invalid inputs.
- * - Handling assertions for null values and edge cases.
- * - JUnit 4 best practices for validating expected exceptions.
- *
- * Stack Overflow:
- * - Validating method arguments in Java: IllegalArgumentException.
- * - Best practices for JUnit 4 testing with custom error messages.
- *
- * Java Documentation:
- * - Java String class methods and formatting techniques
- *
- * JUnit 4 Documentation:
- * - Assertions and Exception handling in JUnit 4
+/*
+  Code Sources
+  <p>
+  ChatGPT:
+  - JUnit 4: Testing exception handling for invalid inputs.
+  - Handling assertions for null values and edge cases.
+  - JUnit 4 best practices for validating expected exceptions.
+  <p>
+  Stack Overflow:
+  - Validating method arguments in Java: IllegalArgumentException.
+  - Best practices for JUnit 4 testing with custom error messages.
+  <p>
+  Java Documentation:
+  - Java String class methods and formatting techniques
+  <p>
+  JUnit 4 Documentation:
+  - Assertions and Exception handling in JUnit 4
  */
 
 

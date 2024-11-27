@@ -68,6 +68,9 @@
         <action
             android:id="@+id/action_eventDetailsFragment_to_createNotif"
             app:destination="@id/createNotif" />
+        <action
+        android:id="@+id/action_eventDetailsFragment_to_lotteryWinnersFragment"
+        app:destination="@id/lotteryWinnersFragment" />
     </fragment>
 
     <fragment
@@ -103,6 +106,12 @@
         android:name="com.example.pickme.views.FacilityCreationFragment"
         android:label="Facility"
         tools:layout="@layout/facility_create" />
+
+    <fragment
+        android:id="@+id/lotteryWinnersFragment"
+        android:name="com.example.pickme.views.LotteryWinnersFragment"
+        android:label="Lottery Winners"
+        tools:layout="@layout/lottery_winners" />
 
     <fragment
         android:id="@+id/createNotif"
