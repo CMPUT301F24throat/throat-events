@@ -73,17 +73,17 @@ public class EventFetcher {
     private void fetchEventById(String eventID, EventCallback callback) {
         Log.d(TAG, "Fetching event details for Event ID: " + eventID);
 
-        eventRepository.getEventById(eventID, new OnCompleteListener<DocumentSnapshot>() {
+        eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<Event> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
-                    DocumentSnapshot document = task.getResult();
-
-                    // Log the raw event document data for debugging
-                    Log.d(TAG, "Raw Event Document: " + document.getData());
+//                    DocumentSnapshot document = task.getResult();
+//
+//                    // Log the raw event document data for debugging
+//                    Log.d(TAG, "Raw Event Document: " + document.getData());
 
                     // Convert Firestore document to Event object
-                    Event event = document.toObject(Event.class);
+                    Event event = task.getResult();
                     if (event != null) {
                         Log.d(TAG, "Event fetched: " + event.getEventTitle());
                         callback.onEventFetched(event);

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -101,21 +102,29 @@ public class EventDetailsFragment extends Fragment {
                 @Override
                 public void onEmpty() {}
             });
+
+            ImageButton createNotif = binding.createNotif;
+
+            createNotif.setOnClickListener(l -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("EventID", event.getEventId());
+                Navigation.findNavController(getView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+            });
         }
     }
 }
-/**
- * Code Sources
- *
- * ChatGPT:
- * - How to navigate fragments and handle back navigation in Android.
- *
- * Stack Overflow:
- * - Using Glide to load images into ImageView in a Fragment
- * - Passing data between fragments using Android Architecture Components
- *
- * Android Developer Documentation:
- * - Fragment Lifecycle - Guidelines for managing fragment lifecycle.
- * - Navigating with Fragments - Handling fragment navigation.
- * - Using Glide for Image Loading - Documentation on image loading with Glide.
+/*
+  Code Sources
+  <p>
+  ChatGPT:
+  - How to navigate fragments and handle back navigation in Android.
+  <p>
+  Stack Overflow:
+  - Using Glide to load images into ImageView in a Fragment
+  - Passing data between fragments using Android Architecture Components
+  <p>
+  Android Developer Documentation:
+  - Fragment Lifecycle - Guidelines for managing fragment lifecycle.
+  - Navigating with Fragments - Handling fragment navigation.
+  - Using Glide for Image Loading - Documentation on image loading with Glide.
  */

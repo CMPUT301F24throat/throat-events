@@ -20,12 +20,12 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.pickme.R;
+import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.QrRepository;
 import com.example.pickme.utils.QRCodeGenerator;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.io.File;
 
@@ -123,13 +123,13 @@ public class QRCodeViewFragment extends Fragment {
      */
     private void loadEventDetails() {
         // Fetch event details from Firestore based on eventID
-        eventRepository.getEventById(eventID, new OnCompleteListener<DocumentSnapshot>() {
+        eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<Event> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
-                    DocumentSnapshot document = task.getResult();
-                    // Retrieve "eventTitle" instead of "title"
-                    String eventTitle = document.getString("eventTitle");
+                    Event event = task.getResult();
+                    // Retrieve "eventTitle" from the Event object
+                    String eventTitle = event.getEventTitle();
                     if (eventTitle != null) {
                         // Update the event title TextView
                         eventTitleTextView.setText(eventTitle);

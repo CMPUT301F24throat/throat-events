@@ -20,7 +20,7 @@ import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
 import com.example.pickme.views.adapters.EventAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,15 +75,9 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
 
     private void checkUserFacility(String userId) {
         facilityRepository.getFacilityByOwnerId(userId, task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                boolean facilityExists = false;
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                    if (document.exists()) {
-                        facilityExists = true;
-                        break;
-                    }
-                }
-                if (facilityExists) {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot != null && !querySnapshot.isEmpty()) {
                     // Facility exists, proceed to show MyEventsFragment view
                     loadUserEvents(userId);
                 } else {
@@ -98,17 +92,18 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     }
 
     private void loadUserEvents(String userId) {
-        eventRepository.getEventsByOrganizerId(userId, task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                eventList.clear();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                    Event event = document.toObject(Event.class);
-                    eventList.add(event);
+        boolean includePastEvents = false; // Set this based on your requirement
+        eventRepository.getEventsByOrganizerId(userId, includePastEvents, task -> {
+            if (task.isSuccessful()) {
+                List<Event> events = task.getResult();
+                if (events != null) {
+                    eventList.clear();
+                    eventList.addAll(events);
+                    eventAdapter.notifyDataSetChanged();
+                    // Show or hide the no events text based on the event list size
+                    View noEventsText = requireView().findViewById(R.id.noEventsText);
+                    noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
                 }
-                eventAdapter.notifyDataSetChanged();
-                // Show or hide the no events text based on the event list size
-                View noEventsText = requireView().findViewById(R.id.noEventsText);
-                noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
             }
         });
     }
@@ -126,16 +121,3 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         navController.navigate(R.id.action_myEventsFragment_to_eventDetailsFragment, bundle);
     }
 }
-
-/**
- * Code Sources
- *
- * Stack Overflow:
- * - RecyclerView setup and data binding in Android
- *
- * Firebase Documentation:
- * - Firestore: Fetching and displaying collection data
- *
- * Android Developers:
- * - Navigation components for data transfer between fragments]- Navigating and passing data between fragments with the Navigation component.
- */

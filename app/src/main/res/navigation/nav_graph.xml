@@ -81,6 +81,13 @@
                 android:name="eventID"
                 app:argType="string" />
         </action>
+
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_createNotif"
+            app:destination="@id/createNotif" />
+        <action
+        android:id="@+id/action_eventDetailsFragment_to_lotteryWinnersFragment"
+        app:destination="@id/lotteryWinnersFragment" />
     </fragment>
 
     <fragment
@@ -98,6 +105,12 @@
             android:id="@+id/action_myEventsFragment_to_facilityCreationFragment"
             app:destination="@id/facilityCreationFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/adminToolsFragment"
+        android:name="com.example.pickme.views.AdminToolsFragment"
+        android:label="Admin Tools"
+        tools:layout="@layout/fragment_admin_tools" />
 
     <fragment
         android:id="@+id/eventCreationFragment"
@@ -119,6 +132,19 @@
         <argument
             android:name="eventID"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lotteryWinnersFragment"
+        android:name="com.example.pickme.views.LotteryWinnersFragment"
+        android:label="Lottery Winners"
+        tools:layout="@layout/lottery_winners" />
+
+    <fragment
+        android:id="@+id/createNotif"
+        android:name="com.example.pickme.views.CreateNotificationFragment"
+        android:label="Create Notif"
+        tools:layout="@layout/notif_create_fragment">
     </fragment>
 
     <!-- Global actions -->

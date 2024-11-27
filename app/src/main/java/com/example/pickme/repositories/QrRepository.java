@@ -68,12 +68,12 @@ public class QrRepository {
     }
 }
 
-/**
- * Code Sources
- *
- * Firebase Documentation:
- * - Firestore Documentation
- *
- * Java Documentation:
- * - Java error handling with exceptions
+/*
+  Code Sources
+  <p>
+  Firebase Documentation:
+  - Firestore Documentation
+  <p>
+  Java Documentation:
+  - Java error handling with exceptions
  */

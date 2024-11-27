@@ -7,136 +7,163 @@
     android:background="@color/background1"
     tools:context=".views.HomeFragment">
 
-    <TextView
-        android:id="@+id/homeHomeText"
-        style="@style/Widget.AppCompat.TextView"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="40dp"
-        android:drawablePadding="8dp"
-        android:fontFamily="sans-serif"
-        android:gravity="center"
-        android:paddingStart="5dp"
-        android:paddingTop="5dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="5dp"
-        android:text="@string/home"
-        android:textAlignment="textStart"
-        android:textAllCaps="false"
-        android:textColor="@color/text1"
-        android:textSize="25sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/homeProfileButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints,RtlCompat"/>
-
-    <TextView
-        android:id="@+id/homeInboxText"
-        style="@style/Widget.AppCompat.TextView"
-        android:layout_width="360dp"
-        android:layout_height="26dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="15dp"
-        android:drawablePadding="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:paddingStart="1dp"
-        android:paddingTop="1dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="1dp"
-        android:text="@string/my_inbox"
-        android:textAlignment="textStart"
-        android:textAllCaps="false"
-        android:textColor="@color/text1"
-        android:textSize="20sp"
+    <!-- Header Group -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/homeProfileButton"
-        tools:ignore="MissingConstraints,RtlCompat" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <View
-        android:id="@+id/divider1"
-        android:layout_width="360dp"
-        android:layout_height="3dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="15dp"
-        android:background="@color/icon"
-        android:gravity="center"
-        android:textAlignment="center"
+        <TextView
+            android:id="@+id/homeHomeText"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:text="@string/home"
+            android:textColor="@color/text1"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.724" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/homeProfileButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="30dp"
+            android:background="@drawable/rounded_button"
+            android:contentDescription="Click to go to profile"
+            android:elevation="1dp"
+            android:padding="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/homeHomeText"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Inbox Group -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/inboxGroup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/myEventsGroup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/homeEventsText"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toBottomOf="@id/headerGroup">
 
-    <TextView
-        android:id="@+id/homeEventsText"
-        style="@style/Widget.AppCompat.TextView"
-        android:layout_width="360dp"
-        android:layout_height="26dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:drawablePadding="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:paddingStart="1dp"
-        android:paddingTop="1dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="1dp"
-        android:text="@string/events"
-        android:textAlignment="textStart"
-        android:textAllCaps="false"
-        android:textColor="@color/text1"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/divider1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints,RtlCompat" />
+        <TextView
+            android:id="@+id/homeInboxText"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/my_inbox"
+            android:textColor="@color/text1"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/divider3"
-        android:layout_width="360dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="210dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="80dp"
-        android:background="#FFFFFF"
-        android:gravity="center"
+        <View
+            android:id="@+id/dividerInbox"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:background="@color/icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/homeInboxText" />
+
+        <ListView
+            android:id="@+id/notifList"
+            android:layout_width="360dp"
+            android:layout_height="230dp"
+            android:isScrollContainer="false"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dividerInbox" />
+
+        <TextView
+            android:id="@+id/emptyInboxText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Your inbox is empty"
+            android:textColor="@color/text1"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dividerInbox" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- My Events Group -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/myEventsGroup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider1"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toBottomOf="@id/inboxGroup">
 
-    <View
-        android:id="@+id/divider4"
-        android:layout_width="360dp"
-        android:layout_height="3dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="15dp"
-        android:background="@color/icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/homeInboxText"
-        tools:ignore="MissingConstraints" />
+        <TextView
+            android:id="@+id/homeEventsText"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/events"
+            android:textColor="@color/text1"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/homeProfileButton"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="35dp"
-        android:layout_marginEnd="30dp"
-        android:background="@drawable/rounded_button"
-        android:contentDescription="Click to go to profile"
-        android:elevation="1dp"
-        android:padding="2dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <View
+            android:id="@+id/dividerEvents"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:background="@color/icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/homeEventsText" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewEvents"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="18dp"
+            android:layout_marginBottom="80dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dividerEvents" />
+
+        <TextView
+            android:id="@+id/emptyEventsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="No events waitlisted"
+            android:textColor="@color/text1"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dividerEvents" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

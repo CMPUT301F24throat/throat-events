@@ -46,12 +46,12 @@ public class UserSignUpFragment extends Fragment {
         String firstName = firstNameEditText.getText().toString().trim();
         String lastName = lastNameEditText.getText().toString().trim();
 
-        if (User.validateFirstName(firstName)) {
+        if (!User.validateFirstName(firstName)) {
             Toast.makeText(getContext(), "Invalid first name. Please enter a valid first name.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (!lastName.isEmpty() && User.validateLastName(lastName)) {
+        if (!lastName.isEmpty() && !User.validateLastName(lastName)) {
             Toast.makeText(getContext(), "Invalid last name. Please enter a valid last name.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -75,6 +75,7 @@ public class UserSignUpFragment extends Fragment {
                 Toast.makeText(getContext(), firstName + " " + (lastName.isEmpty() ? "" : lastName) + " has been added successfully!", Toast.LENGTH_SHORT).show();
                 navigateToHomeFragment();
                 clearText();
+                showBottomNavigation();
             }
 
             @Override
@@ -93,10 +94,11 @@ public class UserSignUpFragment extends Fragment {
     private void navigateToHomeFragment() {
         Navigation.findNavController(getView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
     }
+
+    private void showBottomNavigation() {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            mainActivity.findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+        }
+    }
 }
-/**
- * Coding Sources
- * <p>
- * Stack Overflow
- * - "What is the difference between a Fragment and Intent/Activity?"
- **/
