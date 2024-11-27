@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            User.setInstance(user);
+            User.setInstance(user);  // Set the user instance
             // Show the Admin Tools menu item if the user is an admin
             if (user.isAdmin()) {
                 bottomNavigationView.getMenu().findItem(R.id.navigation_admin_tools).setVisible(true);

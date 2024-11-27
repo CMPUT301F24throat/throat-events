@@ -69,11 +69,13 @@ public class WaitingListUtils {
      * @param entrantId The ID of the entrant.
      * @param onCompleteListener The listener to handle the completion of the task.
      */
-    public void getEntrantFromWaitingList(String eventId, String entrantId, OnCompleteListener<WaitingListEntrant> onCompleteListener) {
-        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
-        entrantRef.get().addOnCompleteListener(task -> {
+    public void getWaitingListEntrantByEntrantId(String eventId, String entrantId, OnCompleteListener<WaitingListEntrant> onCompleteListener) {
+        eventsRef.document(eventId).collection("waitingList")
+                .whereEqualTo("entrantId", entrantId)
+                .get()
+                .addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                WaitingListEntrant entrant = task.getResult().toObject(WaitingListEntrant.class);
+                WaitingListEntrant entrant = task.getResult().toObjects(WaitingListEntrant.class).get(0);
                 onCompleteListener.onComplete(Tasks.forResult(entrant));
             } else {
                 onCompleteListener.onComplete(Tasks.forException(task.getException()));
@@ -114,14 +116,27 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void addEntrantToWaitingList(String eventId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        DocumentReference newEntrantRef = eventsRef.document(eventId).collection("waitingList").document();
-        waitingListEntrant.setWaitListEntrantId(newEntrantRef.getId());
-        newEntrantRef.set(waitingListEntrant)
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Addition failed: " + e.getMessage());
-                });
+        CollectionReference waitingListRef = eventsRef.document(eventId).collection("waitingList");
+
+        waitingListRef.whereEqualTo("entrantId", waitingListEntrant.getEntrantId()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+
+                // Entrant already exists, update the status to WAITING (they rejoin)
+                DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                DocumentReference entrantRef = waitingListRef.document(document.getId());
+                entrantRef.update("entrantStatus", EntrantStatus.WAITING).addOnCompleteListener(onCompleteListener)
+                        .addOnFailureListener(e -> System.err.println("Status update failed: " + e.getMessage()));
+            } else if (task.isSuccessful() && (task.getResult() == null || task.getResult().isEmpty())) {
+
+                // Entrant does not exist, add new document
+                DocumentReference newEntrantRef = waitingListRef.document();
+                waitingListEntrant.setWaitListEntrantId(newEntrantRef.getId());
+                newEntrantRef.set(waitingListEntrant).addOnCompleteListener(onCompleteListener)
+                        .addOnFailureListener(e -> System.err.println("Addition failed: " + e.getMessage()));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
     }
 
     /**
@@ -133,12 +148,19 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void editEntrantInWaitingList(String eventId, String entrantId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
-        entrantRef.set(waitingListEntrant)
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Update failed: " + e.getMessage());
+        eventsRef.document(eventId).collection("waitingList")
+                .whereEqualTo("entrantId", entrantId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(document.getId());
+                        entrantRef.set(waitingListEntrant)
+                                .addOnCompleteListener(onCompleteListener)
+                                .addOnFailureListener(e -> System.err.println("Update failed: " + e.getMessage()));
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                    }
                 });
     }
 
@@ -150,12 +172,19 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void deleteEntrantFromWaitingList(String eventId, String entrantId, OnCompleteListener<Void> onCompleteListener) {
-        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
-        entrantRef.delete()
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Deletion failed: " + e.getMessage());
+        eventsRef.document(eventId).collection("waitingList")
+                .whereEqualTo("entrantId", entrantId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(document.getId());
+                        entrantRef.delete()
+                                .addOnCompleteListener(onCompleteListener)
+                                .addOnFailureListener(e -> System.err.println("Deletion failed: " + e.getMessage()));
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                    }
                 });
     }
 
@@ -232,7 +261,7 @@ public class WaitingListUtils {
      * @param eventId The ID of the event.
      * @param onCompleteListener The listener to handle the completion of the task.
      */
-    public void getPendingEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+    public void getSelectedEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
         getEntrantsByStatus(eventId, EntrantStatus.SELECTED, onCompleteListener);
     }
 
@@ -270,15 +299,15 @@ public class WaitingListUtils {
     }
 
     /**
-     * Retrieves the pending entrants (with EntrantStatus.SELECTED) and changes their status to EntrantStatus.CANCELLED.
+     * Retrieves the selected entrants (with EntrantStatus.SELECTED) and changes their status to EntrantStatus.CANCELLED.
      *
      * @param eventId The ID of the event.
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void cancelPendingEntrants(String eventId, OnCompleteListener<Void> onCompleteListener) {
-        getPendingEntrants(eventId, pendingEntrantsTask -> {
-            if (pendingEntrantsTask.isSuccessful() && pendingEntrantsTask.getResult() != null) {
-                List<WaitingListEntrant> pendingEntrants = pendingEntrantsTask.getResult();
+        getSelectedEntrants(eventId, selectedEntrantsTask -> {
+            if (selectedEntrantsTask.isSuccessful() && selectedEntrantsTask.getResult() != null) {
+                List<WaitingListEntrant> pendingEntrants = selectedEntrantsTask.getResult();
                 List<Task<Void>> updateTasks = new ArrayList<>();
 
                 for (WaitingListEntrant entrant : pendingEntrants) {
@@ -289,7 +318,7 @@ public class WaitingListUtils {
 
                 Tasks.whenAll(updateTasks).addOnCompleteListener(onCompleteListener);
             } else {
-                onCompleteListener.onComplete(Tasks.forException(pendingEntrantsTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(selectedEntrantsTask.getException()));
             }
         });
     }

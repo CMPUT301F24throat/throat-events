@@ -53,7 +53,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
 
         if (user != null) {
             // Check if the user has a facility
-            checkUserFacility(user.getUserId());
+            checkUserFacility(user.getDeviceId());
         }
 
         FloatingActionButton addEventBtn = view.findViewById(R.id.fab_add_event);
@@ -73,13 +73,13 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
-    private void checkUserFacility(String userId) {
-        facilityRepository.getFacilityByOwnerId(userId, task -> {
+    private void checkUserFacility(String userDeviceId) {
+        facilityRepository.getFacilityByOwnerId(userDeviceId, task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot querySnapshot = task.getResult();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
                     // Facility exists, proceed to show MyEventsFragment view
-                    loadUserEvents(userId);
+                    loadUserEvents(userDeviceId);
                 } else {
                     // Facility does not exist, navigate to FacilityCreationFragment
                     navigateToFacilityCreationFragment();
@@ -91,15 +91,21 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
-    private void loadUserEvents(String userId) {
-        boolean includePastEvents = false; // Set this based on your requirement
-        eventRepository.getEventsByOrganizerId(userId, includePastEvents, task -> {
-            if (task.isSuccessful()) {
-                List<Event> events = task.getResult();
+    // Method without includePastEvents parameter, defaulting to false
+    private void loadUserEvents(String userDeviceId) {
+        loadUserEvents(userDeviceId, false);
+    }
+
+    // Method with includePastEvents parameter
+    private void loadUserEvents(String userDeviceId, boolean includePastEvents) {
+        eventRepository.getEventsByOrganizerId(userDeviceId, includePastEvents, getEventsTask -> {
+            if (getEventsTask.isSuccessful()) {
+                List<Event> events = getEventsTask.getResult();
                 if (events != null) {
                     eventList.clear();
                     eventList.addAll(events);
                     eventAdapter.notifyDataSetChanged();
+
                     // Show or hide the no events text based on the event list size
                     View noEventsText = requireView().findViewById(R.id.noEventsText);
                     noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);

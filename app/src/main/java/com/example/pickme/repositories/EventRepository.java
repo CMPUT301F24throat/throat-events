@@ -62,7 +62,6 @@ public class EventRepository {
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
-                    // Handle the error
                     System.err.println("Transaction failed: " + e.getMessage());
                 });
     }
@@ -76,7 +75,6 @@ public class EventRepository {
     public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
         eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
-                    // Handle the error
                     System.err.println("Deletion failed: " + e.getMessage());
                 });
     }
@@ -84,12 +82,12 @@ public class EventRepository {
     /**
      * Retrieves a list of events organized by a specific user.
      *
-     * @param userId The ID of the organizer.
-     * @param includePastEvents Whether to include past events in the result.
+     * @param userDeviceId       The ID of the organizer.
+     * @param includePastEvents  Whether to include past events in the result.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void getEventsByOrganizerId(String userId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(task -> {
+    public void getEventsByOrganizerId(String userDeviceId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userDeviceId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<Event> events = new ArrayList<>();
                 for (DocumentSnapshot document : task.getResult().getDocuments()) {
