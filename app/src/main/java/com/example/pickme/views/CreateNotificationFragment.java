@@ -121,6 +121,8 @@ public class CreateNotificationFragment extends Fragment {
 
                     task.run();
                 });
+
+                //TODO: add more cases to send notifs to correct people based on selection
         }
     }
 }

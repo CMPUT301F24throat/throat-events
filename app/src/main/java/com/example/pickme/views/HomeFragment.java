@@ -180,7 +180,6 @@ public class HomeFragment extends Fragment {
             notificationRepository.addSnapshotListener(getContext());
             notificationRepository.attachAdapter(notificationAdapter);
 
-//                NotificationList.getInstance().clear();
             if(NotificationList.getInstance().isEmpty()){
                 for(UserNotification userNotification : user.getUserNotifications()){
                     NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
