@@ -244,6 +244,27 @@ public class WaitingListUtils {
     }
 
     /**
+     * Retrieves the number of entrants from the waiting list based on their status.
+     *
+     * @param eventId The ID of the event.
+     * @param status The status of the entrants to be counted.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getEntrantNumbersByStatus(String eventId, EntrantStatus status, OnCompleteListener<Integer> onCompleteListener) {
+        eventsRef.document(eventId).collection("waitingList")
+                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
+                .whereEqualTo("entrantStatus", status)
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        int count = task.getResult().size();
+                        onCompleteListener.onComplete(Tasks.forResult(count));
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                    }
+                });
+    }
+
+    /**
      * Retrieves entrants from the waiting list who accepted their
      * invite (ie. status is ACCEPTED).
      *
@@ -312,7 +333,7 @@ public class WaitingListUtils {
 
                 for (WaitingListEntrant entrant : pendingEntrants) {
                     DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrant.getWaitListEntrantId());
-                    Task<Void> updateTask = entrantRef.update("entrantStatus", EntrantStatus.CANCELLED);
+                    Task<Void> updateTask = entrantRef.update("entrantStatus", EntrantStatus.CANCELLED);  // Update the entrant's status to CANCELLED
                     updateTasks.add(updateTask);
                 }
 

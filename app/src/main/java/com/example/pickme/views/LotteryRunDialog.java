@@ -48,7 +48,7 @@ public class LotteryRunDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Dialog dialog = new Dialog(requireContext());
-        View view = getLayoutInflater().inflate(R.layout.dialog_lottery_run, null);
+        View view = getLayoutInflater().inflate(R.layout.lottery_run_dialog, null);
         dialog.setContentView(view);
 
         TextView title = view.findViewById(R.id.dialog_title);
