@@ -52,7 +52,16 @@
         android:id="@+id/qrCameraFragment"
         android:name="com.example.pickme.views.QRCameraFragment"
         android:label="QR Camera"
-        tools:layout="@layout/fragment_qr_camera" />
+        tools:layout="@layout/fragment_qr_camera">
+        <!-- Add navigation to EventDetailsFragment -->
+        <action
+            android:id="@+id/action_qrCameraFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment">
+            <argument
+                android:name="eventID"
+                app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/inboxFragment"
@@ -65,6 +74,17 @@
         android:name="com.example.pickme.views.EventDetailsFragment"
         android:label="Event Details"
         tools:layout="@layout/event_details">
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_QRCodeViewFragment"
+            app:destination="@id/QRCodeViewFragment">
+            <argument
+                android:name="eventID"
+                app:argType="string" />
+        </action>
+
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_createNotif"
+            app:destination="@id/createNotif" />
         <action
         android:id="@+id/action_eventDetailsFragment_to_lotteryWinnersFragment"
         app:destination="@id/lotteryWinnersFragment" />
@@ -105,6 +125,16 @@
         tools:layout="@layout/facility_create" />
 
     <fragment
+        android:id="@+id/QRCodeViewFragment"
+        android:name="com.example.pickme.views.QRCodeViewFragment"
+        android:label="QR Code View"
+        tools:layout="@layout/qr_display_activity">
+        <argument
+            android:name="eventID"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
         android:id="@+id/lotteryWinnersFragment"
         android:name="com.example.pickme.views.LotteryWinnersFragment"
         android:label="Lottery Winners"
@@ -112,6 +142,13 @@
         <action
             android:id="@+id/action_lotteryWinnersFragment_to_eventDetailsFragment"
             app:destination="@id/eventDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createNotif"
+        android:name="com.example.pickme.views.CreateNotificationFragment"
+        android:label="Create Notif"
+        tools:layout="@layout/notif_create_fragment">
     </fragment>
 
     <!-- Global actions -->

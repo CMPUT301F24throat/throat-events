@@ -81,6 +81,7 @@ public class UserRepository {
      * @param callback Callback to handle the result of the user creation
      */
     public void addUser(String firstName, String lastName, String email, String contact, String deviceId, OnUserCreatedCallback callback) {
+        // Adds a user to our database using DeviceId as the DocumentID
         if (deviceId == null || deviceId.isEmpty()) {
             callback.onFailure("Device ID is missing. Unable to create user account.");
             return;
@@ -89,6 +90,9 @@ public class UserRepository {
         auth.signInAnonymously().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String userAuthId = Objects.requireNonNull(task.getResult().getUser()).getUid();
+
+                // Creates the User object
+//                String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
 
                 String initials = String.valueOf(firstName.charAt(0));
                 Image newImage = new Image(deviceId, deviceId);
@@ -99,6 +103,7 @@ public class UserRepository {
                         newUser.signup(firstName, lastName);
                         User.setInstance(newUser);
 
+                        // Save user data to Firestore using DeviceID as the document ID
                         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task2 -> {
                             newUser.setRegToken(task2.getResult());
                             db.collection("users").document(deviceId)  // set the user document ID to the deviceId
@@ -127,20 +132,20 @@ public class UserRepository {
             return;
         }
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("firstName", user.getFirstName());
-        updates.put("lastName", user.getLastName());
-        updates.put("emailAddress", user.getEmailAddress());
-        updates.put("contactNumber", user.getContactNumber());
-        updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
-        updates.put("notificationEnabled", user.isNotificationEnabled());
-        updates.put("profilePictureUrl", user.getProfilePictureUrl());
+//            Map<String, Object> updates = new HashMap<>();
+//            updates.put("firstName", user.getFirstName());
+//            updates.put("lastName", user.getLastName());
+//            updates.put("emailAddress", user.getEmailAddress());
+//            updates.put("contactNumber", user.getContactNumber());
+//            updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
+//            updates.put("notificationEnabled", user.isNotificationEnabled());
+//            updates.put("profilePictureUrl", user.getProfilePictureUrl());
 
-        usersRef.document(user.getDeviceId())
-                .update(updates)
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
-    }
+            usersRef.document(user.getDeviceId())
+                    .set(user)
+                    .addOnCompleteListener(onCompleteListener)
+                    .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
+        }
 
     /**
      * Deletes a user from the Firestore database.
