@@ -1,13 +1,26 @@
 package com.example.pickme.repositories;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 import com.example.pickme.models.Notification;
+import com.example.pickme.models.User;
+import com.example.pickme.utils.NotificationList;
+import com.example.pickme.utils.UserNotification;
+import com.example.pickme.views.adapters.NotifRecAdapter;
+import com.example.pickme.views.adapters.NotificationAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,11 +37,23 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
+    private NotificationAdapter notificationAdapter;
+    private NotifRecAdapter notifRecAdapter;
+    static boolean listening = false;
+
+    static NotificationRepository instance;
+
+    public static NotificationRepository getInstance(){
+        if(instance == null)
+            instance = new NotificationRepository();
+
+        return instance;
+    }
 
     /**
      * Constructor also initializes the Firebase db
      */
-    public NotificationRepository() {
+    private NotificationRepository() {
         // temporary anonymous auth
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
@@ -60,8 +85,8 @@ public class NotificationRepository {
     }
 
     // Read a notification by ID
-    public void getNotificationById(String notificationId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
-        notificationsRef.document(notificationId).get().addOnCompleteListener(onCompleteListener);
+    public void getNotificationById(String notificationId, OnSuccessListener<DocumentSnapshot> onSuccessListener) {
+        notificationsRef.document(notificationId).get().addOnSuccessListener(onSuccessListener);
     }
 
     // Update a notification
@@ -87,6 +112,76 @@ public class NotificationRepository {
     // Read notifications by sender user ID
     public void getNotificationsBySenderUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
         notificationsRef.whereEqualTo("senderId", userId).get().addOnCompleteListener(onCompleteListener);
+    }
+
+    public void addSnapshotListener(Context context){
+        if(listening)
+            return;
+
+        NotificationList notificationList = NotificationList.getInstance();
+        User user = User.getInstance();
+
+        Log.i("NOTIF", "adding listener");
+
+        notificationsRef.addSnapshotListener((query, error) -> {
+
+            if(!listening){
+                listening = true;
+                return;
+            }
+
+            if(error != null){
+                Log.e("NOTIF", "Listen failed: ", error);
+                return;
+            }
+
+            if(query != null){
+                for(DocumentChange change : query.getDocumentChanges()){
+                    Notification notification = change.getDocument().toObject(Notification.class);
+
+                    if(!notification.getSendTo().contains(user.getDeviceId()))
+                        continue;
+
+                    if(change.getType() == DocumentChange.Type.ADDED){
+                        notificationList.add(notification);
+                        user.addUserNotification(new UserNotification(notification.getNotificationId()));
+                        new EventRepository().getEventById(notification.getEventID(), task ->{
+                                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
+                                    .setSmallIcon(android.R.drawable.ic_menu_info_details)
+                                    .setContentTitle(task.getResult().getEventTitle())
+                                    .setContentText(notification.getMessage());
+
+
+                                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                    notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
+                                }
+
+                                });
+
+                    }
+                    else if(change.getType() == DocumentChange.Type.REMOVED)
+                        notificationList.remove(notification);
+
+                }
+
+                if(notificationAdapter != null)
+                    this.notificationAdapter.notifyDataSetChanged();
+
+                if(notifRecAdapter != null)
+                    this.notifRecAdapter.notifyDataSetChanged();
+            }
+
+        });
+
+    }
+
+    public void attachAdapter(NotificationAdapter notificationAdapter){
+        this.notificationAdapter = notificationAdapter;
+    }
+
+    public void attachRecAdapter(NotifRecAdapter notifRecAdapter){
+        this.notifRecAdapter = notifRecAdapter;
     }
 }
 

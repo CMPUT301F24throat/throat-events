@@ -12,8 +12,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -100,17 +98,17 @@ public class UserRepository {
                 return;
             }
 
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("firstName", user.getFirstName());
-            updates.put("lastName", user.getLastName());
-            updates.put("emailAddress", user.getEmailAddress());
-            updates.put("contactNumber", user.getContactNumber());
-            updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
-            updates.put("notificationEnabled", user.isNotificationEnabled());
-            updates.put("profilePictureUrl", user.getProfilePictureUrl());
+//            Map<String, Object> updates = new HashMap<>();
+//            updates.put("firstName", user.getFirstName());
+//            updates.put("lastName", user.getLastName());
+//            updates.put("emailAddress", user.getEmailAddress());
+//            updates.put("contactNumber", user.getContactNumber());
+//            updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
+//            updates.put("notificationEnabled", user.isNotificationEnabled());
+//            updates.put("profilePictureUrl", user.getProfilePictureUrl());
 
             usersRef.document(user.getDeviceId())
-                    .update(updates)
+                    .set(user)
                     .addOnCompleteListener(onCompleteListener)
                     .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
         }

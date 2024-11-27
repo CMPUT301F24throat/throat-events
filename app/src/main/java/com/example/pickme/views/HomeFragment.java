@@ -2,6 +2,9 @@ package com.example.pickme.views;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -22,8 +26,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
+import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
+import com.example.pickme.repositories.NotificationRepository;
+import com.example.pickme.utils.NotificationHelper;
+import com.example.pickme.utils.NotificationList;
+import com.example.pickme.utils.UserNotification;
 import com.example.pickme.views.adapters.EventAdapter;
+import com.example.pickme.views.adapters.NotificationAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +47,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class HomeFragment extends Fragment {
 
     private ImageButton homeProfileButton;
-    private RecyclerView recyclerViewInbox;
+    private NotificationRepository notificationRepository = NotificationRepository.getInstance();
+    private ListView notifList;
     private RecyclerView recyclerViewEvents;
-    private EventAdapter inboxAdapter;
     private EventAdapter eventsAdapter;
     private List<Event> inboxList = new ArrayList<>();
     private List<Event> eventsList = new ArrayList<>();
@@ -56,6 +66,20 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "channelID";
+            String channelName = "My Channel";
+            String channelDescription = "Channel for app notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+
+            NotificationManager notificationManager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -69,19 +93,15 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Find Views
-        recyclerViewInbox = view.findViewById(R.id.recyclerViewInbox);
+        notifList = view.findViewById(R.id.notifList);
         recyclerViewEvents = view.findViewById(R.id.recyclerViewEvents);
         emptyInboxText = view.findViewById(R.id.emptyInboxText);
         emptyEventsText = view.findViewById(R.id.emptyEventsText);
         CircleImageView homeProfileButton = view.findViewById(R.id.homeProfileButton);
 
-        inboxAdapter = new EventAdapter(inboxList, requireActivity(), event -> {
-            // TODO: Handle inbox item click
-        });
         eventsAdapter = new EventAdapter(eventsList, requireActivity(), event -> {
             // TODO: Handle events item click
         });
-        recyclerViewInbox.setAdapter(inboxAdapter);
         recyclerViewEvents.setAdapter(eventsAdapter);
 
         User user = User.getInstance();
@@ -96,13 +116,16 @@ public class HomeFragment extends Fragment {
             homeProfileButton.setOnClickListener(v -> {
                 Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_userProfileFragment);
             });
+
+            //notification setup
+            askNotificationPermission();
+            loadInbox();
+
         } else {
             // Handle the case where the user is null
             homeProfileButton.setVisibility(View.GONE);
         }
 
-        askNotificationPermission();
-        loadInboxEvents();
         loadMyEvents();
     }
 
@@ -111,11 +134,7 @@ public class HomeFragment extends Fragment {
      */
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // FCM SDK (and your app) can post notifications.
-                } else {
-                    // Inform user that your app will not show notifications.
-                }
+                User.getInstance().setNotificationEnabled(isGranted);
             });
 
     /**
@@ -126,6 +145,7 @@ public class HomeFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) ==
                     PackageManager.PERMISSION_GRANTED) {
+                User.getInstance().setNotificationEnabled(true);
                 // FCM SDK (and your app) can post notifications.
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 new AlertDialog.Builder(requireContext())
@@ -136,6 +156,7 @@ public class HomeFragment extends Fragment {
                             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
                         })
                         .setNegativeButton("No Thanks", (dialog, which) -> {
+                            User.getInstance().setNotificationEnabled(false);
                             // No action needed
                         }).show();
             } else {
@@ -144,15 +165,47 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void loadInboxEvents() {
-        emptyInboxText.setVisibility(View.VISIBLE);
-        // TODO: Load inbox of user
+    /**
+     * this method is responsible for loading the user's notifications, and putting it into the
+     * ListView on the screen
+     */
+    private void loadInbox() {
+        User user = User.getInstance();
+
+        int visibility = user.getUserNotifications().isEmpty() ? View.VISIBLE : View.GONE;
+        emptyInboxText.setVisibility(visibility);
+
+        // will clean the user's notifications and then populate the ListView
+        new NotificationHelper().cleanNotifications(() -> {
+
+            NotificationAdapter notificationAdapter = new NotificationAdapter(getContext(), NotificationList.getInstance());
+
+            notifList.setAdapter(notificationAdapter);
+
+            notificationRepository.addSnapshotListener(getContext());
+            notificationRepository.attachAdapter(notificationAdapter);
+
+            // if the current instance of NotificationList is empty, then populate from firebase
+            if(NotificationList.getInstance().isEmpty()){
+                for(UserNotification userNotification : user.getUserNotifications()){
+                    NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
+                        Notification notification = documentSnapshot.toObject(Notification.class);
+                        notification.markRead(userNotification.isRead());
+
+                        NotificationList.getInstance().add(notification);
+                        notificationAdapter.notifyDataSetChanged();
+                    });
+                }
+            }
+
+        });
     }
 
     private void loadMyEvents() {
         emptyEventsText.setVisibility(View.VISIBLE);
         // TODO: load the events the user is on the waitlist for / upcoming
     }
+
 }
 /*
   Code Sources

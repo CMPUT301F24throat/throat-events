@@ -88,18 +88,19 @@ public class EventCreationFragment extends Fragment {
         binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
         binding.create.setOnClickListener(listener -> {
             if (validateInputs()) {
-                if (selectedImageUri != null) {
-                    // Upload the selected image to Firebase
-                    uploadImageToFirebase(selectedImageUri);
-                } else {
-                    if (event == null) {
-                        Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Use the existing poster URL if no new image is selected
-                        posterUrl = event.getPosterImageId();
-                        createOrUpdateEventInFirestore();
-                    }
-                }
+                createOrUpdateEventInFirestore();
+//                if (selectedImageUri != null) {
+//                    // Upload the selected image to Firebase
+//                    uploadImageToFirebase(selectedImageUri);
+//                } else {
+//                    if (event == null) {
+//                        Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        // Use the existing poster URL if no new image is selected
+//                        posterUrl = event.getPosterImageId();
+//                        createOrUpdateEventInFirestore();
+//                    }
+//                }
             } else {
                 Toast.makeText(requireActivity(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             }

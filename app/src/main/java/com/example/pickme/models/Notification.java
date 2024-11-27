@@ -23,8 +23,10 @@ public class Notification {
     private Timestamp timestamp;
 
     private String sentFrom;
-    private ArrayList<String> sendTo;
+    private ArrayList<String> sendTo = new ArrayList<String>();
     private SendLevel level;
+
+    private String eventID;
 
     public Notification(){
         this.read = false;
@@ -56,8 +58,8 @@ public class Notification {
         return read;
     }
 
-    public void markRead() {
-        this.read = true;
+    public void markRead(boolean read) {
+        this.read = read;
     }
 
     public void markUnread(){
@@ -98,6 +100,15 @@ public class Notification {
 
     public void setLevel(SendLevel level) {
         this.level = level;
+    }
+
+    //---------- eventID ------------------
+    public String getEventID() {
+        return eventID;
+    }
+
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
     }
 
     /**
