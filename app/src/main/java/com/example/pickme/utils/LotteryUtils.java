@@ -47,12 +47,12 @@ public class LotteryUtils {
                                                 List<WaitingListEntrant> waitingEntrants = waitingEntrantsTask.getResult();
                                                 Collections.shuffle(waitingEntrants);
 
-                                                List<String> selectedUserIds = new ArrayList<>();
+                                                List<String> selectedUserDeviceIds = new ArrayList<>();
                                                 for (int i = 0; i < Math.min(numToDraw, waitingEntrants.size()); i++) {
-                                                    selectedUserIds.add(waitingEntrants.get(i).getEntrantId());
+                                                    selectedUserDeviceIds.add(waitingEntrants.get(i).getEntrantId());
                                                 }
 
-                                                onCompleteListener.onComplete(Tasks.forResult(selectedUserIds));
+                                                onCompleteListener.onComplete(Tasks.forResult(selectedUserDeviceIds));
                                             } else {
                                                 onCompleteListener.onComplete(Tasks.forException(waitingEntrantsTask.getException()));
                                             }

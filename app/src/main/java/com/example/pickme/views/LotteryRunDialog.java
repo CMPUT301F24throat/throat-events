@@ -80,11 +80,11 @@ public class LotteryRunDialog extends DialogFragment {
         startButton.setOnClickListener(v -> {
             lotteryUtils.runLottery(eventId, task -> {
                 if (task.isSuccessful()) {
-                    List<String> selectedUserIds = task.getResult();
+                    List<String> selectedUserDeviceIds = task.getResult();
                     // If lottery was successful, navigate to the winners fragment
                     dialog.dismiss();
                     Bundle bundle = new Bundle();
-                    bundle.putStringArrayList("selectedUserIds", new ArrayList<>(selectedUserIds));
+                    bundle.putStringArrayList("selectedUserDeviceIds", new ArrayList<>(selectedUserDeviceIds));
                     Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(R.id.action_eventDetailsFragment_to_lotteryWinnersFragment, bundle);
                 } else {
                     // Error running the lottery

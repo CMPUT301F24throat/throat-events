@@ -19,7 +19,7 @@ import java.util.Objects;
 
 /**
  * Handles interactions with the users collection in our Firebase Firestore.
- *
+ * <p>
  * Responsibilities:
  * - CRUD operations for user data based on DeviceID
  *
@@ -57,12 +57,12 @@ public class UserRepository {
     }
 
     /**
-     * Fetches a user by their device ID.
+     * Fetches a user document by their device ID.
      *
      * @param deviceId The device ID of the user
      * @param onCompleteListener Listener to handle the completion of the task
      */
-    public void getUserByDeviceId(String deviceId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
+    public void getUserDocumentByDeviceId(String deviceId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         if (deviceId == null || deviceId.isEmpty()) {
             Log.e("UserRepository", "DeviceID is required for fetching a user.");
             return;
@@ -101,7 +101,7 @@ public class UserRepository {
 
                         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task2 -> {
                             newUser.setRegToken(task2.getResult());
-                            db.collection("users").document(deviceId)
+                            db.collection("users").document(deviceId)  // set the user document ID to the deviceId
                                     .set(newUser)
                                     .addOnSuccessListener(aVoid -> callback.onSuccess(newUser))
                                     .addOnFailureListener(e -> callback.onFailure("Failed to save user data: " + e.getMessage()));
@@ -169,23 +169,21 @@ public class UserRepository {
     }
 
     /**
-     * Fetches the name of a user by their user ID from the Firestore database.
+     * Fetches a user by their device ID (same as the document ID).
      *
-     * @param userId The user ID of the user
+     * @param deviceId           The device ID of the user
      * @param onCompleteListener Listener to handle the completion of the task
      */
-    public void getUserNameById(String userId, OnCompleteListener<String> onCompleteListener) {
-        usersRef.document(userId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+    public void getUserByDeviceId(String deviceId, OnCompleteListener<User> onCompleteListener) {
+        if (deviceId == null || deviceId.isEmpty()) {
+            Log.e("UserRepository", "User ID is required for fetching a user.");
+            return;
+        }
+        usersRef.document(deviceId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
                 DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    String firstName = document.getString("firstName");
-                    String lastName = document.getString("lastName");
-                    String userName = (lastName == null || lastName.isEmpty()) ? firstName : firstName + " " + lastName;
-                    onCompleteListener.onComplete(Tasks.forResult(userName));
-                } else {
-                    onCompleteListener.onComplete(Tasks.forException(new Exception("User not found")));
-                }
+                User user = document.toObject(User.class);
+                onCompleteListener.onComplete(Tasks.forResult(user));
             } else {
                 onCompleteListener.onComplete(Tasks.forException(task.getException()));
             }

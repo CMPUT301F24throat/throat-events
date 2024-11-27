@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
      * @param deviceID The device ID to check in Firestore.
      */
     private void checkUserInFirestore(String deviceID) {
-        userRepository.getUserByDeviceId(deviceID, task -> {
+        userRepository.getUserDocumentByDeviceId(deviceID, task -> {
             if (!task.isSuccessful() || task.getResult() == null) {
                 handleFirestoreError(task.getException());
                 return;
