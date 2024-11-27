@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -19,17 +20,19 @@ import java.util.Objects;
 /**
  * Handles interactions with the users collection in our Firebase Firestore.
  *
- * @author Kenneth (aesoji)
- * @version 1.2
- *
  * Responsibilities:
  * - CRUD operations for user data based on DeviceID
+ *
+ * @version 1.2
  */
 public class UserRepository {
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
     private CollectionReference usersRef;
 
+    /**
+     * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
+     */
     public UserRepository() {
         this.db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
@@ -40,12 +43,25 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param db Firebase Firestore instance
+     * @param auth Firebase Auth instance
+     * @param usersRef Collection reference for users
+     */
     public UserRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference usersRef) {
         this.db = db;
         this.auth = auth;
         this.usersRef = usersRef;
     }
 
+    /**
+     * Fetches a user by their device ID.
+     *
+     * @param deviceId The device ID of the user
+     * @param onCompleteListener Listener to handle the completion of the task
+     */
     public void getUserByDeviceId(String deviceId, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         if (deviceId == null || deviceId.isEmpty()) {
             Log.e("UserRepository", "DeviceID is required for fetching a user.");
@@ -54,8 +70,17 @@ public class UserRepository {
         usersRef.document(deviceId).get().addOnCompleteListener(onCompleteListener);
     }
 
+    /**
+     * Adds a new user to the Firestore database.
+     *
+     * @param firstName The first name of the user
+     * @param lastName The last name of the user
+     * @param email The email address of the user
+     * @param contact The contact number of the user
+     * @param deviceId The device ID of the user
+     * @param callback Callback to handle the result of the user creation
+     */
     public void addUser(String firstName, String lastName, String email, String contact, String deviceId, OnUserCreatedCallback callback) {
-        // Adds a user to our database using DeviceId as the DocumentID
         if (deviceId == null || deviceId.isEmpty()) {
             callback.onFailure("Device ID is missing. Unable to create user account.");
             return;
@@ -64,9 +89,6 @@ public class UserRepository {
         auth.signInAnonymously().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String userAuthId = Objects.requireNonNull(task.getResult().getUser()).getUid();
-
-                // Creates the User object
-//                String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
 
                 String initials = String.valueOf(firstName.charAt(0));
                 Image newImage = new Image(deviceId, deviceId);
@@ -77,7 +99,6 @@ public class UserRepository {
                         newUser.signup(firstName, lastName);
                         User.setInstance(newUser);
 
-                        // Save user data to Firestore using DeviceID as the document ID
                         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task2 -> {
                             newUser.setRegToken(task2.getResult());
                             db.collection("users").document(deviceId)
@@ -94,48 +115,88 @@ public class UserRepository {
         });
     }
 
-        public void updateUser (User user, OnCompleteListener < Void > onCompleteListener){
-            if (user == null || user.getDeviceId() == null || user.getDeviceId().isEmpty()) {
-                Log.e("UserRepository", "Invalid user or user ID.");
-                return;
-            }
-
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("firstName", user.getFirstName());
-            updates.put("lastName", user.getLastName());
-            updates.put("emailAddress", user.getEmailAddress());
-            updates.put("contactNumber", user.getContactNumber());
-            updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
-            updates.put("notificationEnabled", user.isNotificationEnabled());
-            updates.put("profilePictureUrl", user.getProfilePictureUrl());
-
-            usersRef.document(user.getDeviceId())
-                    .update(updates)
-                    .addOnCompleteListener(onCompleteListener)
-                    .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
+    /**
+     * Updates an existing user's information in the Firestore database.
+     *
+     * @param user The user object containing updated information
+     * @param onCompleteListener Listener to handle the completion of the task
+     */
+    public void updateUser(User user, OnCompleteListener<Void> onCompleteListener) {
+        if (user == null || user.getDeviceId() == null || user.getDeviceId().isEmpty()) {
+            Log.e("UserRepository", "Invalid user or user ID.");
+            return;
         }
 
-        public void deleteUser (String deviceId){
-            if (deviceId == null || deviceId.isEmpty()) {
-                Log.e("UserRepository", "DeviceID is required for deleting a user.");
-                return;
-            }
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("firstName", user.getFirstName());
+        updates.put("lastName", user.getLastName());
+        updates.put("emailAddress", user.getEmailAddress());
+        updates.put("contactNumber", user.getContactNumber());
+        updates.put("geoLocationEnabled", user.isGeoLocationEnabled());
+        updates.put("notificationEnabled", user.isNotificationEnabled());
+        updates.put("profilePictureUrl", user.getProfilePictureUrl());
 
-            usersRef.document(deviceId)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> Log.d("UserRepository", "User deleted successfully"))
-                    .addOnFailureListener(e -> Log.e("UserRepository", "Failed to delete user: " + e.getMessage(), e));
-        }
-
-        public void getAllUsers (OnCompleteListener < QuerySnapshot > onCompleteListener) {
-            usersRef.get().addOnCompleteListener(onCompleteListener);
-        }
-
-        public interface OnUserCreatedCallback {
-            // Defines an interface for callback.
-            void onSuccess(User user);
-
-            void onFailure(String errorMessage);
-        }
-
+        usersRef.document(user.getDeviceId())
+                .update(updates)
+                .addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
     }
+
+    /**
+     * Deletes a user from the Firestore database.
+     *
+     * @param deviceId The device ID of the user to be deleted
+     */
+    public void deleteUser(String deviceId) {
+        if (deviceId == null || deviceId.isEmpty()) {
+            Log.e("UserRepository", "DeviceID is required for deleting a user.");
+            return;
+        }
+
+        usersRef.document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> Log.d("UserRepository", "User deleted successfully"))
+                .addOnFailureListener(e -> Log.e("UserRepository", "Failed to delete user: " + e.getMessage(), e));
+    }
+
+    /**
+     * Fetches all users from the Firestore database.
+     *
+     * @param onCompleteListener Listener to handle the completion of the task
+     */
+    public void getAllUsers(OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        usersRef.get().addOnCompleteListener(onCompleteListener);
+    }
+
+    /**
+     * Fetches the name of a user by their user ID from the Firestore database.
+     *
+     * @param userId The user ID of the user
+     * @param onCompleteListener Listener to handle the completion of the task
+     */
+    public void getUserNameById(String userId, OnCompleteListener<String> onCompleteListener) {
+        usersRef.document(userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    String firstName = document.getString("firstName");
+                    String lastName = document.getString("lastName");
+                    String userName = (lastName == null || lastName.isEmpty()) ? firstName : firstName + " " + lastName;
+                    onCompleteListener.onComplete(Tasks.forResult(userName));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("User not found")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
+    }
+
+    /**
+     * Callback interface for user creation.
+     */
+    public interface OnUserCreatedCallback {
+        void onSuccess(User user);
+        void onFailure(String errorMessage);
+    }
+}
