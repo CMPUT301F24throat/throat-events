@@ -7,26 +7,33 @@ import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.NotificationRepository;
 import com.example.pickme.repositories.UserRepository;
-import com.google.firebase.messaging.FirebaseMessagingService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Manages local and push notifications
+ * Manages local notifications
  * @author Omar-Kattan-1
  * <p>
  * Responsibilities:
  * Create and send notifications to users
  * cleans notifications (if deleted from repo and such)
  **/
-public class NotificationHelper extends FirebaseMessagingService{
+public class NotificationHelper {
 
+    /**
+     * empty constructor
+     */
     public NotificationHelper(){
 
     }
 
+    /**
+     * adds a UserNotification to all the users who a notification is supposed to be sent to and
+     * updates it on firebase
+     * @param notification the notification to send
+     */
     public void sendNotification(Notification notification){
 
         UserNotification userNotification = new UserNotification(notification.getNotificationId());
@@ -55,6 +62,15 @@ public class NotificationHelper extends FirebaseMessagingService{
         }
     }
 
+    /**
+     * this method will run through all of the notifications associated with a user and deletes them if:
+     * - the notification ID is null
+     * - the notification doesn't exist in the db
+     * - the notification isn't associated with an event
+     * - the event associated with the notification doesn't exist in the db
+     *
+     * @param toRun the task to run after this is done
+     */
     public void cleanNotifications(Runnable toRun) {
         User user = User.getInstance();
         List<UserNotification> notificationsToRemove = new ArrayList<>();

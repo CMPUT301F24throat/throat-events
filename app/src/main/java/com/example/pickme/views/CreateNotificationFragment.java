@@ -55,13 +55,16 @@ public class CreateNotificationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
 
+        // get all the views
         backArrow = view.findViewById(R.id.back_arrow);
         sendButton = view.findViewById(R.id.sendButton);
         message = view.findViewById(R.id.messageEditText);
         recipientsSpinner = view.findViewById(R.id.dropdown_menu);
 
+        // go back a screen when the back arrow is clicked
         backArrow.setOnClickListener( (v) -> getActivity().getOnBackPressedDispatcher().onBackPressed());
 
+        // populate the spinner with its options
         ArrayList<String> recipientOptions = new ArrayList<>();
         for(Notification.SendLevel level : Notification.SendLevel.values()){
             recipientOptions.add(level.toString());
@@ -72,6 +75,8 @@ public class CreateNotificationFragment extends Fragment {
 
         recipientsSpinner.setAdapter(recipientsAdapter);
 
+        // clicking the send button will first make sure the values entered are valid, then will
+        // create the Notification and send it
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,6 +112,12 @@ public class CreateNotificationFragment extends Fragment {
         });
     }
 
+    /**
+     * Creates the list of people to send the notification to based on the sendLevel of the notification
+     *
+     * @param notification the notification to update the list of
+     * @param task the task to run after this process is done
+     */
     private void createSendList(Notification notification, Runnable task){
         UserRepository userRepository = new UserRepository();
 

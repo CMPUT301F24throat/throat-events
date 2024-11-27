@@ -165,12 +165,17 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    /**
+     * this method is responsible for loading the user's notifications, and putting it into the
+     * ListView on the screen
+     */
     private void loadInbox() {
         User user = User.getInstance();
 
         int visibility = user.getUserNotifications().isEmpty() ? View.VISIBLE : View.GONE;
         emptyInboxText.setVisibility(visibility);
 
+        // will clean the user's notifications and then populate the ListView
         new NotificationHelper().cleanNotifications(() -> {
 
             NotificationAdapter notificationAdapter = new NotificationAdapter(getContext(), NotificationList.getInstance());
@@ -180,6 +185,7 @@ public class HomeFragment extends Fragment {
             notificationRepository.addSnapshotListener(getContext());
             notificationRepository.attachAdapter(notificationAdapter);
 
+            // if the current instance of NotificationList is empty, then populate from firebase
             if(NotificationList.getInstance().isEmpty()){
                 for(UserNotification userNotification : user.getUserNotifications()){
                     NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {

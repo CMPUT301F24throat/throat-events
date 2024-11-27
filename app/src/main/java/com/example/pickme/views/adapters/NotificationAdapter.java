@@ -15,6 +15,11 @@ import com.example.pickme.repositories.EventRepository;
 
 import java.util.ArrayList;
 
+/**
+ * this class is an adapter for Notifications for ListView used on the Home screen
+ *
+ * @author Omar-Kattan-1
+ */
 public class NotificationAdapter extends ArrayAdapter<Notification> {
     private Context context;
     private ArrayList<Notification> notifications;
