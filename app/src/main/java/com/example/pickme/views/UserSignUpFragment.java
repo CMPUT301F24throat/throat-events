@@ -75,6 +75,7 @@ public class UserSignUpFragment extends Fragment {
                 Toast.makeText(getContext(), firstName + " " + (lastName.isEmpty() ? "" : lastName) + " has been added successfully!", Toast.LENGTH_SHORT).show();
                 navigateToHomeFragment();
                 clearText();
+                showBottomNavigation();
             }
 
             @Override
@@ -93,10 +94,11 @@ public class UserSignUpFragment extends Fragment {
     private void navigateToHomeFragment() {
         Navigation.findNavController(getView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
     }
+
+    private void showBottomNavigation() {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            mainActivity.findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+        }
+    }
 }
-/**
- * Coding Sources
- * <p>
- * Stack Overflow
- * - "What is the difference between a Fragment and Intent/Activity?"
- **/

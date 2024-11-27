@@ -245,7 +245,6 @@ public class EventCreationFragment extends Fragment {
                             binding.winners.getText().toString(),
                             true,
                             Integer.parseInt(binding.entrants.getText().toString()),
-                            0,
                             System.currentTimeMillis(),
                             System.currentTimeMillis()
                     );
@@ -267,7 +266,6 @@ public class EventCreationFragment extends Fragment {
                             binding.winners.getText().toString(),
                             true,
                             Integer.parseInt(binding.entrants.getText().toString()),
-                            event.getEntrants(),
                             event.getCreatedAt(),
                             System.currentTimeMillis()
                     );

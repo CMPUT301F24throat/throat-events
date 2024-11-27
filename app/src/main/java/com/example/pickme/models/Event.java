@@ -20,22 +20,21 @@ import java.util.Objects;
 
 public class Event implements Serializable {
 
-    public String eventId;              // Unique event ID
-    public String organizerId;          // Organizer's user ID
-    public String facilityId;           // Facility ID
-    public String eventTitle;           // Title of the event
-    public String eventDescription;     // Description of the event
-    public String eventDate;            // Date and time of the event (as a String)
-    public String promoQrCodeId;        // Promo QR code ID
-    public String waitingListQrCodeId;  // Waiting list QR code ID
-    public String posterImageId;        // URL of the poster image
-    public String eventLocation;        // Location of the event
-    public String maxWinners;           // Max number of winners
-    public boolean geoLocationRequired; // Indicates if geolocation is required
-    public Integer maxEntrants;         // Maximum number of entrants
-    public Integer entrants;         // Number of entrants registered
-    public long createdAt;              // Creation timestamp
-    public long updatedAt;              // Last updated timestamp
+    private String eventId;              // Unique event ID
+    private String organizerId;          // Organizer's user ID
+    private String facilityId;           // Facility ID
+    private String eventTitle;           // Title of the event
+    private String eventDescription;     // Description of the event
+    private String eventDate;            // Date and time of the event (as a String)
+    private String promoQrCodeId;        // Promo QR code ID
+    private String waitingListQrCodeId;  // Waiting list QR code ID
+    private String posterImageId;        // URL of the poster image
+    private String eventLocation;        // Location of the event
+    private String maxWinners;           // Max number of winners
+    private boolean geoLocationRequired; // Indicates if geolocation is required
+    private Integer maxEntrants;         // Maximum number of entrants
+    private long createdAt;              // Creation timestamp
+    private long updatedAt;              // Last updated timestamp
 
     // Default constructor (required for Firestore)
     public Event() {
@@ -46,7 +45,6 @@ public class Event implements Serializable {
                  String eventDescription, String eventDate, String promoQrCodeId,
                  String waitingListQrCodeId, String posterImageId, String eventLocation,
                  String maxWinners, boolean geoLocationRequired, Integer maxEntrants,
-                 Integer entrants,
                  long createdAt, long updatedAt) {
         this.eventId = eventId;
         this.organizerId = organizerId;
@@ -61,7 +59,6 @@ public class Event implements Serializable {
         this.maxWinners = maxWinners;
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
-        this.entrants = entrants;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -75,14 +72,6 @@ public class Event implements Serializable {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Integer getEntrants() {
-        return entrants;
-    }
-
-    public void setEntrants(Integer entrants) {
-        this.entrants = entrants;
     }
 
     public String getOrganizerId() {
@@ -234,16 +223,16 @@ public class Event implements Serializable {
 
 }
 
-/**
- * Code Sources
- *
- * ChatGPT
- * - "Explanation on handling event properties using classes in Java."
- * - "Firestore documentation on serializable classes in Android."
- *
- * Stack Overflow
- * - "Java Serializable vs Parcelable for data classes."
- *
- * Android Developers
- * - "Best practices for defining data classes in Android."
+/*
+  Code Sources
+  <p>
+  ChatGPT
+  - "Explanation on handling event properties using classes in Java."
+  - "Firestore documentation on serializable classes in Android."
+  <p>
+  Stack Overflow
+  - "Java Serializable vs Parcelable for data classes."
+  <p>
+  Android Developers
+  - "Best practices for defining data classes in Android."
  */
