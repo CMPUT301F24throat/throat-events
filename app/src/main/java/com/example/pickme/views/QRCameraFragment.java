@@ -25,6 +25,10 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
+/**
+ * Fragment for scanning QR codes using the device's camera.
+ * Handles camera permissions and QR code scanning functionality.
+ */
 public class QRCameraFragment extends Fragment {
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 101;
@@ -33,6 +37,14 @@ public class QRCameraFragment extends Fragment {
     private DecoratedBarcodeView barcodeScannerView;
     private boolean isProcessingScan = false; // Flag to prevent multiple processing
 
+    /**
+     * Called to inflate the fragment's view and initialize the QR code scanner.
+     *
+     * @param inflater The LayoutInflater object used to inflate views.
+     * @param container The parent view this fragment is attached to.
+     * @param savedInstanceState Saved state data for the fragment.
+     * @return The inflated view for this fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,6 +70,9 @@ public class QRCameraFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Resumes the barcode scanner when the fragment is visible.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -67,6 +82,9 @@ public class QRCameraFragment extends Fragment {
         }
     }
 
+    /**
+     * Pauses the barcode scanner when the fragment is not visible.
+     */
     @Override
     public void onPause() {
         super.onPause();
@@ -75,6 +93,9 @@ public class QRCameraFragment extends Fragment {
         }
     }
 
+    /**
+     * Configures the barcode scanner to decode QR codes continuously.
+     */
     private void setupScanner() {
         Log.d(TAG, "Setting up scanner...");
         barcodeScannerView.decodeContinuous(new BarcodeCallback() {
@@ -89,6 +110,11 @@ public class QRCameraFragment extends Fragment {
         });
     }
 
+    /**
+     * Fetches event details associated with a scanned QR code.
+     *
+     * @param qrID The QR code ID to query event details.
+     */
     private void fetchEventDetails(String qrID) {
         Log.d(TAG, "Starting fetcher for QR ID: " + qrID);
 
@@ -111,6 +137,11 @@ public class QRCameraFragment extends Fragment {
         });
     }
 
+    /**
+     * Navigates to the EventDetailsFragment with the fetched event details.
+     *
+     * @param event The Event object containing event details.
+     */
     private void navigateToEventDetails(Event event) {
         if (event != null) {
             if (isAdded() && getView() != null) {
@@ -130,12 +161,22 @@ public class QRCameraFragment extends Fragment {
         }
     }
 
+    /**
+     * Requests camera permission from the user if not already granted.
+     */
     private void requestCameraPermission() {
         Log.d(TAG, "Requesting camera permission...");
         ActivityCompat.requestPermissions(requireActivity(),
                 new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
     }
 
+    /**
+     * Handles the result of the camera permission request.
+     *
+     * @param requestCode The request code passed in requestPermissions.
+     * @param permissions The requested permissions.
+     * @param grantResults The results for the requested permissions.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
