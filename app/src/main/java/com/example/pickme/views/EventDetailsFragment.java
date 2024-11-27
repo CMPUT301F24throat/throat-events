@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.example.pickme.R;
 import com.example.pickme.databinding.EventDetailsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
@@ -85,6 +87,14 @@ public class EventDetailsFragment extends Fragment {
 
                 @Override
                 public void onEmpty() {}
+            });
+
+            ImageButton createNotif = binding.createNotif;
+
+            createNotif.setOnClickListener(l -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("EventID", event.getEventId());
+                Navigation.findNavController(getView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
             });
         }
     }
