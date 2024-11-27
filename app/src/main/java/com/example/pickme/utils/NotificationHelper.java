@@ -109,7 +109,7 @@ public class NotificationHelper {
                 }
 
                 new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
-                    if (documentSnapshot1.getResult() == null) {
+                    if (!documentSnapshot1.isSuccessful() || documentSnapshot1.getResult() == null) {
                         notificationsToRemove.add(userNotification);
                         new UserRepository().updateUser(user, task -> {
                             Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
