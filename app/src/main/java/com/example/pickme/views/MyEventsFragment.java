@@ -14,12 +14,12 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
+import com.example.pickme.databinding.FragmentMyEventsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
 import com.example.pickme.views.adapters.EventAdapter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -33,10 +33,13 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     private EventAdapter eventAdapter;
     private List<Event> eventList = new ArrayList<>();
 
+    private FragmentMyEventsBinding binding;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_my_events, container, false);
+        binding = FragmentMyEventsBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -47,17 +50,15 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         eventRepository = new EventRepository();
         User user = User.getInstance();
 
-        recyclerView = view.findViewById(R.id.recyclerView);
         eventAdapter = new EventAdapter(eventList, requireActivity(), this);
-        recyclerView.setAdapter(eventAdapter);
+        binding.recyclerView.setAdapter(eventAdapter);
 
         if (user != null) {
             // Check if the user has a facility
             checkUserFacility(user.getUserId());
         }
 
-        FloatingActionButton addEventBtn = view.findViewById(R.id.fab_add_event);
-        addEventBtn.setOnClickListener(v -> {
+        binding.fabAddEvent.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
             navController.navigate(R.id.action_myEventsFragment_to_eventCreationFragment);
         });
@@ -101,8 +102,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
                     eventList.addAll(events);
                     eventAdapter.notifyDataSetChanged();
                     // Show or hide the no events text based on the event list size
-                    View noEventsText = requireView().findViewById(R.id.noEventsText);
-                    noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
+                    binding.noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
                 }
             }
         });
