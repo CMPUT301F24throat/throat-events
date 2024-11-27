@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private UserRepository userRepository;
     private BottomNavigationView bottomNavigationView;
+    private View loadingScreen; // Reference to the loading screen view
 
     /**
      * Called when the activity is first created.
@@ -43,10 +45,13 @@ public class MainActivity extends AppCompatActivity {
 
         userRepository = new UserRepository();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        loadingScreen = findViewById(R.id.loading_screen); // Find the loading screen view
+
         bottomNavigationView.setVisibility(View.GONE); // Initially hide the bottom navigation
 
         String deviceID = getDocumentationDeviceId();
         if (deviceID != null && !deviceID.isEmpty()) {
+            showLoadingScreen(); // Show loading screen while checking Firestore
             checkUserInFirestore(deviceID);
         }
 
@@ -101,7 +106,8 @@ public class MainActivity extends AppCompatActivity {
      * @param deviceID The device ID to check in Firestore.
      */
     private void checkUserInFirestore(String deviceID) {
-        userRepository.getUserDocumentByDeviceId(deviceID, task -> {
+        userRepository.getUserByDeviceId(deviceID, task -> {
+            hideLoadingScreen(); // Hide the loading screen after Firestore operation
             if (!task.isSuccessful() || task.getResult() == null) {
                 handleFirestoreError(task.getException());
                 return;
@@ -126,6 +132,21 @@ public class MainActivity extends AppCompatActivity {
             }
             navigateToHomeFragment();
         });
+    }
+
+    // Show the loading screen
+    private void showLoadingScreen() {
+        if (loadingScreen != null) {
+            loadingScreen.setVisibility(View.VISIBLE);
+        }
+    }
+
+    // Hide the loading screen with a delay
+    private void hideLoadingScreen() {
+        if (loadingScreen != null) {
+            // Delay for 2 seconds before hiding the loading screen
+            new Handler().postDelayed(() -> loadingScreen.setVisibility(View.GONE), 2000);
+        }
     }
 
     /**
