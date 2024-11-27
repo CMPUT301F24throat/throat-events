@@ -25,32 +25,31 @@ public class NotificationHelper {
     /**
      * empty constructor
      */
-    public NotificationHelper() {
+    public NotificationHelper(){
 
     }
 
     /**
      * adds a UserNotification to all the users who a notification is supposed to be sent to and
      * updates it on firebase
-     *
      * @param notification the notification to send
      */
-    public void sendNotification(Notification notification) {
+    public void sendNotification(Notification notification){
 
         UserNotification userNotification = new UserNotification(notification.getNotificationId());
         UserRepository userRepository = new UserRepository();
 
-        for (String userID : notification.getSendTo()) {
+        for(String userID : notification.getSendTo()){
 
             userRepository.getUserByDeviceId(userID, documentSnapshotTask -> {
-                if (!documentSnapshotTask.isSuccessful() || documentSnapshotTask.getResult() == null) {
+                if(!documentSnapshotTask.isSuccessful() || documentSnapshotTask.getResult() == null){
                     Log.i("NOTIF", "Failed to find user to send notif; userID: " + userID);
                     return;
                 }
 
                 User user = documentSnapshotTask.getResult().toObject(User.class);
 
-                if (user == null || !user.isNotificationEnabled())
+                if(user == null || !user.isNotificationEnabled())
                     return;
 
                 user.addUserNotification(userNotification);
@@ -110,26 +109,30 @@ public class NotificationHelper {
                 }
 
                 new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
-                    if (!documentSnapshot1.isSuccessful() || documentSnapshot1.getResult() == null) {
-                        notificationsToRemove.add(userNotification);
-                        new UserRepository().updateUser(user, task -> {
-                            Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
+                    if (documentSnapshot1.isSuccessful()) {
+                        if (documentSnapshot1.getResult()==null){
+                            notificationsToRemove.add(userNotification);
+                            new UserRepository().updateUser(user, task -> {
+                                Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
+                                future.complete(null);
+                            });
+                        } else {
                             future.complete(null);
-                        });
+                        }
                     }
                 });
             });
-
-            // Wait for all futures to complete
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
-                user.getUserNotifications().removeAll(notificationsToRemove);
-                new UserRepository().updateUser(user, task -> {
-                    Log.i("NOTIF", "Cleaned Notifs");
-                    toRun.run();
-                });
-
-            });
         }
+
+        // Wait for all futures to complete
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            user.getUserNotifications().removeAll(notificationsToRemove);
+            new UserRepository().updateUser(user, task -> {
+                Log.i("NOTIF", "Cleaned Notifs");
+                toRun.run();
+            });
+
+        });
     }
 }
 
