@@ -246,7 +246,7 @@
             android:id="@+id/addImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/ic_button_bg_main"
             app:drawableStartCompat="@drawable/ic_camera"
             android:drawablePadding="8dp"
@@ -259,14 +259,27 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/descCard" />
+            app:layout_constraintTop_toBottomOf="@id/geoLocation" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="@id/requiredField"
-            app:layout_constraintTop_toBottomOf="@id/addImage"
+            app:layout_constraintTop_toBottomOf="@id/descCard"
             android:id="@+id/geoLocation"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/geolocation_required"
+            android:textColor="@color/text2"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/geoLocation"
+            android:layout_marginStart="15dp"
+            app:layout_constraintBottom_toBottomOf="@id/geoLocation"
+            app:layout_constraintStart_toEndOf="@id/geoLocation"/>
 
         <TextView
             android:id="@+id/requiredField"
@@ -280,7 +293,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/geoLocation" />
+            app:layout_constraintTop_toBottomOf="@id/addImage" />
 
         <Button
             android:id="@+id/create"

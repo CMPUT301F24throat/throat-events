@@ -18,4 +18,5 @@
     <string name="required_field">* Required Field</string>
     <string name="qr_camera">QR Camera</string>
     <string name="admin_tools">Admin Tools</string>
+    <string name="geolocation_required">Geolocation Required</string>
 </resources>
