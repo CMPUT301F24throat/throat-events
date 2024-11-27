@@ -27,7 +27,6 @@ public class Event implements Serializable {
     private String eventDescription;     // Description of the event
     private String eventDate;            // Date and time of the event (as a String)
     private String promoQrCodeId;        // Promo QR code ID
-    private String waitingListQrCodeId;  // Waiting list QR code ID
     private String posterImageId;        // URL of the poster image
     private String eventLocation;        // Location of the event
     private String maxWinners;           // Max number of winners
@@ -43,7 +42,7 @@ public class Event implements Serializable {
     // Constructor with parameters
     public Event(String eventId, String organizerId, String facilityId, String eventTitle,
                  String eventDescription, String eventDate, String promoQrCodeId,
-                 String waitingListQrCodeId, String posterImageId, String eventLocation,
+                 String posterImageId, String eventLocation,
                  String maxWinners, boolean geoLocationRequired, Integer maxEntrants,
                  long createdAt, long updatedAt) {
         this.eventId = eventId;
@@ -53,7 +52,6 @@ public class Event implements Serializable {
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
         this.promoQrCodeId = promoQrCodeId;
-        this.waitingListQrCodeId = waitingListQrCodeId;
         this.posterImageId = posterImageId;
         this.eventLocation = eventLocation;
         this.maxWinners = maxWinners;
@@ -133,14 +131,6 @@ public class Event implements Serializable {
 
     public void setPromoQrCodeId(String promoQrCodeId) {
         this.promoQrCodeId = promoQrCodeId;
-    }
-
-    public String getWaitingListQrCodeId() {
-        return waitingListQrCodeId;
-    }
-
-    public void setWaitingListQrCodeId(String waitingListQrCodeId) {
-        this.waitingListQrCodeId = waitingListQrCodeId;
     }
 
     public String getPosterImageId() {

@@ -226,7 +226,6 @@ public class EventCreationFragment extends Fragment {
         String eventTitle = binding.title.getText().toString();
         String eventDescription = binding.description.getText().toString();
         String promoQrCodeId = generateRandomQrCodeId(10);
-        String waitingListQrCodeId = generateRandomQrCodeId(10);
         String date = binding.date.getText().toString() + ", " + binding.startTime.getText().toString() + " - " + binding.endTime.getText().toString();
 
         facilityRepository.getFacilityByOwnerId(organizerId, task -> {
@@ -243,7 +242,6 @@ public class EventCreationFragment extends Fragment {
                             eventDescription,
                             date,
                             promoQrCodeId,
-                            waitingListQrCodeId,
                             posterUrl,
                             binding.address.getText().toString(),
                             binding.winners.getText().toString(),
@@ -264,7 +262,6 @@ public class EventCreationFragment extends Fragment {
                             eventDescription,
                             date,
                             event.getPromoQrCodeId(),
-                            event.getWaitingListQrCodeId(),
                             posterUrl,
                             binding.address.getText().toString(),
                             binding.winners.getText().toString(),
