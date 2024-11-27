@@ -175,7 +175,8 @@ public class ImageRepository {
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
-        StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
+        String imageType = i.getImageType().toString();
+        StorageReference imgRef = imgStorage.child(imageType).child(uploaderId).child(imageId);
 
         // update storage file
         imgRef
@@ -204,7 +205,8 @@ public class ImageRepository {
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
-        StorageReference imgRef = imgStorage.child(uploaderId).child(imageId);
+        String imageType = i.getImageType().toString();
+        StorageReference imgRef = imgStorage.child(imageType).child(uploaderId).child(imageId);
 
         // update storage file
         imgRef
@@ -299,6 +301,7 @@ public class ImageRepository {
                             Log.d(TAG, "delete: Query successful");
                             Log.d(TAG, String.format("delete: Deleting file %s", imageId));
                             imgStorage
+                                    .child(imageType)
                                     .child(uploaderId)
                                     .child(imageId)
                                     .delete()

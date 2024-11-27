@@ -16,6 +16,11 @@ import com.example.pickme.repositories.EventRepository;
 
 import java.util.ArrayList;
 
+/**
+ * this class is an adapter for Notifications for a RecyclerView used on the Inbox screen
+ *
+ * @author Omar-Kattan-1
+ */
 public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHolder> {
     private Context context;
     private ArrayList<Notification> notifications;
@@ -48,12 +53,11 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
     // Called to bind data to the ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        // Get the notification for this position
         Notification notification = notifications.get(position);
 
         // Fetch event details asynchronously
         new EventRepository().getEventById(notification.getEventID(), task -> {
-            String eventTitle = task.getResult().get("eventTitle", String.class);
+            String eventTitle = task.getResult().getEventTitle();
             holder.eventName.setText(eventTitle);
         });
 
@@ -71,9 +75,4 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
         return notifications.size();
     }
 
-    // Optional: Method to update the dataset
-    public void updateNotifications(ArrayList<Notification> newNotifications) {
-        notifications = newNotifications;
-        notifyDataSetChanged();
-    }
 }

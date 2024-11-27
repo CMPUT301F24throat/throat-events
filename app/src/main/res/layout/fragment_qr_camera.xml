@@ -5,14 +5,29 @@
     android:layout_height="match_parent"
     android:background="@color/background1">
 
+    <!-- TextView for displaying scanned QR code result -->
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/scanResult"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="QR Camera - Under Construction"
-        android:textColor="@color/text1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:text="Scan Event QR Code"
+        android:textColor="@color/text3"
+        android:textSize="16sp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ZXing Scanner View -->
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/barcodeScannerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/scanResult"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

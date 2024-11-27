@@ -1,7 +1,9 @@
 package com.example.pickme.views;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,15 +16,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.pickme.R;
+import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.QrRepository;
 import com.example.pickme.utils.QRCodeGenerator;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.io.File;
 
 /**
  * Fragment to display a large QR code and event title for a specific event.
@@ -99,11 +104,18 @@ public class QRCodeViewFragment extends Fragment {
             }
         });
 
+        // Set up the share button to share the QR code
+        view.findViewById(R.id.shareButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareQRCode();
+            }
+        });
+
         // Load event details and QR code for display
         loadEventDetails();
         return view;
     }
-
 
     /**
      * Loads event details using EventRepository and updates the event title TextView.
@@ -111,13 +123,13 @@ public class QRCodeViewFragment extends Fragment {
      */
     private void loadEventDetails() {
         // Fetch event details from Firestore based on eventID
-        eventRepository.getEventById(eventID, new OnCompleteListener<DocumentSnapshot>() {
+        eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<Event> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
-                    DocumentSnapshot document = task.getResult();
-                    // Retrieve "eventTitle" instead of "title"
-                    String eventTitle = document.getString("eventTitle");
+                    Event event = task.getResult();
+                    // Retrieve "eventTitle" from the Event object
+                    String eventTitle = event.getEventTitle();
                     if (eventTitle != null) {
                         // Update the event title TextView
                         eventTitleTextView.setText(eventTitle);
@@ -136,7 +148,6 @@ public class QRCodeViewFragment extends Fragment {
         });
     }
 
-
     /**
      * Generates a QR code using QRCodeGenerator for the given eventID.
      * Checks if a cached QR code exists; if so, it displays the cached image.
@@ -146,14 +157,19 @@ public class QRCodeViewFragment extends Fragment {
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override
             public void onQRCodeReady(String filePath) {
-                Bitmap qrBitmap = BitmapFactory.decodeFile(filePath);
-                if (qrBitmap != null) {
-                    qrCodeImageView.setImageBitmap(qrBitmap);
-                    qrCodeImageView.setVisibility(View.VISIBLE); // Make the ImageView visible
-                    qrCodeImageView.setAlpha(0f);
-                    qrCodeImageView.animate().alpha(1f).setDuration(300).start(); // Apply fade-in animation
+                if (filePath != null) {
+                    File qrCodeFile = new File(filePath);
+                    if (qrCodeFile.exists()) {
+                        Bitmap qrBitmap = BitmapFactory.decodeFile(filePath);
+                        qrCodeImageView.setImageBitmap(qrBitmap);
+                        qrCodeImageView.setVisibility(View.VISIBLE); // Make the ImageView visible
+                        qrCodeImageView.setAlpha(0f);
+                        qrCodeImageView.animate().alpha(1f).setDuration(300).start(); // Apply fade-in animation
+                    } else {
+                        Toast.makeText(getContext(), "QR code file not found", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(getContext(), "Failed to load QR code", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to load QR code file path", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -164,4 +180,43 @@ public class QRCodeViewFragment extends Fragment {
         });
     }
 
+    /**
+     * Shares the QR code currently displayed in the ImageView.
+     * Uses the cached file path provided by QRCodeGenerator to create a shareable intent.
+     */
+    private void shareQRCode() {
+        qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
+            @Override
+            public void onQRCodeReady(String filePath) {
+                if (filePath != null) {
+                    File qrCodeFile = new File(filePath);
+                    if (qrCodeFile.exists()) {
+                        Uri qrCodeUri = FileProvider.getUriForFile(
+                                requireContext(),
+                                requireContext().getPackageName() + ".provider",
+                                qrCodeFile
+                        );
+
+                        // Create an intent to share the file
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("image/png");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrCodeUri);
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                        // Launch the share dialog
+                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+                    } else {
+                        Toast.makeText(getContext(), "QR code file not found for sharing", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Failed to retrieve QR code file path", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(getContext(), "Unable to share QR code: " + errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

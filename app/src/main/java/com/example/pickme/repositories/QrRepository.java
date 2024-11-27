@@ -44,7 +44,7 @@ public class QrRepository {
      * @return Task containing the QR document if found
      */
     public Task<QuerySnapshot> readQRByID(String qrID) {
-        return qrRef.whereEqualTo("qrID", qrID).get();
+        return qrRef.whereEqualTo("qrId", qrID).get();
     }
 
     /**
@@ -68,12 +68,12 @@ public class QrRepository {
     }
 }
 
-/**
- * Code Sources
- *
- * Firebase Documentation:
- * - Firestore Documentation
- *
- * Java Documentation:
- * - Java error handling with exceptions
+/*
+  Code Sources
+  <p>
+  Firebase Documentation:
+  - Firestore Documentation
+  <p>
+  Java Documentation:
+  - Java error handling with exceptions
  */

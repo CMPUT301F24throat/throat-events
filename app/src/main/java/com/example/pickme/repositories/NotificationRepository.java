@@ -148,8 +148,9 @@ public class NotificationRepository {
                         new EventRepository().getEventById(notification.getEventID(), task ->{
                                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
                                     .setSmallIcon(android.R.drawable.ic_menu_info_details)
-                                    .setContentTitle(task.getResult().get("eventTitle", String.class))
+                                    .setContentTitle(task.getResult().getEventTitle())
                                     .setContentText(notification.getMessage());
+
 
                                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
                                 if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {

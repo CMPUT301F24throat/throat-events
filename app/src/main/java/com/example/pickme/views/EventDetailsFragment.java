@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
@@ -11,8 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.bumptech.glide.Glide;
 import com.example.pickme.databinding.EventDetailsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
@@ -57,6 +58,19 @@ public class EventDetailsFragment extends Fragment {
             // Handle the case where no event is passed
             Navigation.findNavController(requireView()).navigateUp();
         }
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+
+        // Set up navigation to QRCodeViewFragment
+        binding.goToQrView.setOnClickListener(v -> {
+            if (event != null) {
+                String eventID = event.getEventId();
+                Bundle args = new Bundle();
+                args.putString("eventID", eventID);
+                Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_QRCodeViewFragment, args);
+            } else {
+                Toast.makeText(getContext(), "Event ID not available", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Displays the event information in the UI
@@ -99,18 +113,18 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 }
-/**
- * Code Sources
- *
- * ChatGPT:
- * - How to navigate fragments and handle back navigation in Android.
- *
- * Stack Overflow:
- * - Using Glide to load images into ImageView in a Fragment
- * - Passing data between fragments using Android Architecture Components
- *
- * Android Developer Documentation:
- * - Fragment Lifecycle - Guidelines for managing fragment lifecycle.
- * - Navigating with Fragments - Handling fragment navigation.
- * - Using Glide for Image Loading - Documentation on image loading with Glide.
+/*
+  Code Sources
+  <p>
+  ChatGPT:
+  - How to navigate fragments and handle back navigation in Android.
+  <p>
+  Stack Overflow:
+  - Using Glide to load images into ImageView in a Fragment
+  - Passing data between fragments using Android Architecture Components
+  <p>
+  Android Developer Documentation:
+  - Fragment Lifecycle - Guidelines for managing fragment lifecycle.
+  - Navigating with Fragments - Handling fragment navigation.
+  - Using Glide for Image Loading - Documentation on image loading with Glide.
  */

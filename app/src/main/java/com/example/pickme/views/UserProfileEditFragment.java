@@ -215,17 +215,17 @@ public class UserProfileEditFragment extends Fragment {
     }
 }
 
- /**
-  * Coding Sources
-  * <p>
-  * ChatGBT
-  * - "How do I set up a Firebase Firestore database collection?"
-  * - "How do I properly setup a Map / Hashmap?"
-  * <p>
-  * Stack Overflow
-  * - "What is the difference between the HashMap and Map objects in Java?"
-  * - "Persistent Data Storage in Android Development"
-  * <p>
-  * Android Developers
-  * - "Data and file storage overview"
-  **/
+ /*
+   Coding Sources
+   <p>
+   ChatGBT
+   - "How do I set up a Firebase Firestore database collection?"
+   - "How do I properly setup a Map / Hashmap?"
+   <p>
+   Stack Overflow
+   - "What is the difference between the HashMap and Map objects in Java?"
+   - "Persistent Data Storage in Android Development"
+   <p>
+   Android Developers
+   - "Data and file storage overview"
+  */
