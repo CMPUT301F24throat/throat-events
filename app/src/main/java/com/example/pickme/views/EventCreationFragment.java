@@ -130,6 +130,7 @@ public class EventCreationFragment extends Fragment {
         binding.address.setText(event.getEventLocation());
         binding.winners.setText(event.getMaxWinners());
         binding.entrants.setText(event.getMaxEntrants().toString());
+        binding.geoLocation.setChecked(event.isGeoLocationRequired());
 
         // Download and set the event image
         Image image = new Image("1234567890", "123456789");
@@ -245,7 +246,7 @@ public class EventCreationFragment extends Fragment {
                             posterUrl,
                             binding.address.getText().toString(),
                             binding.winners.getText().toString(),
-                            true,
+                            binding.geoLocation.isChecked(),
                             Integer.parseInt(binding.entrants.getText().toString()),
                             System.currentTimeMillis(),
                             System.currentTimeMillis()
@@ -266,7 +267,7 @@ public class EventCreationFragment extends Fragment {
                             posterUrl,
                             binding.address.getText().toString(),
                             binding.winners.getText().toString(),
-                            true,
+                            binding.geoLocation.isChecked(),
                             Integer.parseInt(binding.entrants.getText().toString()),
                             event.getCreatedAt(),
                             System.currentTimeMillis()
