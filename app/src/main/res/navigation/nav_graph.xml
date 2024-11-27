@@ -108,7 +108,11 @@
         android:id="@+id/lotteryWinnersFragment"
         android:name="com.example.pickme.views.LotteryWinnersFragment"
         android:label="Lottery Winners"
-        tools:layout="@layout/lottery_winners" />
+        tools:layout="@layout/lottery_winners">
+        <action
+            android:id="@+id/action_lotteryWinnersFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
 
     <!-- Global actions -->
     <action
