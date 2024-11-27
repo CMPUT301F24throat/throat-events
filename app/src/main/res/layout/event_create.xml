@@ -57,8 +57,7 @@
             app:iconTintMode="add"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/back"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/title"
