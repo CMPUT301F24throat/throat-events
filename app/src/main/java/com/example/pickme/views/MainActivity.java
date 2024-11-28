@@ -15,6 +15,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.qrCleanup;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -144,6 +145,8 @@ public class MainActivity extends AppCompatActivity {
     // Hide the loading screen with a delay
     private void hideLoadingScreen() {
         if (loadingScreen != null) {
+            // Clean up invalid QR codes
+            qrCleanup.cleanUpQRCodes();
             // Delay for 2 seconds before hiding the loading screen
             new Handler().postDelayed(() -> loadingScreen.setVisibility(View.GONE), 2000);
         }
