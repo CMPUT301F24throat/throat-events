@@ -64,7 +64,7 @@ public class Event implements Serializable {
      */
     public Event(String eventId, String organizerId, String facilityId, String eventTitle,
                  String eventDescription, String eventDate, String posterImageId,
-                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList, boolean hasLotteryExecuted) {
+                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.facilityId = facilityId;
@@ -77,7 +77,7 @@ public class Event implements Serializable {
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
         this.waitingList = waitingList;
-        this.hasLotteryExecuted = hasLotteryExecuted;
+        this.hasLotteryExecuted = false;
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
     }
