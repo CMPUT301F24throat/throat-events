@@ -104,6 +104,9 @@
         <action
             android:id="@+id/action_myEventsFragment_to_facilityCreationFragment"
             app:destination="@id/facilityCreationFragment" />
+        <action
+            android:id="@+id/action_myEventsFragment_to_organizerEventDetailsFragment"
+            app:destination="@id/organizerEventDetailsFragment" />
     </fragment>
 
     <fragment
@@ -166,4 +169,16 @@
     <action
         android:id="@+id/action_global_facilityCreationFragment"
         app:destination="@id/facilityCreationFragment" />
+    <fragment
+        android:id="@+id/organizerEventDetailsFragment"
+        android:name="com.example.pickme.views.OrganizerEventDetailsFragment"
+        android:label="event_organizer_event_details"
+        tools:layout="@layout/event_organizer_event_details" >
+        <action
+            android:id="@+id/action_organizerEventDetailsFragment_to_eventCreationFragment"
+            app:destination="@id/eventCreationFragment" />
+        <action
+            android:id="@+id/action_organizerEventDetailsFragment_to_createNotif"
+            app:destination="@id/createNotif" />
+    </fragment>
 </navigation>

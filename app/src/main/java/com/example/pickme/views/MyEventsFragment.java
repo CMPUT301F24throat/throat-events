@@ -118,6 +118,6 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", event);
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-        navController.navigate(R.id.action_myEventsFragment_to_eventDetailsFragment, bundle);
+        navController.navigate(R.id.action_myEventsFragment_to_organizerEventDetailsFragment, bundle);
     }
 }

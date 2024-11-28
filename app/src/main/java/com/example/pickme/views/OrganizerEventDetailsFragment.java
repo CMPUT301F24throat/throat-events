@@ -1,66 +1,112 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.example.pickme.databinding.EventOrganizerEventDetailsBinding;
+import com.example.pickme.models.Event;
+import com.example.pickme.models.Image;
+import com.example.pickme.models.User;
+import com.example.pickme.utils.ImageQuery;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link OrganizerEventDetailsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class OrganizerEventDetailsFragment extends Fragment {
+    private EventOrganizerEventDetailsBinding binding;
+    private Event event;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public OrganizerEventDetailsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment OrganizerEventDetailsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static OrganizerEventDetailsFragment newInstance(String param1, String param2) {
-        OrganizerEventDetailsFragment fragment = new OrganizerEventDetailsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    // Inflates the layout for the event details fragment
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = EventOrganizerEventDetailsBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
+    }
+
+    // Sets up the UI and initializes the event data
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            event = (Event) getArguments().getSerializable("selectedEvent");
+            displayEventDetails();
+        } else {
+            // Handle the case where no event is passed
+            Navigation.findNavController(requireView()).navigateUp();
         }
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+
+        // Set up navigation to QRCodeViewFragment
+        binding.goToQrView.setOnClickListener(v -> {
+            if (event != null) {
+                String eventID = event.getEventId();
+                Bundle args = new Bundle();
+                args.putString("eventID", eventID);
+                Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_QRCodeViewFragment, args);
+            } else {
+                Toast.makeText(getContext(), "Event ID not available", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        binding.edit.setOnClickListener(v -> {
+            if (event != null) {
+                Bundle args = new Bundle();
+                args.putSerializable("selectedEvent", event);
+                Navigation.findNavController(requireView()).navigate(R.id.action_organizerEventDetailsFragment_to_eventCreationFragment, args);
+            } else {
+                Toast.makeText(getContext(), "Event ID not available", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.event_organizer_event_details, container, false);
+    // Displays the event information in the UI
+    private void displayEventDetails() {
+        if (event != null) {
+            User user = new User();
+            if (user.isAdmin()) {
+                binding.scanQr.setVisibility(View.GONE);
+            }
+
+            binding.title.setText(event.getEventTitle());
+            binding.description.setText(event.getEventDescription());
+            binding.date.setText(event.getEventDate());
+            binding.address.setText(event.getEventLocation());
+            binding.winners.setText(event.getMaxWinners() + (Integer.parseInt(event.getMaxWinners()) == 1 ? " Winner" : " Winners"));
+            binding.entrants.setText(event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
+
+            Image image = new Image(event.getOrganizerId(), event.getEventId());
+            image.download(new ImageQuery() {
+                @Override
+                public void onSuccess(Image image) {
+                    if (isAdded()) {
+                        Glide.with(binding.getRoot())
+                                .load(image.getImageUrl())
+                                .into(binding.eventFlyer);
+                    }
+                }
+
+                @Override
+                public void onEmpty() {}
+            });
+
+            ImageButton createNotif = binding.createNotif;
+
+            createNotif.setOnClickListener(l -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("EventID", event.getEventId());
+                Navigation.findNavController(getView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+            });
+        }
     }
 }

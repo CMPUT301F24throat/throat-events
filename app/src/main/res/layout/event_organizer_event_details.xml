@@ -244,4 +244,17 @@
         app:layout_constraintEnd_toStartOf="@+id/endGuide"
         app:layout_constraintTop_toTopOf="@+id/textView3" />
 
+    <TextView
+        android:id="@+id/addImage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_button_bg_main"
+        android:gravity="center"
+        android:text="Start Lottery"
+        android:paddingVertical="10dp"
+        android:textColor="@color/text1"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintBottom_toTopOf="@id/bottomGuide"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
