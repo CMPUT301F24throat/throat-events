@@ -13,10 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
 import com.example.pickme.models.Enums.EntrantStatus;
-import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.utils.WaitingListUtils;
-
-import java.util.List;
 
 public class LotteryOverviewFragment extends Fragment {
 
@@ -66,16 +63,16 @@ public class LotteryOverviewFragment extends Fragment {
     }
 
     private void filterRecyclerView(EntrantStatus status) {
-        String eventId = "your_event_id"; // Replace with actual event ID
-        waitingListUtils.getEntrantsByStatus(eventId, status, task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                List<WaitingListEntrant> filteredEntrants = task.getResult();
-                // Update your RecyclerView adapter with the filtered list
-                // recyclerView.setAdapter(new YourAdapter(filteredEntrants));
-            } else {
-                // Handle the error
-            }
-        });
+//        String eventId = "your_event_id"; // Replace with actual event ID
+//            waitingListUtils.getEntrantsByStatus(eventId, status, task -> {
+//            if (task.isSuccessful() && task.getResult() != null) {
+//                List<WaitingListEntrant> filteredEntrants = task.getResult();
+//                // Update your RecyclerView adapter with the filtered list
+//                // recyclerView.setAdapter(new YourAdapter(filteredEntrants));
+//            } else {
+//                // Handle the error
+//            }
+//        });
     }
 
     private void updateLotteryStatsText() {

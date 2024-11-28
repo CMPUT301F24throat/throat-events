@@ -14,7 +14,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.Navigation;
 
 import com.example.pickme.R;
-import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
@@ -57,24 +56,24 @@ public class LotteryRunDialog extends DialogFragment {
         Button cancelButton = view.findViewById(R.id.cancel_button);
 
         // Fetch the waiting list entrants and set the description text
-        waitingListUtils.getWaitingEntrants(eventId, task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                int y = task.getResult().size();
-                eventRepository.getEventById(eventId, eventTask -> {
-                    if (eventTask.isSuccessful() && eventTask.getResult() != null) {
-                        Event event = eventTask.getResult();
-                        lotteryUtils.getNumToDraw(event, eventId, task1 -> {
-                            if (task1.isSuccessful() && task1.getResult() != null) {
-                                int x = task1.getResult();
-                                description.setText("We will draw " + x + " winners from your waitlist of " + y + " entrants.\nProceed?");
-                                title.setText("Event Lottery");
-                                dialog.show();  // Only show dialog once all fields are set!!!!
-                            }
-                        });
-                    }
-                });
-            }
-        });
+//        waitingListUtils.getWaitingEntrants(eventId, task -> {
+//            if (task.isSuccessful() && task.getResult() != null) {
+//                int y = task.getResult().size();
+//                eventRepository.getEventById(eventId, eventTask -> {
+//                    if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+//                        Event event = eventTask.getResult();
+//                        lotteryUtils.getNumToDraw(event, eventId, task1 -> {
+//                            if (task1.isSuccessful() && task1.getResult() != null) {
+//                                int x = task1.getResult();
+//                                description.setText("We will draw " + x + " winners from your waitlist of " + y + " entrants.\nProceed?");
+//                                title.setText("Event Lottery");
+//                                dialog.show();  // Only show dialog once all fields are set!!!!
+//                            }
+//                        });
+//                    }
+//                });
+//            }
+//        });
 
         // Set the start button click listener to run the lottery
         startButton.setOnClickListener(v -> {

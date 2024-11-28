@@ -217,8 +217,5 @@
         android:layout_width="52dp"
         android:layout_height="50dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/qr_code_2_24px"
-        app:layout_constraintBottom_toBottomOf="@+id/textView3"
-        app:layout_constraintEnd_toStartOf="@+id/endGuide"
-        app:layout_constraintTop_toTopOf="@+id/textView3" />
+        android:src="@drawable/qr_code_2_24px"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
