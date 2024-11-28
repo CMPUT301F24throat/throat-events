@@ -121,7 +121,7 @@ public class LotteryUtils {
                         List<WaitingListEntrant> selectedEntrants = selectedEntrantsTask.getResult();
                         numPotentialWinners.addAndGet(selectedEntrants.size());
 
-                        int targetNumWinners = Integer.parseInt(event.getMaxWinners());
+                        int targetNumWinners = event.getMaxWinners();
 
                         // Get the number of entrants to draw using helper method
                         waitingListUtils.getWaitingEntrants(eventId, waitingEntrantsTask -> {

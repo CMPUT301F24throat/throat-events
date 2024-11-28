@@ -85,7 +85,7 @@ public class EventDetailsFragment extends Fragment {
             binding.description.setText(event.getEventDescription());
             binding.date.setText(event.getEventDate());
             binding.address.setText(event.getEventLocation());
-            binding.winners.setText(event.getMaxWinners() + (Integer.parseInt(event.getMaxWinners()) == 1 ? " Winner" : " Winners"));
+            binding.winners.setText(event.getMaxWinners() + (event.getMaxWinners()) == 1 ? " Winner" : " Winners");
             binding.entrants.setText(event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
 
             Image image = new Image("1234567890", "123456789");

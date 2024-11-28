@@ -65,7 +65,7 @@ public class EventSignUpFragment extends Fragment {
             binding.description.setText(event.getEventDescription());
             binding.date.setText(event.getEventDate());
             binding.address.setText(event.getEventLocation());
-            binding.winners.setText(event.getMaxWinners() + (Integer.parseInt(event.getMaxWinners()) == 1 ? " Winner" : " Winners"));
+            binding.winners.setText(event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners"));
 
             waitingListUtils.getWaitingEntrants(event.getEventId(), task -> {
                 if (task.isSuccessful()) {

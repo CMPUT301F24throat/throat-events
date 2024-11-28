@@ -2,15 +2,11 @@ package com.example.pickme.utils;
 
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
-import com.example.pickme.models.WaitingList;
 import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -24,35 +20,21 @@ public class WaitingListUtils {
     private final CollectionReference eventsRef = db.collection("events");
 
     /**
-     * Retrieves an event along with its waiting list.
+     * Retrieves an event's waiting list and creates a WaitingList object.
      *
      * @param eventId The ID of the event.
      * @param onCompleteListener The listener to handle the completion of the task.
      */
-    public void getEventWithWaitingList(String eventId, OnCompleteListener<WaitingList> onCompleteListener) {
+    public void getEventWaitingList(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
         DocumentReference eventRef = eventsRef.document(eventId);
-        CollectionReference waitingListRef = eventRef.collection("waitingList");
 
         eventRef.get().addOnCompleteListener(eventTask -> {
             if (eventTask.isSuccessful() && eventTask.getResult() != null) {
                 Event event = eventTask.getResult().toObject(Event.class);
 
                 if (event != null) {
-                    waitingListRef.get().addOnCompleteListener(waitingListTask -> {
-                        if (waitingListTask.isSuccessful() && waitingListTask.getResult() != null) {
-                            int numEntrants = waitingListTask.getResult().size() - 1; // Exclude the placeholder document
-
-                            WaitingList waitingList = new WaitingList();
-                            waitingList.setEventId(event.getEventId());
-                            waitingList.setMaxEntrants(event.getMaxEntrants());
-                            waitingList.setMaxWinners(Integer.parseInt(event.getMaxWinners()));
-                            waitingList.setNumEntrants(numEntrants);
-
-                            onCompleteListener.onComplete(Tasks.forResult(waitingList));
-                        } else {
-                            onCompleteListener.onComplete(Tasks.forException(waitingListTask.getException()));
-                        }
-                    });
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    onCompleteListener.onComplete(Tasks.forResult(waitingList));
                 } else {
                     onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
                 }
@@ -70,42 +52,26 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void getWaitingListEntrantByEntrantId(String eventId, String entrantId, OnCompleteListener<WaitingListEntrant> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereEqualTo("entrantId", entrantId)
-                .get()
-                .addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                WaitingListEntrant entrant = task.getResult().toObjects(WaitingListEntrant.class).get(0);
-                onCompleteListener.onComplete(Tasks.forResult(entrant));
+        DocumentReference eventRef = eventsRef.document(eventId);
+
+        eventRef.get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    for (WaitingListEntrant entrant : event.getWaitingList()) {
+                        if (entrant.getEntrantId().equals(entrantId)) {
+                            onCompleteListener.onComplete(Tasks.forResult(entrant));
+                            return;
+                        }
+                    }
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
             }
         });
-    }
-
-    /**
-     * Retrieves all entrants from the waiting list.
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getAllEntrantsFromWaitingList(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        List<WaitingListEntrant> entrants = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                            WaitingListEntrant entrant = document.toObject(WaitingListEntrant.class);
-                            if (entrant != null) {
-                                entrants.add(entrant);
-                            }
-                        }
-                        onCompleteListener.onComplete(Tasks.forResult(entrants));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
-                    }
-                });
     }
 
     /**
@@ -116,25 +82,21 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void addEntrantToWaitingList(String eventId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        CollectionReference waitingListRef = eventsRef.document(eventId).collection("waitingList");
+        DocumentReference eventRef = eventsRef.document(eventId);
 
-        waitingListRef.whereEqualTo("entrantId", waitingListEntrant.getEntrantId()).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-
-                // Entrant already exists, update the status to WAITING (they rejoin)
-                DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                DocumentReference entrantRef = waitingListRef.document(document.getId());
-                entrantRef.update("entrantStatus", EntrantStatus.WAITING).addOnCompleteListener(onCompleteListener)
-                        .addOnFailureListener(e -> System.err.println("Status update failed: " + e.getMessage()));
-            } else if (task.isSuccessful() && (task.getResult() == null || task.getResult().isEmpty())) {
-
-                // Entrant does not exist, add new document
-                DocumentReference newEntrantRef = waitingListRef.document();
-                waitingListEntrant.setWaitListEntrantId(newEntrantRef.getId());
-                newEntrantRef.set(waitingListEntrant).addOnCompleteListener(onCompleteListener)
-                        .addOnFailureListener(e -> System.err.println("Addition failed: " + e.getMessage()));
+        eventRef.get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    waitingList.add(waitingListEntrant);
+                    event.setWaitingList(new ArrayList<>(waitingList));
+                    eventRef.set(event).addOnCompleteListener(onCompleteListener);
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
             }
         });
     }
@@ -148,20 +110,29 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void editEntrantInWaitingList(String eventId, String entrantId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereEqualTo("entrantId", entrantId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(document.getId());
-                        entrantRef.set(waitingListEntrant)
-                                .addOnCompleteListener(onCompleteListener)
-                                .addOnFailureListener(e -> System.err.println("Update failed: " + e.getMessage()));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
+        DocumentReference eventRef = eventsRef.document(eventId);
+
+        eventRef.get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    for (int i = 0; i < waitingList.size(); i++) {
+                        if (waitingList.get(i).getEntrantId().equals(entrantId)) {
+                            waitingList.set(i, waitingListEntrant);
+                            event.setWaitingList(new ArrayList<>(waitingList));
+                            eventRef.set(event).addOnCompleteListener(onCompleteListener);
+                            return;
+                        }
                     }
-                });
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+            }
+        });
     }
 
     /**
@@ -172,20 +143,23 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void deleteEntrantFromWaitingList(String eventId, String entrantId, OnCompleteListener<Void> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereEqualTo("entrantId", entrantId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(document.getId());
-                        entrantRef.delete()
-                                .addOnCompleteListener(onCompleteListener)
-                                .addOnFailureListener(e -> System.err.println("Deletion failed: " + e.getMessage()));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
-                    }
-                });
+        DocumentReference eventRef = eventsRef.document(eventId);
+
+        eventRef.get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    waitingList.removeIf(entrant -> entrant.getEntrantId().equals(entrantId));
+                    event.setWaitingList(new ArrayList<>(waitingList));
+                    eventRef.set(event).addOnCompleteListener(onCompleteListener);
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+            }
+        });
     }
 
     /**
@@ -196,22 +170,32 @@ public class WaitingListUtils {
      * @param newStatus The new status to be set for the entrant.
      */
     public void updateEntrantStatus(String eventId, String userId, EntrantStatus newStatus) {
-        CollectionReference waitingListRef = eventsRef.document(eventId).collection("waitingList");
+        DocumentReference eventRef = eventsRef.document(eventId);
 
-        waitingListRef.whereEqualTo("entrantId", userId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                DocumentReference entrantRef = waitingListRef.document(document.getId());
-
-                entrantRef.update("entrantStatus", newStatus).addOnCompleteListener(updateTask -> {
-                    if (updateTask.isSuccessful()) {
-                        System.out.println("Entrant status updated successfully.");
-                    } else {
-                        System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+        eventRef.get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    for (WaitingListEntrant entrant : waitingList) {
+                        if (entrant.getEntrantId().equals(userId)) {
+                            entrant.setStatus(newStatus);
+                            break;
+                        }
                     }
-                });
+                    event.setWaitingList(new ArrayList<>(waitingList));
+                    eventRef.set(event).addOnCompleteListener(updateTask -> {
+                        if (updateTask.isSuccessful()) {
+                            System.out.println("Entrant status updated successfully.");
+                        } else {
+                            System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+                        }
+                    });
+                } else {
+                    System.err.println("Event not found.");
+                }
             } else {
-                System.err.println("User is not an entrant in the waiting list.");
+                System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
             }
         });
     }
@@ -224,23 +208,26 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void getEntrantsByStatus(String eventId, EntrantStatus status, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
-                .whereEqualTo("entrantStatus", status)
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        List<WaitingListEntrant> entrants = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                            WaitingListEntrant entrant = document.toObject(WaitingListEntrant.class);
-                            if (entrant != null) {
-                                entrants.add(entrant);
-                            }
+        DocumentReference eventRef = eventsRef.document(eventId);
+
+        eventRef.get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> entrants = new ArrayList<>();
+                    for (WaitingListEntrant entrant : event.getWaitingList()) {
+                        if (entrant.getStatus() == status) {
+                            entrants.add(entrant);
                         }
-                        onCompleteListener.onComplete(Tasks.forResult(entrants));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
                     }
-                });
+                    onCompleteListener.onComplete(Tasks.forResult(entrants));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+            }
+        });
     }
 
     /**
@@ -251,17 +238,13 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void getEntrantNumbersByStatus(String eventId, EntrantStatus status, OnCompleteListener<Integer> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
-                .whereEqualTo("entrantStatus", status)
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        int count = task.getResult().size();
-                        onCompleteListener.onComplete(Tasks.forResult(count));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
-                    }
-                });
+        getEntrantsByStatus(eventId, status, task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                onCompleteListener.onComplete(Tasks.forResult(task.getResult().size()));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
     }
 
     /**
@@ -329,15 +312,30 @@ public class WaitingListUtils {
         getSelectedEntrants(eventId, selectedEntrantsTask -> {
             if (selectedEntrantsTask.isSuccessful() && selectedEntrantsTask.getResult() != null) {
                 List<WaitingListEntrant> pendingEntrants = selectedEntrantsTask.getResult();
-                List<Task<Void>> updateTasks = new ArrayList<>();
+                DocumentReference eventRef = eventsRef.document(eventId);
 
-                for (WaitingListEntrant entrant : pendingEntrants) {
-                    DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrant.getWaitListEntrantId());
-                    Task<Void> updateTask = entrantRef.update("entrantStatus", EntrantStatus.CANCELLED);  // Update the entrant's status to CANCELLED
-                    updateTasks.add(updateTask);
-                }
-
-                Tasks.whenAll(updateTasks).addOnCompleteListener(onCompleteListener);
+                eventRef.get().addOnCompleteListener(eventTask -> {
+                    if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                        Event event = eventTask.getResult().toObject(Event.class);
+                        if (event != null) {
+                            List<WaitingListEntrant> waitingList = event.getWaitingList();
+                            for (WaitingListEntrant entrant : pendingEntrants) {
+                                for (WaitingListEntrant wlEntrant : waitingList) {
+                                    if (wlEntrant.getEntrantId().equals(entrant.getEntrantId())) {
+                                        wlEntrant.setStatus(EntrantStatus.CANCELLED);
+                                        break;
+                                    }
+                                }
+                            }
+                            event.setWaitingList(new ArrayList<>(waitingList));
+                            eventRef.set(event).addOnCompleteListener(onCompleteListener);
+                        } else {
+                            onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                        }
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                    }
+                });
             } else {
                 onCompleteListener.onComplete(Tasks.forException(selectedEntrantsTask.getException()));
             }

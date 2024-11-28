@@ -36,6 +36,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * Fragment for creating or updating an event.
+ */
 public class EventCreationFragment extends Fragment {
     private String posterUrl;
     private Uri selectedImageUri;
@@ -117,6 +120,9 @@ public class EventCreationFragment extends Fragment {
         setCurrentDateTime();
     }
 
+    /**
+     * Sets the event data in the UI if an event is being edited.
+     */
     private void setEventData() {
         if (event == null) {
             return;
@@ -148,6 +154,9 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets the current date and time in the UI.
+     */
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
@@ -164,6 +173,10 @@ public class EventCreationFragment extends Fragment {
         endTimeEdit.setText(endTime);
     }
 
+    /**
+     * Validates the input fields to ensure all required fields are filled.
+     * @return true if all required fields are filled, false otherwise.
+     */
     private boolean validateInputs() {
         return !eventTitleEdit.getText().toString().isEmpty() &&
                 !eventDateEdit.getText().toString().isEmpty() &&
@@ -173,6 +186,9 @@ public class EventCreationFragment extends Fragment {
                 !maxWinnersEdit.getText().toString().isEmpty();
     }
 
+    /**
+     * Opens the gallery to select an image.
+     */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -190,6 +206,10 @@ public class EventCreationFragment extends Fragment {
             }
     );
 
+    /**
+     * Uploads the selected image to Firebase.
+     * @param imageUri the URI of the selected image.
+     */
     private void uploadImageToFirebase(Uri imageUri) {
         Image image = new Image("1234567890", "123456789");
         image.upload(imageUri, task -> {
@@ -200,6 +220,9 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    /**
+     * Creates or updates an event in Firestore.
+     */
     private void upsertEvent() {
         String eventTitle = eventTitleEdit.getText().toString();
         String eventDescription = descriptionEdit.getText().toString();
@@ -291,6 +314,10 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    /**
+     * Deletes the specified event.
+     * @param event the event to be deleted.
+     */
     private void deleteEvent(Event event) {
         EventRepository eventRepository = EventRepository.getInstance();
 
@@ -304,6 +331,9 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    /**
+     * Opens a date picker dialog to select a date.
+     */
     private void pickDate() {
         Calendar calendar = Calendar.getInstance();
 
@@ -319,6 +349,10 @@ public class EventCreationFragment extends Fragment {
         datePicker.show();
     }
 
+    /**
+     * Opens a time picker dialog to select a time.
+     * @param isStartTime true if selecting start time, false if selecting end time.
+     */
     private void pickTime(boolean isStartTime) {
         Calendar calendar = Calendar.getInstance();
         TimePickerDialog timePicker = new TimePickerDialog(requireActivity(), (timeView, hourOfDay, minute) -> {

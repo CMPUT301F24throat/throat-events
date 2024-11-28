@@ -67,6 +67,7 @@ public class EventRepository {
         db.runTransaction(transaction -> {
                     DocumentReference newEventRef = eventsRef.document();
                     event.setEventId(newEventRef.getId());
+                    event.setHasLotteryExecuted(false);
                     transaction.set(newEventRef, event);
 
                     return null;

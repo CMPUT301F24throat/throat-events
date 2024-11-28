@@ -35,6 +35,7 @@ public class Event implements Serializable {
     private boolean geoLocationRequired; // Indicates if geolocation is required
     private Integer maxEntrants;         // Maximum number of entrants
     private ArrayList<WaitingListEntrant> waitingList; // Event waiting list; a list of waiting list entrants
+    private boolean hasLotteryExecuted;  // Flag to indicate if the lottery has been executed
     private final Timestamp createdAt;              // Creation timestamp
     private Timestamp updatedAt;              // Last updated timestamp
 
@@ -63,7 +64,7 @@ public class Event implements Serializable {
      */
     public Event(String eventId, String organizerId, String facilityId, String eventTitle,
                  String eventDescription, String eventDate, String posterImageId,
-                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList) {
+                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList, boolean hasLotteryExecuted) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.facilityId = facilityId;
@@ -76,6 +77,7 @@ public class Event implements Serializable {
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
         this.waitingList = waitingList;
+        this.hasLotteryExecuted = hasLotteryExecuted;
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
     }
@@ -308,6 +310,44 @@ public class Event implements Serializable {
         }
 
         this.maxEntrants = maxEntrants;  // Assuming maxEntrants is an Integer
+    }
+
+    /**
+     * Gets the waiting list for the event.
+     *
+     * @return waitingList
+     */
+    public ArrayList<WaitingListEntrant> getWaitingList() {
+        return waitingList;
+    }
+
+    /**
+     * Sets the waiting list for the event.
+     *
+     * @param waitingList Event waiting list; a list of waiting list entrants
+     */
+    public void setWaitingList(ArrayList<WaitingListEntrant> waitingList) {
+        this.waitingList = waitingList;
+        this.updatedAt = Timestamp.now();
+    }
+
+    /**
+     * Sets if the lottery has been executed.
+     *
+     * @param hasLotteryExecuted Indicates if the lottery has been executed
+     */
+    public void setHasLotteryExecuted(boolean hasLotteryExecuted) {
+        this.hasLotteryExecuted = hasLotteryExecuted;
+        this.updatedAt = Timestamp.now();
+    }
+
+    /**
+     * Checks if the lottery has been executed.
+     *
+     * @return hasLotteryExecuted
+     */
+    public boolean hasLotteryExecuted() {
+        return hasLotteryExecuted;
     }
 
     /**
