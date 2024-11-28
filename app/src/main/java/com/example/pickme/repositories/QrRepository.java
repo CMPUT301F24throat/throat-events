@@ -48,6 +48,16 @@ public class QrRepository {
     }
 
     /**
+     * Retrieves all QR documents in Firestore.
+     *
+     * @return Task containing all QR documents.
+     */
+    public Task<QuerySnapshot> getAllQRs() {
+        return qrRef.get();
+    }
+
+
+    /**
      * Reads a QR document by its association.
      *
      * @param qrAssociation Associated entity reference for the QR document
