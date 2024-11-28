@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -45,6 +47,10 @@ import java.util.Random;
  * - Navigate to appropriate screens based on user actions.
  */
 public class EventCreationFragment extends Fragment {
+
+    private Button backBtn, deleteEventBtn, upsertEventBtn;
+    private EditText eventTitle, eventDescription, maxEntrants, maxWinners, eventLocation;
+
     private EventCreateBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
@@ -52,6 +58,7 @@ public class EventCreationFragment extends Fragment {
     private EventViewModel eventViewModel = new EventViewModel();
     private FacilityRepository facilityRepository = new FacilityRepository();
     private String organizerId;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -87,7 +94,7 @@ public class EventCreationFragment extends Fragment {
         binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
         binding.create.setOnClickListener(listener -> {
             if (validateInputs()) {
-                createOrUpdateEventInFirestore();
+                upsertEvent();
 //                if (selectedImageUri != null) {
 //                    // Upload the selected image to Firebase
 //                    uploadImageToFirebase(selectedImageUri);
@@ -210,7 +217,7 @@ public class EventCreationFragment extends Fragment {
         image.upload(imageUri, task -> {
             if (task.isSuccessful()) {
                 posterUrl = task.getResult().getImageUrl();
-                createOrUpdateEventInFirestore();
+                upsertEvent();
             }
         });
     }
@@ -218,7 +225,7 @@ public class EventCreationFragment extends Fragment {
     /**
      * Create or update the event in Firestore.
      */
-    private void createOrUpdateEventInFirestore() {
+    private void upsertEvent() {
         String eventTitle = binding.title.getText().toString();
         String eventDescription = binding.description.getText().toString();
         String promoQrCodeId = generateRandomQrCodeId(10);

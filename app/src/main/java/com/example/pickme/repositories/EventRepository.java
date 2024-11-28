@@ -1,8 +1,11 @@
 package com.example.pickme.repositories;
 
+import android.util.Log;
+
 import com.example.pickme.models.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,8 +28,24 @@ public class EventRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference eventsRef = db.collection("events");
 
+    static EventRepository instance;
+
+    public static EventRepository getInstance() {
+        if (instance == null)
+            instance = new EventRepository();
+
+        return instance;
+    }
+
+    public EventRepository() {
+        // temp anonymous auth
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.signInAnonymously().addOnSuccessListener(authResult -> Log.d("AUTH", "AUTH: Successful authentication"));
+    }
+
     /**
      * Creates a new event in the Firestore database.
+     * @see Event
      *
      * @param event The event to be added.
      * @param onCompleteListener The listener to notify upon completion.
@@ -36,15 +55,9 @@ public class EventRepository {
                     DocumentReference newEventRef = eventsRef.document();
                     event.setEventId(newEventRef.getId());
                     transaction.set(newEventRef, event);
-
-                    // Create an empty waitingList subcollection
-                    CollectionReference waitingListRef = newEventRef.collection("waitingList");
-                    //transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
-
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
-                    // Handle the error
                     System.err.println("Transaction failed: " + e.getMessage());
                 });
     }
