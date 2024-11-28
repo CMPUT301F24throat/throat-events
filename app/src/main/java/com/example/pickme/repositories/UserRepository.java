@@ -36,9 +36,7 @@ public class UserRepository {
         this.auth = FirebaseAuth.getInstance();
 
         // Initializes usersRef after proper assignment.
-        if (db != null) {
-            this.usersRef = db.collection("users");
-        }
+        this.usersRef = db.collection("users");
     }
 
     /**

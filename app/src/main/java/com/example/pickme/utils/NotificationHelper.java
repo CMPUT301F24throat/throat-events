@@ -41,7 +41,7 @@ public class NotificationHelper {
 
         for(String userID : notification.getSendTo()){
 
-            userRepository.getUserByDeviceId(userID, documentSnapshotTask -> {
+            userRepository.getUserDocumentByDeviceId(userID, documentSnapshotTask -> {
                 if(!documentSnapshotTask.isSuccessful() || documentSnapshotTask.getResult() == null){
                     Log.i("NOTIF", "Failed to find user to send notif; userID: " + userID);
                     return;

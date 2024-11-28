@@ -3,6 +3,7 @@ package com.example.pickme.repositories;
 import com.example.pickme.models.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -22,8 +23,39 @@ import java.util.List;
  * @version 2.0
  */
 public class EventRepository {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference eventsRef = db.collection("events");
+    private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
+    private CollectionReference eventsRef;
+
+    static EventRepository instance;
+    public static EventRepository getInstance(){
+        if(instance == null)
+            instance = new EventRepository();
+
+        return instance;
+    }
+
+    /**
+     * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
+     */
+    public EventRepository() {
+        this.db = FirebaseFirestore.getInstance();
+        this.auth = FirebaseAuth.getInstance();
+        this.eventsRef = db.collection("events");
+    }
+
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param db Firebase Firestore instance
+     * @param auth Firebase Auth instance
+     * @param eventsRef Collection reference for events
+     */
+    public EventRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference eventsRef) {
+        this.db = db;
+        this.auth = auth;
+        this.eventsRef = eventsRef;
+    }
 
     /**
      * Creates a new event in the Firestore database.
@@ -36,10 +68,6 @@ public class EventRepository {
                     DocumentReference newEventRef = eventsRef.document();
                     event.setEventId(newEventRef.getId());
                     transaction.set(newEventRef, event);
-
-                    // Create an empty waitingList subcollection
-                    CollectionReference waitingListRef = newEventRef.collection("waitingList");
-                    //transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
 
                     return null;
                 }).addOnCompleteListener(onCompleteListener)

@@ -1,8 +1,13 @@
 package com.example.pickme.models;
 
+import androidx.annotation.NonNull;
+
+import com.google.firebase.Timestamp;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -11,13 +16,11 @@ import java.util.Objects;
  * location, geolocation requirements, QR codes, and timestamps.
  *
  * @version 2.0
- * @author Ayub Ali
  * Responsibilities:
  * - Define the properties and structure for event-related data.
  * - Validate key fields such as max entrants and event date format.
  * - Manage event identity and equality for list operations and comparisons.
  */
-
 public class Event implements Serializable {
 
     private String eventId;              // Unique event ID
@@ -26,100 +29,176 @@ public class Event implements Serializable {
     private String eventTitle;           // Title of the event
     private String eventDescription;     // Description of the event
     private String eventDate;            // Date and time of the event (as a String)
-    private String promoQrCodeId;        // Promo QR code ID
-    private String waitingListQrCodeId;  // Waiting list QR code ID
     private String posterImageId;        // URL of the poster image
     private String eventLocation;        // Location of the event
-    private String maxWinners;           // Max number of winners
+    private Integer maxWinners;           // Max number of winners
     private boolean geoLocationRequired; // Indicates if geolocation is required
     private Integer maxEntrants;         // Maximum number of entrants
-    private long createdAt;              // Creation timestamp
-    private long updatedAt;              // Last updated timestamp
+    private ArrayList<WaitingListEntrant> waitingList; // Event waiting list; a list of waiting list entrants
+    private final Timestamp createdAt;              // Creation timestamp
+    private Timestamp updatedAt;              // Last updated timestamp
 
-    // Default constructor (required for Firestore)
+    /**
+     * Default constructor (required for Firestore)
+     */
     public Event() {
+        this.createdAt = Timestamp.now();
     }
 
-    // Constructor with parameters
+    /**
+     * Constructor with parameters
+     *
+     * @param eventId Unique event ID
+     * @param organizerId Organizer's user ID
+     * @param facilityId Facility ID
+     * @param eventTitle Title of the event
+     * @param eventDescription Description of the event
+     * @param eventDate Date and time of the event (as a String)
+     * @param posterImageId URL of the poster image
+     * @param eventLocation Location of the event
+     * @param maxWinners Max number of winners
+     * @param geoLocationRequired Indicates if geolocation is required
+     * @param maxEntrants Maximum number of entrants
+     * @param waitingList Event waiting list; a list of waiting list entrants
+     */
     public Event(String eventId, String organizerId, String facilityId, String eventTitle,
-                 String eventDescription, String eventDate, String promoQrCodeId,
-                 String waitingListQrCodeId, String posterImageId, String eventLocation,
-                 String maxWinners, boolean geoLocationRequired, Integer maxEntrants,
-                 long createdAt, long updatedAt) {
+                 String eventDescription, String eventDate, String posterImageId,
+                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.facilityId = facilityId;
         this.eventTitle = eventTitle;
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
-        this.promoQrCodeId = promoQrCodeId;
-        this.waitingListQrCodeId = waitingListQrCodeId;
         this.posterImageId = posterImageId;
         this.eventLocation = eventLocation;
         this.maxWinners = maxWinners;
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.waitingList = waitingList;
+        this.createdAt = Timestamp.now();
+        this.updatedAt = Timestamp.now();
     }
 
     // Getters and Setters
-    public String getEventId() {return eventId;}
 
+    /**
+     * Gets the unique event ID.
+     *
+     * @return eventId
+     */
+    public String getEventId() {
+        return eventId;
+    }
+
+    /**
+     * Sets the unique event ID.
+     *
+     * @param eventId Unique event ID
+     */
     public void setEventId(String eventId) {
         this.eventId = eventId;
+        this.updatedAt = Timestamp.now();
     }
 
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
+    /**
+     * Gets the organizer's user ID.
+     *
+     * @return organizerId
+     */
     public String getOrganizerId() {
         return organizerId;
     }
 
+    /**
+     * Sets the organizer's user ID.
+     *
+     * @param organizerId Organizer's user ID
+     */
     public void setOrganizerId(String organizerId) {
         this.organizerId = organizerId;
+        this.updatedAt = Timestamp.now();
     }
 
+    /**
+     * Gets the facility ID.
+     *
+     * @return facilityId
+     */
     public String getFacilityId() {
         return facilityId;
     }
 
+    /**
+     * Sets the facility ID.
+     *
+     * @param facilityId Facility ID
+     */
     public void setFacilityId(String facilityId) {
         this.facilityId = facilityId;
+        this.updatedAt = Timestamp.now();
     }
 
+    /**
+     * Gets the title of the event.
+     *
+     * @return eventTitle
+     */
     public String getEventTitle() {
         return eventTitle;
     }
 
+    /**
+     * Sets the title of the event.
+     *
+     * @param eventTitle Title of the event
+     */
     public void setEventTitle(String eventTitle) {
         this.eventTitle = eventTitle;
+        this.updatedAt = Timestamp.now();
     }
 
+    /**
+     * Gets the description of the event.
+     *
+     * @return eventDescription
+     */
     public String getEventDescription() {
         return eventDescription;
     }
 
+    /**
+     * Sets the description of the event.
+     *
+     * @param eventDescription Description of the event
+     */
     public void setEventDescription(String eventDescription) {
         this.eventDescription = eventDescription;
+        this.updatedAt = Timestamp.now();
     }
 
+    /**
+     * Gets the date and time of the event.
+     *
+     * @return eventDate
+     */
     public String getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(String eventDate) {
-        if (eventDate == null) {
-            throw new IllegalArgumentException("Event date cannot be null.");
-        }
-
+    /**
+     * Sets the date and time of the event.
+     *
+     * @param eventDate Date and time of the event (as a String)
+     * @throws IllegalArgumentException if the date format is invalid
+     */
+    public void setEventDate(@NonNull String eventDate) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a");
         dateFormat.setLenient(false); // Make strict parsing
 
         try {
             dateFormat.parse(eventDate); // Attempt to parse the date
+            this.updatedAt = Timestamp.now();
         } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid date format. Please use 'MMMM d yyyy, h:mm a'.");
         }
@@ -127,67 +206,103 @@ public class Event implements Serializable {
         this.eventDate = eventDate; // Assuming eventDate is a String type
     }
 
-    public String getPromoQrCodeId() {
-        return promoQrCodeId;
-    }
-
-    public void setPromoQrCodeId(String promoQrCodeId) {
-        this.promoQrCodeId = promoQrCodeId;
-    }
-
-    public String getWaitingListQrCodeId() {
-        return waitingListQrCodeId;
-    }
-
-    public void setWaitingListQrCodeId(String waitingListQrCodeId) {
-        this.waitingListQrCodeId = waitingListQrCodeId;
-    }
-
+    /**
+     * Gets the URL of the poster image.
+     *
+     * @return posterImageId
+     */
     public String getPosterImageId() {
         return posterImageId;
     }
 
+    /**
+     * Sets the URL of the poster image.
+     *
+     * @param posterImageId URL of the poster image
+     */
     public void setPosterImageId(String posterImageId) {
         this.posterImageId = posterImageId;
+        this.updatedAt = Timestamp.now();
     }
 
+    /**
+     * Gets the location of the event.
+     *
+     * @return eventLocation
+     */
     public String getEventLocation() {
         return eventLocation;
     }
 
+    /**
+     * Sets the location of the event.
+     *
+     * @param eventLocation Location of the event
+     */
     public void setEventLocation(String eventLocation) {
         this.eventLocation = eventLocation;
+        this.updatedAt = Timestamp.now();
     }
 
-    public String getMaxWinners() {
+    /**
+     * Gets the max number of winners.
+     *
+     * @return maxWinners
+     */
+    public Integer getMaxWinners() {
         return maxWinners;
     }
 
-    public void setMaxWinners(String maxWinners) {
-        if (maxWinners == null || !maxWinners.matches("\\d+")) {  // Check if not numeric
+    /**
+     * Sets the max number of winners.
+     *
+     * @param maxWinners Max number of winners
+     * @throws IllegalArgumentException if maxWinners is not a non-negative numeric value
+     */
+    public void setMaxWinners(@NonNull Integer maxWinners) {
+        if (maxWinners < 0) {  // Check if not numeric
             throw new IllegalArgumentException("Max winners must be a non-negative numeric value.");
         }
 
         this.maxWinners = maxWinners;  // Assuming maxWinners is a String type
+        this.updatedAt = Timestamp.now();
     }
 
-
+    /**
+     * Checks if geolocation is required.
+     *
+     * @return geoLocationRequired
+     */
     public boolean isGeoLocationRequired() {
         return geoLocationRequired;
     }
 
+    /**
+     * Sets if geolocation is required.
+     *
+     * @param geoLocationRequired Indicates if geolocation is required
+     */
     public void setGeoLocationRequired(boolean geoLocationRequired) {
         this.geoLocationRequired = geoLocationRequired;
+        this.updatedAt = Timestamp.now();
     }
 
+    /**
+     * Gets the maximum number of entrants.
+     *
+     * @return maxEntrants
+     */
     public Integer getMaxEntrants() {
         return maxEntrants;
     }
 
-    public void setMaxEntrants(Integer maxEntrants) {
-        if (maxEntrants == null) {
-            throw new IllegalArgumentException("Max entrants cannot be null.");
-        }
+    /**
+     * Sets the maximum number of entrants.
+     *
+     * @param maxEntrants Maximum number of entrants
+     * @throws IllegalArgumentException if maxEntrants is not a positive value
+     */
+    public void setMaxEntrants(@NonNull Integer maxEntrants) {
         if (maxEntrants <= 0) {  // Check for negative and zero values
             throw new IllegalArgumentException("Max entrants must be a positive value.");
         }
@@ -195,19 +310,30 @@ public class Event implements Serializable {
         this.maxEntrants = maxEntrants;  // Assuming maxEntrants is an Integer
     }
 
-
-    public long getCreatedAt() {
+    /**
+     * Gets the creation timestamp.
+     *
+     * @return createdAt
+     */
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    /**
+     * Gets the last updated timestamp.
+     *
+     * @return updatedAt
+     */
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
+    /**
+     * Checks if this event is equal to another object.
+     *
+     * @param obj The object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true; // Check for reference equality
@@ -216,6 +342,11 @@ public class Event implements Serializable {
         return eventId.equals(event.eventId); // Compare based on eventId (or any unique field)
     }
 
+    /**
+     * Generates a hash code for this event.
+     *
+     * @return hash code
+     */
     @Override
     public int hashCode() {
         return Objects.hash(eventId); // Use eventId for hash code

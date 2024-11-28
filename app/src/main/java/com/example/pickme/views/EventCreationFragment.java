@@ -10,6 +10,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,87 +23,69 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import com.example.pickme.controllers.EventViewModel;
-import com.example.pickme.databinding.EventCreateBinding;
+import com.example.pickme.R;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
+import com.example.pickme.models.WaitingListEntrant;
+import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
 import com.example.pickme.utils.ImageQuery;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Random;
 
-/**
- * Fragment for creating and managing events in the system.
- * Provides a UI for organizers to input event details, such as title, description, date, location, and poster image.
- * Handles validation, image selection, Firestore data storage, and QR code generation for events.
- *
- * @version 2.0
- * Responsibilities:
- * - Capture and validate user input for event details.
- * - Manage event creation, updating, and deletion in Firestore.
- * - Handle image selection and upload for event posters.
- * - Generate QR codes for promotional and waiting list purposes.
- * - Navigate to appropriate screens based on user actions.
- */
 public class EventCreationFragment extends Fragment {
-    private EventCreateBinding binding;
     private String posterUrl;
     private Uri selectedImageUri;
     private Event event;
-    private EventViewModel eventViewModel = new EventViewModel();
+
     private FacilityRepository facilityRepository = new FacilityRepository();
     private String organizerId;
+
+    private EditText eventTitleEdit, descriptionEdit, eventDateEdit, startTimeEdit, endTimeEdit, locationEdit, maxWinnersEdit, maxEntrantsEdit;
+    private TextView addImage;
+    private Button upsertEventBtn, deleteEventBtn, backBtn;
+    private CheckBox requireGeolocation;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment using view binding
-        binding = EventCreateBinding.inflate(getLayoutInflater(), container, false);
-        return binding.getRoot();
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.event_create, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Get the organizer ID from the current user instance
-        organizerId = User.getInstance().getUserId();
-        // Set the current date and time in the UI
-        setCurrentDateTime();
 
-        // Set click listeners for various UI elements
-        binding.addImage.setOnClickListener(listener -> openGallery());
-        binding.date.setOnClickListener(listener -> pickDate());
-        binding.startTime.setOnClickListener(listener -> pickTime(true));
-        binding.endTime.setOnClickListener(listener -> pickTime(false));
-        binding.deleteEvent.setOnClickListener(listener -> {
-            if (event == null) {
-                // Navigate up if no event is being edited
-                Navigation.findNavController(requireView()).navigateUp();
-            } else {
-                // Delete the event if it exists
-                deleteEvent(event);
-            }
-        });
+        organizerId = User.getInstance().getDeviceId();
 
-        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
-        binding.create.setOnClickListener(listener -> {
+        // Initialize views
+        eventTitleEdit = view.findViewById(R.id.title);
+        descriptionEdit = view.findViewById(R.id.description);
+        eventDateEdit = view.findViewById(R.id.date);
+        startTimeEdit = view.findViewById(R.id.startTime);
+        endTimeEdit = view.findViewById(R.id.endTime);
+        locationEdit = view.findViewById(R.id.address);
+        maxWinnersEdit = view.findViewById(R.id.winners);
+        maxEntrantsEdit = view.findViewById(R.id.entrants);
+        addImage = view.findViewById(R.id.addImage);
+        backBtn = view.findViewById(R.id.back);
+        upsertEventBtn = view.findViewById(R.id.create);
+        deleteEventBtn = view.findViewById(R.id.deleteEvent);
+        requireGeolocation = view.findViewById(R.id.requireGeolocation);
+
+        // Set click listeners for UI elements
+        addImage.setOnClickListener(listener -> openGallery());
+        eventDateEdit.setOnClickListener(listener -> pickDate());
+        startTimeEdit.setOnClickListener(listener -> pickTime(true));
+        endTimeEdit.setOnClickListener(listener -> pickTime(false));
+        backBtn.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+        upsertEventBtn.setOnClickListener(listener -> {
             if (validateInputs()) {
-                createOrUpdateEventInFirestore();
-//                if (selectedImageUri != null) {
-//                    // Upload the selected image to Firebase
-//                    uploadImageToFirebase(selectedImageUri);
-//                } else {
-//                    if (event == null) {
-//                        Toast.makeText(requireActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        // Use the existing poster URL if no new image is selected
-//                        posterUrl = event.getPosterImageId();
-//                        createOrUpdateEventInFirestore();
-//                    }
-//                }
+                upsertEvent();
             } else {
                 Toast.makeText(requireActivity(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             }
@@ -108,27 +94,45 @@ public class EventCreationFragment extends Fragment {
         // Check if there are arguments passed to the fragment
         if (getArguments() != null) {
             event = (Event) getArguments().getSerializable("selectedEvent");
+
+            // If an event is being edited, set the event data in the UI
+            if (event != null) {
+                setEventData();
+
+                deleteEventBtn.setVisibility(View.VISIBLE);
+                deleteEventBtn.setOnClickListener(listener -> {
+                    if (event == null) {
+                        // Navigate up if no event is being edited
+                        Navigation.findNavController(requireView()).navigateUp();
+                    } else {
+                        // Delete the event if it exists
+                        deleteEvent(event);
+                    }
+                });
+                backBtn.setText("Edit Event");
+                upsertEventBtn.setText("Save Changes");
+            }
         }
-        // If an event is being edited, set the event data in the UI
-        if (event != null) {
-            setEventData();
-        }
+        // Set the current eventDateEdit and time in the UI
+        setCurrentDateTime();
     }
 
-    /**
-     * Set the event data in the UI for editing.
-     */
     private void setEventData() {
-        binding.title.setText(event.getEventTitle());
-        binding.description.setText(event.getEventDescription());
-        String[] parts = event.getEventDate().split(", ");
-        binding.date.setText(parts[0]);
-        String[] times = parts[1].split(" - ");
-        binding.startTime.setText(times[0]);
-        binding.endTime.setText(times[1]);
-        binding.address.setText(event.getEventLocation());
-        binding.winners.setText(event.getMaxWinners());
-        binding.entrants.setText(event.getMaxEntrants().toString());
+        if (event == null) {
+            return;
+        }
+
+        eventTitleEdit.setText(event.getEventTitle() != null ? event.getEventTitle() : "");
+        descriptionEdit.setText(event.getEventDescription() != null ? event.getEventDescription() : "");
+        String[] parts = event.getEventDate() != null ? event.getEventDate().split(", ") : new String[]{"", ""};
+        eventDateEdit.setText(parts[0]);
+        String[] times = parts.length > 1 ? parts[1].split(" - ") : new String[]{"", ""};
+        startTimeEdit.setText(times[0]);
+        endTimeEdit.setText(times.length > 1 ? times[1] : "");
+        locationEdit.setText(event.getEventLocation() != null ? event.getEventLocation() : "");
+        maxWinnersEdit.setText(event.getMaxWinners() != null ? event.getMaxWinners().toString() : "");
+        maxEntrantsEdit.setText(event.getMaxEntrants() != null ? event.getMaxEntrants().toString() : "");
+        requireGeolocation.setChecked(event.isGeoLocationRequired());
 
         // Download and set the event image
         Image image = new Image("1234567890", "123456789");
@@ -136,60 +140,45 @@ public class EventCreationFragment extends Fragment {
             @Override
             public void onSuccess(Image image) {
                 // TODO: FIXXXX Set image to ImageView
-                //Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
+                //Glide.with(getView()).load(image.getImageUrl()).into(binding.camera);
             }
 
             @Override
             public void onEmpty() {}
         });
-
-        // Update UI elements for editing mode
-        binding.deleteEvent.setVisibility(View.VISIBLE);
-        binding.back.setText("Edit Event");
     }
 
-    /**
-     * Set the current date and time in the UI.
-     */
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
         String currentDate = dateFormat.format(calendar.getTime());
-        binding.date.setText(currentDate);
+        eventDateEdit.setText(currentDate);
 
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         String currentTime = timeFormat.format(calendar.getTime());
-        binding.startTime.setText(currentTime);
+        startTimeEdit.setText(currentTime);
 
         calendar.add(Calendar.HOUR_OF_DAY, 3);
         String endTime = timeFormat.format(calendar.getTime());
-        binding.endTime.setText(endTime);
+        endTimeEdit.setText(endTime);
     }
 
-    /**
-     * Validate the user inputs to ensure all required fields are filled.
-     * @return true if all required fields are filled, false otherwise.
-     */
     private boolean validateInputs() {
-        return !binding.title.getText().toString().isEmpty() &&
-                !binding.date.getText().toString().isEmpty() &&
-                !binding.startTime.getText().toString().isEmpty() &&
-                !binding.endTime.getText().toString().isEmpty() &&
-                !binding.address.getText().toString().isEmpty() &&
-                !binding.entrants.getText().toString().isEmpty();
+        return !eventTitleEdit.getText().toString().isEmpty() &&
+                !eventDateEdit.getText().toString().isEmpty() &&
+                !startTimeEdit.getText().toString().isEmpty() &&
+                !endTimeEdit.getText().toString().isEmpty() &&
+                !locationEdit.getText().toString().isEmpty() &&
+                !maxWinnersEdit.getText().toString().isEmpty();
     }
 
-    /**
-     * Open the gallery to select an image.
-     */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         galleryLauncher.launch(intent);
     }
 
-    // Activity result launcher for handling the result of the gallery intent
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -201,29 +190,50 @@ public class EventCreationFragment extends Fragment {
             }
     );
 
-    /**
-     * Upload the selected image to Firebase.
-     * @param imageUri the URI of the selected image.
-     */
     private void uploadImageToFirebase(Uri imageUri) {
         Image image = new Image("1234567890", "123456789");
         image.upload(imageUri, task -> {
             if (task.isSuccessful()) {
                 posterUrl = task.getResult().getImageUrl();
-                createOrUpdateEventInFirestore();
+                upsertEvent();
             }
         });
     }
 
-    /**
-     * Create or update the event in Firestore.
-     */
-    private void createOrUpdateEventInFirestore() {
-        String eventTitle = binding.title.getText().toString();
-        String eventDescription = binding.description.getText().toString();
-        String promoQrCodeId = generateRandomQrCodeId(10);
-        String waitingListQrCodeId = generateRandomQrCodeId(10);
-        String date = binding.date.getText().toString() + ", " + binding.startTime.getText().toString() + " - " + binding.endTime.getText().toString();
+    private void upsertEvent() {
+        String eventTitle = eventTitleEdit.getText().toString();
+        String eventDescription = descriptionEdit.getText().toString();
+        String eventLocation = locationEdit.getText().toString();
+        final Integer maxWinners;
+        final Integer maxEntrants;
+
+        // Check if maxWinnersEdit is not empty
+        if (!maxWinnersEdit.getText().toString().isEmpty()) {
+            try {
+                maxWinners = Integer.parseInt(maxWinnersEdit.getText().toString());
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireActivity(), "Please enter a valid number for max winners", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            Toast.makeText(requireActivity(), "Max winners is required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if maxEntrantsEdit is not empty
+        if (!maxEntrantsEdit.getText().toString().isEmpty()) {
+            try {
+                maxEntrants = Integer.parseInt(maxEntrantsEdit.getText().toString());
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireActivity(), "Please enter a valid number for max entrants", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            maxEntrants = null; // Optional field
+        }
+
+        String dateTime = eventDateEdit.getText().toString() + ", " + startTimeEdit.getText().toString() + " - " + endTimeEdit.getText().toString();
+        boolean isGeolocationRequired = requireGeolocation.isChecked();
 
         facilityRepository.getFacilityByOwnerId(organizerId, task -> {
             if (task.isSuccessful() && !task.getResult().isEmpty()) {
@@ -237,81 +247,54 @@ public class EventCreationFragment extends Fragment {
                             facilityId,
                             eventTitle,
                             eventDescription,
-                            date,
-                            promoQrCodeId,
-                            waitingListQrCodeId,
+                            dateTime,
                             posterUrl,
-                            binding.address.getText().toString(),
-                            binding.winners.getText().toString(),
-                            true,
-                            Integer.parseInt(binding.entrants.getText().toString()),
-                            System.currentTimeMillis(),
-                            System.currentTimeMillis()
+                            eventLocation,
+                            maxWinners,
+                            isGeolocationRequired,
+                            maxEntrants,
+                            new ArrayList<WaitingListEntrant>()
                     );
 
-                    pushEventToFirestore(newEvent);
+                    EventRepository eventRepository = EventRepository.getInstance();
+                    eventRepository.addEvent(newEvent, task1 -> {
+                        if (task1.isSuccessful()) {
+                            Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
+                            Navigation.findNavController(requireView()).navigateUp();
+                        } else {
+                            Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     // Update the existing event
-                    Event updatedEvent = new Event(
-                            event.getEventId(),
-                            event.getOrganizerId(),
-                            event.getFacilityId(),
-                            eventTitle,
-                            eventDescription,
-                            date,
-                            event.getPromoQrCodeId(),
-                            event.getWaitingListQrCodeId(),
-                            posterUrl,
-                            binding.address.getText().toString(),
-                            binding.winners.getText().toString(),
-                            true,
-                            Integer.parseInt(binding.entrants.getText().toString()),
-                            event.getCreatedAt(),
-                            System.currentTimeMillis()
-                    );
+                    event.setEventTitle(eventTitle);
+                    event.setEventDescription(eventDescription);
+                    event.setEventDate(dateTime);
+                    event.setEventLocation(eventLocation);
+                    event.setMaxWinners(maxWinners);
+                    if (maxEntrants != null) {
+                        event.setMaxEntrants(maxEntrants);
+                    }
+                    event.setGeoLocationRequired(isGeolocationRequired);
 
-                    pushEventUpdateToFirestore(updatedEvent);
+                    EventRepository eventRepository = EventRepository.getInstance();
+                    eventRepository.updateEvent(event, task1 -> {
+                        if (task1.isSuccessful()) {
+                            Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
+                            Navigation.findNavController(requireView()).navigateUp();
+                        } else {
+                            Toast.makeText(requireActivity(), "Failed to update event", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
     }
 
-    /**
-     * Push the new event to Firestore.
-     * @param event the event to be added.
-     */
-    private void pushEventToFirestore(Event event) {
-        eventViewModel.addEvent(event, task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
-                Navigation.findNavController(requireView()).navigateUp();
-            } else {
-                Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * Push the updated event to Firestore.
-     * @param event the event to be updated.
-     */
-    private void pushEventUpdateToFirestore(Event event) {
-        eventViewModel.updateEvent(event, task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
-                Navigation.findNavController(requireView()).navigateUp();
-            } else {
-                Toast.makeText(requireActivity(), "Failed to update event", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * Delete the event from Firestore.
-     * @param event the event to be deleted.
-     */
     private void deleteEvent(Event event) {
-        eventViewModel.deleteEvent(event, task -> {
+        EventRepository eventRepository = EventRepository.getInstance();
+
+        eventRepository.deleteEvent(event.getEventId(), task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).navigateUp();
@@ -321,24 +304,6 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
-    /**
-     * Generate a random QR code ID.
-     * @param length the length of the QR code ID.
-     * @return the generated QR code ID.
-     */
-    private String generateRandomQrCodeId(int length) {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder id = new StringBuilder();
-        Random random = new Random();
-        for (int i = 0; i < length; i++) {
-            id.append(chars.charAt(random.nextInt(chars.length())));
-        }
-        return id.toString();
-    }
-
-    /**
-     * Show a date picker dialog to select a date.
-     */
     private void pickDate() {
         Calendar calendar = Calendar.getInstance();
 
@@ -348,16 +313,12 @@ public class EventCreationFragment extends Fragment {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
             String formattedDate = dateFormat.format(calendar.getTime());
 
-            binding.date.setText(formattedDate);
+            eventDateEdit.setText(formattedDate);
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
         datePicker.show();
     }
 
-    /**
-     * Show a time picker dialog to select a time.
-     * @param isStartTime true if selecting start time, false if selecting end time.
-     */
     private void pickTime(boolean isStartTime) {
         Calendar calendar = Calendar.getInstance();
         TimePickerDialog timePicker = new TimePickerDialog(requireActivity(), (timeView, hourOfDay, minute) -> {
@@ -368,11 +329,11 @@ public class EventCreationFragment extends Fragment {
             String formattedTime = timeFormat.format(calendar.getTime());
 
             if (isStartTime) {
-                binding.startTime.setText(formattedTime);
+                startTimeEdit.setText(formattedTime);
             } else {
-                binding.endTime.setText(formattedTime);
+                endTimeEdit.setText(formattedTime);
             }
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
 
         timePicker.show();
     }
