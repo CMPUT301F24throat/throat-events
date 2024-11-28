@@ -32,7 +32,7 @@ public class EventTest {
     public void setUp() {
         event = new Event("1", "organizer123", "facility456", "Sample Event",
                 "An event description", "October 5 2024, 7:00 PM", "promo123",
-                "waitingList123", "poster123", "123 Main St", "5",
+                "poster123", "123 Main St", "5",
                 true, 100, System.currentTimeMillis(), System.currentTimeMillis());
     }
 
