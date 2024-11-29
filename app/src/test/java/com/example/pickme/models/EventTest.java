@@ -6,9 +6,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import com.google.firebase.Timestamp;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -17,11 +20,6 @@ import java.util.Objects;
  * including date formatting, entrant limits, and winner specifications.
  *
  * @version 1.0
- * @author Ayub Ali
- * Responsibilities:
- * - Test validation and setting of event properties such as date, max entrants, and max winners.
- * - Verify equality and hash code generation for events.
- * - Confirm behavior for null and invalid inputs on key fields.
  */
 
 public class EventTest {
@@ -31,9 +29,8 @@ public class EventTest {
     @Before
     public void setUp() {
         event = new Event("1", "organizer123", "facility456", "Sample Event",
-                "An event description", "October 5 2024, 7:00 PM", "promo123",
-                "waitingList123", "poster123", "123 Main St", "5",
-                true, 100, System.currentTimeMillis(), System.currentTimeMillis());
+                "An event description", "October 5 2024, 7:00 PM", "poster123",
+                "123 Main St", 5, true, 100, new ArrayList<>(), false);
     }
 
     @Test
@@ -49,12 +46,6 @@ public class EventTest {
             event.setMaxEntrants(0);  // Invalid, zero value
         });
         assertEquals("Max entrants must be a positive value.", exception.getMessage());
-
-        // Test for null max entrants
-        exception = assertThrows(IllegalArgumentException.class, () -> {
-            event.setMaxEntrants(null);  // Null value for max entrants
-        });
-        assertEquals("Max entrants cannot be null.", exception.getMessage());
     }
 
     @Test
@@ -69,12 +60,11 @@ public class EventTest {
         assertTrue(Objects.requireNonNull(actualMessage).contains(expectedMessage)); // Verify the message matches
     }
 
-
     @Test
-    public void testMaxWinnersParsing() {
-        // Test for non-numeric max winners
+    public void testMaxWinners() {
+        // Test for negative max winners
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            event.setMaxWinners("abc");  // Invalid value for max winners
+            event.setMaxWinners(-1);  // Invalid, negative value
         });
 
         String expectedMessage = "Max winners must be a non-negative numeric value.";
@@ -82,11 +72,10 @@ public class EventTest {
 
         assertTrue(Objects.requireNonNull(actualMessage).contains(expectedMessage)); // Verify the message matches
 
-        // Testing with a valid numeric string
-        event.setMaxWinners("50");
-        assertEquals("50", event.getMaxWinners());
+        // Testing with a valid numeric value
+        event.setMaxWinners(50);
+        assertEquals(50, event.getMaxWinners().intValue());
     }
-
 
     @Test
     public void testNullEventTitle() {
@@ -100,7 +89,7 @@ public class EventTest {
     @Test
     public void testEdgeDateFormat() {
         // Edge case for date formatting
-        String edgeDate = "Dec 31 2024, 11:59 PM";
+        String edgeDate = "December 31 2024, 11:59 PM";
         event.setEventDate(edgeDate);
         assertEquals(edgeDate, event.getEventDate());
     }
@@ -139,9 +128,9 @@ public class EventTest {
 
     @Test
     public void testCreatedAtNotModified() {
-        long createdAtBefore = event.getCreatedAt();
+        Timestamp createdAtBefore = event.getCreatedAt();
         // Since 'createdAt' should not be modified after initialization, ensure it remains unchanged
-        event.setUpdatedAt(System.currentTimeMillis());  // Set updatedAt to check it doesn't affect createdAt
+        event.setUpdatedAt(Timestamp.now());  // Set updatedAt to check it doesn't affect createdAt
         assertEquals(createdAtBefore, event.getCreatedAt());
     }
 
@@ -152,25 +141,24 @@ public class EventTest {
         event.setPosterImageId(validPosterImageId);
         assertEquals(validPosterImageId, event.getPosterImageId());
     }
+
+    @Test
+    public void testHasEventPassed() {
+        // Test if the event date has passed
+        event.setEventDate("October 5 2020, 7:00 PM");
+        assertTrue(event.hasEventPassed());
+
+        event.setEventDate("October 5 2024, 7:00 PM");
+        assertFalse(event.hasEventPassed());
+    }
+
+    @Test
+    public void testEqualityAndHashCode() {
+        Event event2 = new Event("1", "organizer123", "facility456", "Sample Event",
+                "An event description", "October 5 2024, 7:00 PM", "poster123",
+                "123 Main St", 5, true, 100, new ArrayList<>(), false);
+
+        assertEquals(event, event2);
+        assertEquals(event.hashCode(), event2.hashCode());
+    }
 }
-
-/*
-  Code Sources
-  <p>
-  ChatGPT:
-  - JUnit 4: Testing exception handling for invalid inputs.
-  - Handling assertions for null values and edge cases.
-  - JUnit 4 best practices for validating expected exceptions.
-  <p>
-  Stack Overflow:
-  - Validating method arguments in Java: IllegalArgumentException.
-  - Best practices for JUnit 4 testing with custom error messages.
-  <p>
-  Java Documentation:
-  - Java String class methods and formatting techniques
-  <p>
-  JUnit 4 Documentation:
-  - Assertions and Exception handling in JUnit 4
- */
-
-

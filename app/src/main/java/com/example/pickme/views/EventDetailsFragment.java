@@ -49,6 +49,10 @@ public class EventDetailsFragment extends Fragment {
         if (getArguments() != null) {
             event = (Event) getArguments().getSerializable("selectedEvent");
             currentUser = User.getInstance();
+
+            waitingListUtils = new WaitingListUtils();
+            lotteryUtils = new LotteryUtils();
+
             configureView(view, currentUser);
             displayEventDetails(view);
         } else {
@@ -78,12 +82,12 @@ public class EventDetailsFragment extends Fragment {
         if (event != null) {
             int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
 
-            setText(view, R.id.eventDetails_eventTitle, event.getEventTitle());
-            setText(view, R.id.eventDetails_eventDesc, event.getEventDescription());
-            setText(view, R.id.eventDetails_dateTime, event.getEventDate());
-            setText(view, R.id.eventDetails_location, event.getEventLocation());
-            setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners"));
-            setText(view, R.id.eventDetails_maxEntrants, waitingEntrantsCount + " / " + event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
+            setText(view, R.id.eventDetails_eventTitle, event.getEventTitle() != null ? event.getEventTitle() : " ");
+            setText(view, R.id.eventDetails_eventDesc, event.getEventDescription() != null ? event.getEventDescription() : "No description set for the event");
+            setText(view, R.id.eventDetails_dateTime, event.getEventDate() != null ? event.getEventDate() : " ");
+            setText(view, R.id.eventDetails_location, event.getEventLocation() != null ? event.getEventLocation() : " ");
+            setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() != 0 ? event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners") : " ");
+            setText(view, R.id.eventDetails_maxEntrants, waitingEntrantsCount + " / " + (event.getMaxEntrants() != null ? event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants") : "No waitlist limit"));
 
             // TODO: is this correct or dummy data?
             loadImage(view, R.id.eventDetails_poster, "1234567890", "123456789");
@@ -109,42 +113,44 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void configWaitlistBtn() {
-        View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
-        waitingListUtils.getEntrantsCountByStatus(event.getEventId(), EntrantStatus.WAITING, task -> {
-            int waitingEntrantsCount;
-            if (task.isSuccessful()) {
-                waitingEntrantsCount = task.getResult();
-            } else {
-                waitingEntrantsCount = 0;
-            }
+        if (waitingListUtils != null) {
+            View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
+            waitingListUtils.getEntrantsCountByStatus(event.getEventId(), EntrantStatus.WAITING, task -> {
+                int waitingEntrantsCount;
+                if (task.isSuccessful()) {
+                    waitingEntrantsCount = task.getResult();
+                } else {
+                    waitingEntrantsCount = 0;
+                }
 
-            if (waitingEntrantsCount >= event.getMaxEntrants()) {
-                ((TextView) waitlistBtn).setText("Waitlist is full - try again later");
-                waitlistBtn.setEnabled(false);
-                waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
-                ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
-            } else if (event.hasEventPassed()) {
-                ((TextView) waitlistBtn).setText("This event has already passed");
-                waitlistBtn.setEnabled(false);
-                waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
-                ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
-            } else {
-                waitlistBtn.setOnClickListener(v -> {
-                    GeoPoint currentUserLocation = null;
-                    if (event.isGeoLocationRequired()) {
-                        // TODO: Implement geolocation
-                    }
-
-                    waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
-                        if (addTask.isSuccessful()) {
-                            Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                if (waitingEntrantsCount >= event.getMaxEntrants()) {
+                    ((TextView) waitlistBtn).setText("Waitlist is full - try again later");
+                    waitlistBtn.setEnabled(false);
+                    waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+                    ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+                } else if (event.hasEventPassed()) {
+                    ((TextView) waitlistBtn).setText("This event has already passed");
+                    waitlistBtn.setEnabled(false);
+                    waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+                    ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+                } else {
+                    waitlistBtn.setOnClickListener(v -> {
+                        GeoPoint currentUserLocation = null;
+                        if (event.isGeoLocationRequired()) {
+                            // TODO: Implement geolocation
                         }
+
+                        waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
+                            if (addTask.isSuccessful()) {
+                                Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     });
-                });
-            }
-        });
+                }
+            });
+        }
     }
 
     private void configLotteryBtn() {

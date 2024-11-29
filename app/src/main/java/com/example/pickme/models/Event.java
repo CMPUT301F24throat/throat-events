@@ -32,9 +32,9 @@ public class Event implements Serializable {
     private String eventDate;            // Date and time of the event (as a String)
     private String posterImageId;        // URL of the poster image
     private String eventLocation;        // Location of the event
-    private Integer maxWinners;           // Max number of winners
+    private int maxWinners;           // Max number of winners
     private boolean geoLocationRequired; // Indicates if geolocation is required
-    private Integer maxEntrants;         // Maximum number of entrants
+    private Integer maxEntrants;         // Maximum number of entrants [Nullable]
     private ArrayList<WaitingListEntrant> waitingList; // Event waiting list; a list of waiting list entrants
     private Boolean hasLotteryExecuted;  // Flag to indicate if the lottery has been executed
     private final Timestamp createdAt;              // Creation timestamp
@@ -65,7 +65,7 @@ public class Event implements Serializable {
      */
     public Event(String eventId, String organizerId, String facilityId, String eventTitle,
                  String eventDescription, String eventDate, String posterImageId,
-                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList, Boolean hasLotteryExecuted) {
+                 String eventLocation, int maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList, Boolean hasLotteryExecuted) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.facilityId = facilityId;
@@ -252,7 +252,7 @@ public class Event implements Serializable {
      *
      * @return maxWinners
      */
-    public Integer getMaxWinners() {
+    public int getMaxWinners() {
         return maxWinners;
     }
 
@@ -262,12 +262,12 @@ public class Event implements Serializable {
      * @param maxWinners Max number of winners
      * @throws IllegalArgumentException if maxWinners is not a non-negative numeric value
      */
-    public void setMaxWinners(@NonNull Integer maxWinners) {
+    public void setMaxWinners(int maxWinners) {
         if (maxWinners < 0) {  // Check if not numeric
             throw new IllegalArgumentException("Max winners must be a non-negative numeric value.");
         }
 
-        this.maxWinners = maxWinners;  // Assuming maxWinners is a String type
+        this.maxWinners = maxWinners;
         this.updatedAt = Timestamp.now();
     }
 
@@ -303,14 +303,9 @@ public class Event implements Serializable {
      * Sets the maximum number of entrants.
      *
      * @param maxEntrants Maximum number of entrants
-     * @throws IllegalArgumentException if maxEntrants is not a positive value
      */
-    public void setMaxEntrants(@NonNull Integer maxEntrants) {
-        if (maxEntrants <= 0) {  // Check for negative and zero values
-            throw new IllegalArgumentException("Max entrants must be a positive value.");
-        }
-
-        this.maxEntrants = maxEntrants;  // Assuming maxEntrants is an Integer
+    public void setMaxEntrants(Integer maxEntrants) {
+        this.maxEntrants = maxEntrants;
     }
 
     /**
@@ -367,6 +362,15 @@ public class Event implements Serializable {
      */
     public Timestamp getUpdatedAt() {
         return updatedAt;
+    }
+
+    /**
+     * Sets the last updated timestamp.
+     *
+     * @param updatedAt Last updated timestamp
+     */
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     /**

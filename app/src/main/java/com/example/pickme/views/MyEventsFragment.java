@@ -67,7 +67,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
             if (result.getBoolean("eventCreated")) {
                 Toast.makeText(requireActivity(), "Event successfully created", Toast.LENGTH_SHORT).show();
                 if (user != null) {
-                    loadUserEvents(user.getUserId());
+                    loadUserEvents(user.getDeviceId());
                 }
             }
         });

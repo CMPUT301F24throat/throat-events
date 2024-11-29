@@ -134,7 +134,7 @@ public class EventCreationFragment extends Fragment {
         startTimeEdit.setText(times[0]);
         endTimeEdit.setText(times.length > 1 ? times[1] : "");
         locationEdit.setText(event.getEventLocation() != null ? event.getEventLocation() : "");
-        maxWinnersEdit.setText(event.getMaxWinners() != null ? event.getMaxWinners().toString() : "");
+        maxWinnersEdit.setText(event.getMaxWinners());
         maxEntrantsEdit.setText(event.getMaxEntrants() != null ? event.getMaxEntrants().toString() : "");
         requireGeolocation.setChecked(event.isGeoLocationRequired());
 
@@ -225,7 +225,7 @@ public class EventCreationFragment extends Fragment {
         String eventTitle = eventTitleEdit.getText().toString();
         String eventDescription = descriptionEdit.getText().toString();
         String eventLocation = locationEdit.getText().toString();
-        final Integer maxWinners;
+        final int maxWinners;
         final Integer maxEntrants;
 
         // Check if maxWinnersEdit is not empty
