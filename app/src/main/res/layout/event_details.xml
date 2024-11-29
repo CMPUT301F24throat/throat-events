@@ -264,6 +264,20 @@
                     app:layout_constraintHorizontal_bias="0.064"
                     app:layout_constraintStart_toEndOf="@+id/eventDetails_usersIcon"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/eventDetails_moreInfoLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter"
+                    android:text="tap for more info"
+                    android:textColor="@color/text3"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.212"
+                    app:layout_constraintStart_toEndOf="@+id/eventDetails_maxEntrants"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 
