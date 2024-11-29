@@ -1,6 +1,7 @@
 package com.example.pickme.repositories;
 
 import com.example.pickme.models.Event;
+import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,6 +69,7 @@ public class EventRepository {
                     DocumentReference newEventRef = eventsRef.document();
                     event.setEventId(newEventRef.getId());
                     event.setHasLotteryExecuted(false);
+                    event.setWaitingList(new ArrayList<WaitingListEntrant>());
                     transaction.set(newEventRef, event);
 
                     return null;

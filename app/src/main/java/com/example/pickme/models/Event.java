@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -35,7 +36,7 @@ public class Event implements Serializable {
     private boolean geoLocationRequired; // Indicates if geolocation is required
     private Integer maxEntrants;         // Maximum number of entrants
     private ArrayList<WaitingListEntrant> waitingList; // Event waiting list; a list of waiting list entrants
-    private boolean hasLotteryExecuted;  // Flag to indicate if the lottery has been executed
+    private Boolean hasLotteryExecuted;  // Flag to indicate if the lottery has been executed
     private final Timestamp createdAt;              // Creation timestamp
     private Timestamp updatedAt;              // Last updated timestamp
 
@@ -64,7 +65,7 @@ public class Event implements Serializable {
      */
     public Event(String eventId, String organizerId, String facilityId, String eventTitle,
                  String eventDescription, String eventDate, String posterImageId,
-                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList) {
+                 String eventLocation, Integer maxWinners, boolean geoLocationRequired, Integer maxEntrants, ArrayList<WaitingListEntrant> waitingList, Boolean hasLotteryExecuted) {
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.facilityId = facilityId;
@@ -77,7 +78,7 @@ public class Event implements Serializable {
         this.geoLocationRequired = geoLocationRequired;
         this.maxEntrants = maxEntrants;
         this.waitingList = waitingList;
-        this.hasLotteryExecuted = false;
+        this.hasLotteryExecuted = hasLotteryExecuted;
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
     }
@@ -390,6 +391,26 @@ public class Event implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(eventId); // Use eventId for hash code
+    }
+
+    /**
+     * Checks if the event date has passed.
+     *
+     * @return true if the event date has passed, false otherwise
+     */
+    public boolean hasEventPassed() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a");
+        try {
+            Date eventDateParsed = dateFormat.parse(eventDate.split(" - ")[0]);
+            Date currentDate = new Date();
+            if (eventDateParsed != null) {
+                return eventDateParsed.before(currentDate);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
     }
 
 }

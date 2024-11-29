@@ -27,13 +27,11 @@ import com.example.pickme.R;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
-import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
 import com.example.pickme.utils.ImageQuery;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -276,7 +274,8 @@ public class EventCreationFragment extends Fragment {
                             maxWinners,
                             isGeolocationRequired,
                             maxEntrants,
-                            new ArrayList<WaitingListEntrant>()
+                            null,  // set to null here, will be initialized in EventRepository
+                            null    // set to null here, will be initialized in EventRepository
                     );
 
                     EventRepository eventRepository = EventRepository.getInstance();

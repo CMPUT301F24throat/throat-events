@@ -10,21 +10,29 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
+import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.utils.ImageQuery;
+import com.example.pickme.utils.LotteryUtils;
+import com.example.pickme.utils.WaitingListUtils;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Objects;
 
 public class EventDetailsFragment extends Fragment {
     private Event event;
     private User currentUser;
+    private WaitingListUtils waitingListUtils;
+    private LotteryUtils lotteryUtils;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,12 +63,14 @@ public class EventDetailsFragment extends Fragment {
                 view.findViewById(R.id.scanQr).setVisibility(View.GONE);
             }
 
+            int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
+
             setText(view, R.id.eventDetails_eventTitle, event.getEventTitle());
             setText(view, R.id.eventDetails_eventDesc, event.getEventDescription());
             setText(view, R.id.eventDetails_dateTime, event.getEventDate());
             setText(view, R.id.eventDetails_location, event.getEventLocation());
             setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners"));
-            setText(view, R.id.eventDetails_maxEntrants, event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
+            setText(view, R.id.eventDetails_maxEntrants, waitingEntrantsCount + " / " + event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
 
             loadImage(view, R.id.eventDetails_poster, "1234567890", "123456789");
 
@@ -81,17 +91,45 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_sendNotifBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_runLotteryBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_joinWaitlistBtn, !isOrganizer);
+
+        configWaitlistBtn();
     }
+
 
     private void configWaitlistBtn() {
-        // if waitlist is full, set text to 'Waitlist is full - try again later' and disable button, set bgTint to disabledButtonBG and set text color to disabledButtonTxt
+        View waitlistBtn = getView().findViewById(R.id.eventDetails_joinWaitlistBtn);
+        int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
 
-        // if event has passed set text to 'This event has already passed' and disable button, set bgTint to disabledButtonBG and set text color to disabledButtonTxt
+        if (waitingEntrantsCount >= event.getMaxEntrants()) {
+            ((TextView) waitlistBtn).setText("Waitlist is full - try again later");
+            waitlistBtn.setEnabled(false);
+            waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+            ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+        } else if (event.hasEventPassed()) {
+            ((TextView) waitlistBtn).setText("This event has already passed");
+            waitlistBtn.setEnabled(false);
+            waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+            ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+        } else {
+            waitlistBtn.setOnClickListener(v -> {
 
-        // if neither, leave button as is
+                GeoPoint currentUserLocation = null;
+                if (event.isGeoLocationRequired()) {
+                    // TODO: Implement geolocation
+                }
+
+                waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to add to waitlist: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        }
     }
 
-    private void configLotterBtn() {
+    private void configLotteryBtn() {
 
         if (!event.hasLotteryExecuted()) {
             // if lottery hasn't been ran, keep text as 'Run Lottery' and set up click listener to run lottery using lotteryUtils
