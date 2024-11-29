@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".views.EventsArchiveFragment"
+    android:background="@color/background1">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05"
+        android:id="@+id/startGuide"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95"
+        android:id="@+id/endGuide"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05"
+        android:id="@+id/topGuide"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95"
+        android:id="@+id/bottomGuide"/>
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintTop_toBottomOf="@id/topGuide"/>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="@string/event_archive"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/back"
+        app:layout_constraintStart_toEndOf="@id/back"
+        app:layout_constraintTop_toTopOf="@id/back" />
+
+    <EditText
+        android:id="@+id/searchBar"
+        android:layout_width="350dp"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/search_bar_bg"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="15dp"
+        android:hint="Search"
+        android:maxLines="1"
+        android:paddingHorizontal="20dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/text3"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintTop_toBottomOf="@id/back" />
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintTop_toBottomOf="@id/searchBar"
+        android:layout_marginTop="15dp"/>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintTop_toBottomOf="@id/idTitle" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        app:layout_constraintBottom_toTopOf="@id/view2"
+        app:layout_constraintStart_toEndOf="@id/idTitle"/>
+
+    <View
+        android:id="@+id/view4"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        app:layout_constraintBottom_toTopOf="@id/view2"
+        app:layout_constraintStart_toEndOf="@id/eventTitle"/>
+    <TextView
+        android:paddingVertical="5dp"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="ID"
+        android:id="@+id/idTitle"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        android:paddingStart="5dp"/>
+
+    <TextView
+        android:paddingVertical="5dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Event Title"
+        android:id="@+id/eventTitle"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintStart_toEndOf="@id/view3"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        android:paddingStart="5dp"/>
+
+    <TextView
+        android:id="@+id/noEventsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="You have no events"
+        android:textColor="@color/text1"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@id/startGuide"
+        app:layout_constraintEnd_toStartOf="@id/endGuide"
+        app:layout_constraintTop_toBottomOf="@id/view2"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomGuide"
+        tools:listitem="@layout/admin_event_archive_item_view"
+        tools:itemCount="20"
+        android:id="@+id/recyclerView"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

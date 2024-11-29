@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background2">
+    <View
+        android:id="@+id/view1"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/idTitle" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        app:layout_constraintBottom_toTopOf="@id/view2"
+        app:layout_constraintStart_toEndOf="@id/idTitle"/>
+
+    <View
+        android:id="@+id/view4"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        app:layout_constraintBottom_toTopOf="@id/view2"
+        app:layout_constraintStart_toEndOf="@id/eventTitle"/>
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="@color/dialogBG1"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        app:layout_constraintBottom_toTopOf="@id/view2"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:paddingHorizontal="10dp"
+        android:id="@+id/viewDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_search"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        app:layout_constraintBottom_toTopOf="@id/view2"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:paddingVertical="5dp"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="ID"
+        android:id="@+id/idTitle"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        android:paddingStart="5dp"/>
+
+    <TextView
+        android:paddingVertical="5dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Event Title"
+        android:id="@+id/eventTitle"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/viewDetails"
+        app:layout_constraintStart_toEndOf="@id/view3"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        android:paddingStart="5dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
