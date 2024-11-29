@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navigation_my_events) {
                 navController.navigate(R.id.action_global_myEventsFragment);
                 return true;
+            }  else if (itemId == R.id.navigation_admin_tools) {
+                navController.navigate(R.id.action_global_adminToolsFragment);
             }
             return false;
         });
