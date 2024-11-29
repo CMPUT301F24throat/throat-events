@@ -33,30 +33,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <ImageView
             android:id="@+id/deleteEvent"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="86dp"
+            android:layout_width="54dp"
             android:layout_height="54dp"
             android:layout_marginTop="32dp"
-            android:backgroundTint="@color/background1"
-            android:contentDescription="Touch to delete event"
-            android:fontFamily="sans-serif"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:textStyle="bold"
+            android:background="@drawable/button_squircle_background"
+            android:backgroundTint="@color/highlight1"
+            android:src="@drawable/ic_delete"
             android:visibility="gone"
-            app:icon="@drawable/ic_delete"
-            app:iconPadding="0dp"
-            app:iconSize="40dp"
-            app:iconTint="@color/background1"
-            app:iconTintMode="add"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/back"
+            app:layout_constraintEnd_toEndOf="@id/title"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText

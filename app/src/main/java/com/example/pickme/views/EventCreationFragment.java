@@ -17,9 +17,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.example.pickme.R;
 import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventCreateBinding;
 import com.example.pickme.models.Event;
@@ -335,7 +337,12 @@ public class EventCreationFragment extends Fragment {
         eventViewModel.deleteEvent(event, task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();
-                Navigation.findNavController(requireView()).navigateUp();
+                // Clear the backstack and navigate to MyEventsFragment
+                NavController navController = Navigation.findNavController(requireView());
+
+                // Create a NavOptions object to clear the back stack
+                navController.popBackStack(R.id.myEventsFragment, false); // False to not inclusive
+                navController.navigate(R.id.myEventsFragment);
             } else {
                 Toast.makeText(requireActivity(), "Failed to delete event", Toast.LENGTH_SHORT).show();
             }
