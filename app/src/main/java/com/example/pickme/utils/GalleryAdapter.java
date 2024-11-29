@@ -1,6 +1,7 @@
 package com.example.pickme.utils;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,11 +41,19 @@ public class GalleryAdapter extends ArrayAdapter<String> {
             convertView = inflater.inflate(R.layout.image_gallery_item, parent, false);
         }
 
+        ImageView i = convertView.findViewById(R.id.gallery_imageview);
+
         Glide
                 .with(context)
                 .load(imageUrls.get(position))
-                .into((ImageView) convertView);
+                .into(i);
+
+        ImageView delete = convertView.findViewById(R.id.gallery_deleteButton);
+        delete.setOnClickListener(v -> {
+            Log.d("DELETE", "getView: " + v);
+        });
 
         return convertView;
     }
+
 }
