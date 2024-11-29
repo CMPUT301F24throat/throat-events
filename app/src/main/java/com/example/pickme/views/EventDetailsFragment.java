@@ -64,14 +64,13 @@ public class EventDetailsFragment extends Fragment {
         view.findViewById(R.id.eventDetails_sendNotifBtn).setOnClickListener(v -> navigateToCreateNotif());
         view.findViewById(R.id.eventDetails_deleteBtn).setOnClickListener(v -> {
             if (event != null) {
-                EventRepository eventRepository = EventRepository.getInstance();
 
-                eventRepository.deleteEvent(event.getEventId(), deleteTask -> {
+                EventRepository.getInstance().deleteEvent(event.getEventId(), deleteTask -> {
                     if (deleteTask.isSuccessful()) {
                         Navigation.findNavController(requireView()).navigateUp();
                         Toast.makeText(getContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getContext(), "Failed to delete event: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Failed to delete event: " + Objects.requireNonNull(deleteTask.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -143,7 +142,7 @@ public class EventDetailsFragment extends Fragment {
                             if (addTask.isSuccessful()) {
                                 Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Failed to add to waitlist: " + Objects.requireNonNull(addTask.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     });
@@ -161,9 +160,11 @@ public class EventDetailsFragment extends Fragment {
         } else {
             // If lottery has been run, set up click listener to navigate to lottery status fragment
             lotteryBtn.setOnClickListener(v -> {
+                if (event != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("eventId", event.getEventId());
                 Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);
+                }
             });
         }
     }
@@ -206,13 +207,17 @@ public class EventDetailsFragment extends Fragment {
 
     private void navigateToCreateNotif() {
         Bundle bundle = new Bundle();
-        bundle.putString("EventID", event.getEventId());
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+        if (event != null) {
+            bundle.putString("EventID", event.getEventId());
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+        }
     }
 
     private void navigateToEditEvent() {
         Bundle bundle = new Bundle();
-        bundle.putSerializable("selectedEvent", event);
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+        if (event != null) {
+            bundle.putSerializable("selectedEvent", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+        }
     }
 }

@@ -116,7 +116,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
                     }
                 }
 
-                Log.d("MyEventsFragment", "Received events: " + events.toString());
+                Log.d("MyEventsFragment", "Received events: " + events);
 
                 eventList.clear();
                 eventList.addAll(events);
@@ -140,9 +140,19 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
 
     @Override
     public void onEventClick(Event event) {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("selectedEvent", event);
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-        navController.navigate(R.id.action_myEventsFragment_to_eventDetailsFragment, bundle);
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedEvent", event);
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+            navController.navigate(R.id.action_myEventsFragment_to_eventDetailsFragment, bundle);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clear the event list to release memory
+        eventList.clear();
+        eventAdapter.notifyDataSetChanged();
     }
 }

@@ -15,6 +15,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 public class QRCodeGenerator {
 
@@ -115,7 +116,7 @@ public class QRCodeGenerator {
      * @param bitmap Bitmap to save
      */
     private void saveBitmapToCache(File file, Bitmap bitmap) {
-        file.getParentFile().mkdirs(); // Ensure the directory exists
+        Objects.requireNonNull(file.getParentFile()).mkdirs(); // Ensure the directory exists
         try (FileOutputStream fos = new FileOutputStream(file)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (IOException e) {

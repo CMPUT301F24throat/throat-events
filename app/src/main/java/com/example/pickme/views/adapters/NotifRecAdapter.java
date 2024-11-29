@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
@@ -46,8 +47,9 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
     }
 
     // Called when RecyclerView needs a new ViewHolder
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Inflate the item layout
         View itemView = LayoutInflater.from(context).inflate(R.layout.notif_list_view, parent, false);
         return new ViewHolder(itemView);

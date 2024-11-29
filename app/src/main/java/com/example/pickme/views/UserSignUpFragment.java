@@ -41,6 +41,8 @@ public class UserSignUpFragment extends Fragment {
         // Sets up the response to if the user wants to proceed.
         submitButton.setOnClickListener(v -> validateInformation());
     }
+    
+
 
     private void validateInformation() {
         String firstName = firstNameEditText.getText().toString().trim();
@@ -64,7 +66,7 @@ public class UserSignUpFragment extends Fragment {
     }
 
     private String getDeviceID() {
-        return Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     private void createUser(String firstName, String lastName, String email, String contact, String deviceId) {
@@ -91,7 +93,7 @@ public class UserSignUpFragment extends Fragment {
     }
 
     private void navigateToHomeFragment() {
-        Navigation.findNavController(getView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
+        Navigation.findNavController(requireView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
     }
 
     private void showBottomNavigation() {

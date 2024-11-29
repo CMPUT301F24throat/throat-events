@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Facilitates CRUD operations and interactions with the Firestore events collection.
@@ -86,7 +87,7 @@ public class EventRepository {
             if (task.isSuccessful()) {
                 onCompleteListener.onComplete(Tasks.forResult(task.getResult()));
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(task.getException())));
             }
         }).addOnFailureListener(e -> {
             // Handle the error
@@ -187,7 +188,7 @@ public class EventRepository {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a");
         try {
             Date eventDate = dateFormat.parse(event.getEventDate());
-            return eventDate.before(new Date());
+            return Objects.requireNonNull(eventDate).before(new Date());
         } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid event date format.");
         }

@@ -19,6 +19,8 @@ import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
 
+import java.util.Objects;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileFragment extends Fragment {
@@ -87,10 +89,10 @@ public class UserProfileFragment extends Fragment {
     }
 
     private void navigateToEditFragment() {
-        Navigation.findNavController(getView()).navigate(R.id.action_userProfileFragment_to_userProfileEditFragment);
+        Navigation.findNavController(Objects.requireNonNull(getView())).navigate(R.id.action_userProfileFragment_to_userProfileEditFragment);
     }
 
     private void navigateToHomeFragment() {
-        Navigation.findNavController(getView()).navigate(R.id.action_userProfileFragment_to_homeFragment);
+        Navigation.findNavController(Objects.requireNonNull(getView())).navigate(R.id.action_userProfileFragment_to_homeFragment);
     }
 }

@@ -37,6 +37,7 @@ import com.example.pickme.views.adapters.NotificationAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -191,7 +192,7 @@ public class HomeFragment extends Fragment {
                     NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), (documentSnapshot, e) -> {
                         if (documentSnapshot != null) {
                             Notification notification = documentSnapshot.toObject(Notification.class);
-                            notification.markRead(userNotification.isRead());
+                            Objects.requireNonNull(notification).markRead(userNotification.isRead());
 
                             NotificationList.getInstance().add(notification);
                             notificationAdapter.notifyDataSetChanged();

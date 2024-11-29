@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utility class for running a lottery on an event's waiting list.
@@ -48,7 +49,7 @@ public class LotteryUtils {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("User is not the organizer of the event or event has passed")));
                 }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(eventTask.getException())));
             }
         });
     }
@@ -80,14 +81,14 @@ public class LotteryUtils {
                                 onCompleteListener.onComplete(Tasks.forException(new Exception("User is not the organizer of the event or event has passed")));
                             }
                         } else {
-                            onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                            onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(eventTask.getException())));
                         }
                     });
                 } else {
                     onCompleteListener.onComplete(Tasks.forResult(new ArrayList<>()));
                 }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(task.getException())));
             }
         });
     }
@@ -131,11 +132,11 @@ public class LotteryUtils {
                     if (updateTask.isSuccessful()) {
                         onCompleteListener.onComplete(Tasks.forResult(selectedUserDeviceIds));
                     } else {
-                        onCompleteListener.onComplete(Tasks.forException(updateTask.getException()));
+                        onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(updateTask.getException())));
                     }
                 });
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(task.getException())));
             }
         });
     }

@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utility class for managing waiting lists in the Firestore database.
@@ -44,7 +45,7 @@ public class WaitingListUtils {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
                 }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(eventTask.getException())));
             }
         });
     }
@@ -69,7 +70,7 @@ public class WaitingListUtils {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
                 }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(eventTask.getException())));
             }
         });
     }
@@ -101,7 +102,7 @@ public class WaitingListUtils {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
                 }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(eventTask.getException())));
             }
         });
     }
@@ -130,14 +131,14 @@ public class WaitingListUtils {
                         if (updateTask.isSuccessful()) {
                             System.out.println("Entrant status updated successfully.");
                         } else {
-                            System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+                            System.err.println("Failed to update entrant status: " + Objects.requireNonNull(updateTask.getException()).getMessage());
                         }
                     });
                 } else {
                     System.err.println("Event not found.");
                 }
             } else {
-                System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+                System.err.println("Failed to retrieve event: " + Objects.requireNonNull(eventTask.getException()).getMessage());
             }
         });
     }
@@ -183,7 +184,7 @@ public class WaitingListUtils {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
                 }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(Objects.requireNonNull(eventTask.getException())));
             }
         });
     }
@@ -244,11 +245,11 @@ public class WaitingListUtils {
                         if (updateTask.isSuccessful()) {
                             System.out.println("Rejected invites cancelled successfully.");
                         } else {
-                            System.err.println("Failed to cancel rejected invites: " + updateTask.getException().getMessage());
+                            System.err.println("Failed to cancel rejected invites: " + Objects.requireNonNull(updateTask.getException()).getMessage());
                         }
                     });
                 } else {
-                System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+                System.err.println("Failed to retrieve event: " + Objects.requireNonNull(eventTask.getException()).getMessage());
             }
         }});
     }

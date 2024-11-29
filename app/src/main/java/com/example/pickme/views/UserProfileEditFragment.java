@@ -27,6 +27,8 @@ import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 
+import java.util.Objects;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileEditFragment extends Fragment {
@@ -197,7 +199,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void navigateToUserProfileFragment() {
-        Navigation.findNavController(getView()).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
+        Navigation.findNavController(Objects.requireNonNull(getView())).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
     }
 
     private void showUnsavedChangesDialog() {

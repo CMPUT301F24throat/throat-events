@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.example.pickme.R;
 import com.example.pickme.models.Notification;
 import com.example.pickme.repositories.EventRepository;
@@ -33,8 +35,9 @@ public class NotificationAdapter extends ArrayAdapter<Notification> {
         this.notifications = notifications;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         // Reuse the view if possible
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.notif_list_view, parent, false);

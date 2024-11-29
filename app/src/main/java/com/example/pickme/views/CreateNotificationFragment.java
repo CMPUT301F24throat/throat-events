@@ -55,7 +55,7 @@ public class CreateNotificationFragment extends Fragment {
         recipientsSpinner = view.findViewById(R.id.dropdown_menu);
 
         // go back a screen when the back arrow is clicked
-        backArrow.setOnClickListener( (v) -> getActivity().getOnBackPressedDispatcher().onBackPressed());
+        backArrow.setOnClickListener( (v) -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
 
         // populate the spinner with its options
         ArrayList<String> recipientOptions = new ArrayList<>();
@@ -63,7 +63,7 @@ public class CreateNotificationFragment extends Fragment {
             recipientOptions.add(level.toString());
         }
 
-        ArrayAdapter<String> recipientsAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<String> recipientsAdapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_dropdown_item, recipientOptions);
 
         recipientsSpinner.setAdapter(recipientsAdapter);
@@ -81,7 +81,7 @@ public class CreateNotificationFragment extends Fragment {
             notification.setSentFrom(User.getInstance().getUserId());
             notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
             notification.setDateTimeNow();
-            notification.setEventID(getArguments().getString("EventID"));
+            notification.setEventID(requireArguments().getString("EventID"));
 
             createSendList(notification, () -> {
 
@@ -96,7 +96,7 @@ public class CreateNotificationFragment extends Fragment {
                     new NotificationHelper().sendNotification(notification);
                 });
 
-                getActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
+                requireActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
             });
 
         });

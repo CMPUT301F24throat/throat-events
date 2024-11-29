@@ -21,6 +21,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.Objects;
+
 /**
  * MainActivity class that handles the main entry point of the application.
  * It initializes Firebase, sets up the navigation controller, and manages the bottom navigation view.
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up NavController
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
+        NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         // Set up bottom navigation item selection listener

@@ -13,6 +13,8 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Objects;
+
 /**
  * Handles interactions with the QRs collection
  * CRUD operations for QR data
@@ -62,7 +64,7 @@ public class QrRepository {
                 qr.setQrId(generatedQrId);
                 return docRef.update("qrId", generatedQrId).continueWith(updateTask -> docRef);  // Return DocumentReference after update
             } else {
-                throw task.getException();  // Propagate the exception if the add operation failed
+                throw Objects.requireNonNull(task.getException());  // Propagate the exception if the add operation failed
             }
         });
     }

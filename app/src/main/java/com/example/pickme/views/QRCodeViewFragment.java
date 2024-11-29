@@ -61,7 +61,7 @@ public class QRCodeViewFragment extends Fragment {
      * @param eventID ID of the event for which the QR code is generated.
      * @return A new instance of QRCodeViewFragment with the specified arguments.
      */
-    public static QRCodeViewFragment newInstance(String eventID) {
+    public static QRCodeViewFragment newInstance(@NonNull String eventID) {
         QRCodeViewFragment fragment = new QRCodeViewFragment();
         Bundle args = new Bundle();
         args.putString(ARG_EVENT_ID, eventID);
