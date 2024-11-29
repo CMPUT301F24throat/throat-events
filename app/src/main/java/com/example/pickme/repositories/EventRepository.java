@@ -1,5 +1,7 @@
 package com.example.pickme.repositories;
 
+import android.util.Log;
+
 import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -8,7 +10,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,22 +31,27 @@ public class EventRepository {
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
     private CollectionReference eventsRef;
-
-    static EventRepository instance;
-    public static EventRepository getInstance(){
-        if(instance == null)
-            instance = new EventRepository();
-
-        return instance;
-    }
+    private static EventRepository instance;
 
     /**
      * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
      */
-    public EventRepository() {
+    private EventRepository() {
         this.db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
         this.eventsRef = db.collection("events");
+    }
+
+    /**
+     * Singleton pattern to ensure only one instance of the repository is created.
+     *
+     * @return The instance of the EventRepository.
+     */
+    public static synchronized EventRepository getInstance(){
+        if(instance == null)
+            instance = new EventRepository();
+
+        return instance;
     }
 
     /**
@@ -64,20 +73,25 @@ public class EventRepository {
      * @param event The event to be added.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+    public void addEvent(Event event, OnCompleteListener<String> onCompleteListener) {
         db.runTransaction(transaction -> {
-                    DocumentReference newEventRef = eventsRef.document();
-                    event.setEventId(newEventRef.getId());
-                    event.setHasLotteryExecuted(false);
-                    event.setWaitingList(new ArrayList<WaitingListEntrant>());
-                    transaction.set(newEventRef, event);
+            DocumentReference newEventRef = eventsRef.document();
+            event.setEventId(newEventRef.getId());
+            event.setHasLotteryExecuted(false);
+            event.setWaitingList(new ArrayList<WaitingListEntrant>());
+            transaction.set(newEventRef, event);
 
-                    return null;
-                }).addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Transaction failed: " + e.getMessage());
-                });
+            return newEventRef.getId();
+        }).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                onCompleteListener.onComplete(Tasks.forResult(task.getResult()));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        }).addOnFailureListener(e -> {
+            // Handle the error
+            System.err.println("Transaction failed: " + e.getMessage());
+        });
     }
 
     /**
@@ -115,13 +129,18 @@ public class EventRepository {
      *
      * @param userDeviceId       The ID of the organizer.
      * @param includePastEvents  Whether to include past events in the result.
-     * @param onCompleteListener The listener to notify upon completion.
+     * @param eventListener The listener to notify upon completion.
      */
-    public void getEventsByOrganizerId(String userDeviceId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("organizerId", userDeviceId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
+    public void getEventsByOrganizerId(String userDeviceId, boolean includePastEvents, EventListener<QuerySnapshot> eventListener) {
+        eventsRef.whereEqualTo("organizerId", userDeviceId).addSnapshotListener((querySnapshot, e) -> {
+            if (e != null) {
+                Log.w("EventRepository", "Listen failed.", e);
+                return;
+            }
+
+            if (querySnapshot != null && !querySnapshot.isEmpty()) {
                 List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                     Event event = document.toObject(Event.class);
                     if (event != null) {
                         if (includePastEvents || !hasEventPassed(event)) {
@@ -129,9 +148,9 @@ public class EventRepository {
                         }
                     }
                 }
-                onCompleteListener.onComplete(Tasks.forResult(events));
+                eventListener.onEvent(querySnapshot, null);
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                Log.d("EventRepository", "Current data: null");
             }
         });
     }
@@ -140,20 +159,20 @@ public class EventRepository {
      * Retrieves an event by its ID.
      *
      * @param eventId The ID of the event to be retrieved.
-     * @param onCompleteListener The listener to notify upon completion.
+     * @param eventListener The listener to notify upon completion.
      */
-    public void getEventById(String eventId, OnCompleteListener<Event> onCompleteListener) {
-        eventsRef.document(eventId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Event event = document.toObject(Event.class);
-                    onCompleteListener.onComplete(Tasks.forResult(event));
-                } else {
-                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
-                }
+    public void getEventById(String eventId, EventListener<DocumentSnapshot> eventListener) {
+        eventsRef.document(eventId).addSnapshotListener((documentSnapshot, e) -> {
+            if (e != null) {
+                Log.w("EventRepository", "Listen failed.", e);
+                return;
+            }
+
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                Event event = documentSnapshot.toObject(Event.class);
+                eventListener.onEvent(documentSnapshot, null);
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                Log.d("EventRepository", "Current data: null");
             }
         });
     }
@@ -177,21 +196,26 @@ public class EventRepository {
     /**
      * Retrieves all events from the Firestore database.
      *
-     * @param onCompleteListener The listener to notify upon completion.
+     * @param eventListener The listener to notify upon completion.
      */
-    public void getAllEvents(OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
+    public void getAllEvents(EventListener<QuerySnapshot> eventListener) {
+        eventsRef.addSnapshotListener((querySnapshot, e) -> {
+            if (e != null) {
+                Log.w("EventRepository", "Listen failed.", e);
+                return;
+            }
+
+            if (querySnapshot != null && !querySnapshot.isEmpty()) {
                 List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                     Event event = document.toObject(Event.class);
                     if (event != null) {
                         events.add(event);
                     }
                 }
-                onCompleteListener.onComplete(Tasks.forResult(events));
+                eventListener.onEvent(querySnapshot, null);
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                Log.d("EventRepository", "Current data: null");
             }
         });
     }
@@ -201,23 +225,28 @@ public class EventRepository {
      *
      * @param startDate The start date of the range.
      * @param endDate The end date of the range.
-     * @param onCompleteListener The listener to notify upon completion.
+     * @param eventListener The listener to notify upon completion.
      */
-    public void getEventsByDateRange(Date startDate, Date endDate, OnCompleteListener<List<Event>> onCompleteListener) {
+    public void getEventsByDateRange(Date startDate, Date endDate, EventListener<QuerySnapshot> eventListener) {
         eventsRef.whereGreaterThanOrEqualTo("eventDate", startDate)
                 .whereLessThanOrEqualTo("eventDate", endDate)
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
+                .addSnapshotListener((querySnapshot, e) -> {
+                    if (e != null) {
+                        Log.w("EventRepository", "Listen failed.", e);
+                        return;
+                    }
+
+                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
                         List<Event> events = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                             Event event = document.toObject(Event.class);
                             if (event != null) {
                                 events.add(event);
                             }
                         }
-                        onCompleteListener.onComplete(Tasks.forResult(events));
+                        eventListener.onEvent(querySnapshot, null);
                     } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                        Log.d("EventRepository", "Current data: null");
                     }
                 });
     }
@@ -226,67 +255,26 @@ public class EventRepository {
      * Retrieves events based on their location.
      *
      * @param location The location to filter events by.
-     * @param onCompleteListener The listener to notify upon completion.
+     * @param eventListener The listener to notify upon completion.
      */
-    public void getEventsByLocation(String location, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("location", location).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                    Event event = document.toObject(Event.class);
-                    if (event != null) {
-                        events.add(event);
-                    }
-                }
-                onCompleteListener.onComplete(Tasks.forResult(events));
-            } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+    public void getEventsByLocation(String location, EventListener<QuerySnapshot> eventListener) {
+        eventsRef.whereEqualTo("location", location).addSnapshotListener((querySnapshot, e) -> {
+            if (e != null) {
+                Log.w("EventRepository", "Listen failed.", e);
+                return;
             }
-        });
-    }
 
-    /**
-     * Retrieves events based on their status.
-     *
-     * @param status The status to filter events by.
-     * @param onCompleteListener The listener to notify upon completion.
-     */
-    public void getEventsByStatus(String status, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("status", status).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
+            if (querySnapshot != null && !querySnapshot.isEmpty()) {
                 List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                     Event event = document.toObject(Event.class);
                     if (event != null) {
                         events.add(event);
                     }
                 }
-                onCompleteListener.onComplete(Tasks.forResult(events));
+                eventListener.onEvent(querySnapshot, null);
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
-            }
-        });
-    }
-
-    /**
-     * Retrieves events based on their category.
-     *
-     * @param category The category to filter events by.
-     * @param onCompleteListener The listener to notify upon completion.
-     */
-    public void getEventsByCategory(String category, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("category", category).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                    Event event = document.toObject(Event.class);
-                    if (event != null) {
-                        events.add(event);
-                    }
-                }
-                onCompleteListener.onComplete(Tasks.forResult(events));
-            } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                Log.d("EventRepository", "Current data: null");
             }
         });
     }

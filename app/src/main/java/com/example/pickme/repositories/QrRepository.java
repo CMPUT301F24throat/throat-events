@@ -1,9 +1,15 @@
 package com.example.pickme.repositories;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
+
+import android.util.Log;
+
 import com.example.pickme.models.QR;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -12,8 +18,31 @@ import com.google.firebase.firestore.QuerySnapshot;
  * CRUD operations for QR data
  */
 public class QrRepository {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference qrRef = db.collection("QRs");
+    private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
+    private final CollectionReference qrRef;
+    private static QrRepository instance;
+
+    /**
+     * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
+     */
+    private QrRepository() {
+        this.db = FirebaseFirestore.getInstance();
+        this.auth = FirebaseAuth.getInstance();
+        this.qrRef = db.collection("QRs");
+    }
+
+    /**
+     * Singleton pattern to ensure only one instance of the repository is created.
+     *
+     * @return The instance of the QrRepository.
+     */
+    public static synchronized QrRepository getInstance() {
+        if (instance == null) {
+            instance = new QrRepository();
+        }
+        return instance;
+    }
 
     /**
      * Creates a new QR document using a QR object.
@@ -22,6 +51,7 @@ public class QrRepository {
      * @return Task for tracking success/failure
      */
     public Task<DocumentReference> createQR(QR qr) {
+        Log.d(TAG, "Creating QR: " + qr);  // debug
         // Add the QR object to Firestore and let Firestore generate the document ID
         return qrRef.add(qr).continueWithTask(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
@@ -41,30 +71,29 @@ public class QrRepository {
      * Reads a QR document by its ID.
      *
      * @param qrID ID of the QR document to read
-     * @return Task containing the QR document if found
+     * @param eventListener The listener to notify upon completion
      */
-    public Task<QuerySnapshot> readQRByID(String qrID) {
-        return qrRef.whereEqualTo("qrId", qrID).get();
+    public void readQRByID(String qrID, EventListener<QuerySnapshot> eventListener) {
+        qrRef.whereEqualTo("qrId", qrID).addSnapshotListener(eventListener);
     }
 
     /**
      * Retrieves all QR documents in Firestore.
      *
-     * @return Task containing all QR documents.
+     * @param eventListener The listener to notify upon completion
      */
-    public Task<QuerySnapshot> getAllQRs() {
-        return qrRef.get();
+    public void getAllQRs(EventListener<QuerySnapshot> eventListener) {
+        qrRef.addSnapshotListener(eventListener);
     }
-
 
     /**
      * Reads a QR document by its association.
      *
      * @param qrAssociation Associated entity reference for the QR document
-     * @return Task containing the QR document if found
+     * @param eventListener The listener to notify upon completion
      */
-    public Task<QuerySnapshot> readQRByAssociation(String qrAssociation) {
-        return qrRef.whereEqualTo("qrAssociation", qrAssociation).get();
+    public void readQRByAssociation(String qrAssociation, EventListener<QuerySnapshot> eventListener) {
+        qrRef.whereEqualTo("qrAssociation", qrAssociation).addSnapshotListener(eventListener);
     }
 
     /**
@@ -77,13 +106,3 @@ public class QrRepository {
         return qrRef.document(qrID).delete();
     }
 }
-
-/*
-  Code Sources
-  <p>
-  Firebase Documentation:
-  - Firestore Documentation
-  <p>
-  Java Documentation:
-  - Java error handling with exceptions
- */

@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.pickme.models.Event;
 import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
 import com.example.pickme.utils.NotificationList;
@@ -23,37 +24,31 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the notifications collection
- * @author sophiecabungcal, Omar-Kattan-1
  * @version 1.1
- * <b></b>
  * Responsibilities:
  * CRUD operations for notification data
  */
 public class NotificationRepository {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference notificationsRef = db.collection("notifications");
+    private final FirebaseFirestore db;
+    private final CollectionReference notificationsRef;
     private NotificationAdapter notificationAdapter;
     private NotifRecAdapter notifRecAdapter;
     static boolean listening = false;
-
-    static NotificationRepository instance;
-
-    public static NotificationRepository getInstance(){
-        if(instance == null)
-            instance = new NotificationRepository();
-
-        return instance;
-    }
+    private static NotificationRepository instance;
 
     /**
-     * Constructor also initializes the Firebase db
+     * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
      */
     private NotificationRepository() {
+        this.db = FirebaseFirestore.getInstance();
+        this.notificationsRef = db.collection("notifications");
+
         // temporary anonymous auth
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
@@ -62,6 +57,19 @@ public class NotificationRepository {
                 Log.d("AUTH", "AUTH: Successful authentication");
             }
         });
+    }
+
+    /**
+     * Singleton pattern to ensure only one instance of the repository is created.
+     *
+     * @return The instance of the NotificationRepository.
+     */
+    public static synchronized NotificationRepository getInstance(){
+        if (instance == null) {
+            instance = new NotificationRepository();
+        }
+
+        return instance;
     }
 
     /**
@@ -84,36 +92,61 @@ public class NotificationRepository {
                 });
     }
 
-    // Read a notification by ID
-    public void getNotificationById(String notificationId, OnSuccessListener<DocumentSnapshot> onSuccessListener) {
-        notificationsRef.document(notificationId).get().addOnSuccessListener(onSuccessListener);
+    /**
+     * Reads a notification by ID
+     * @param notificationId The ID of the notification to be read
+     * @param eventListener Listener to handle real-time updates
+     */
+    public void getNotificationById(String notificationId, EventListener<DocumentSnapshot> eventListener) {
+        notificationsRef.document(notificationId).addSnapshotListener(eventListener);
     }
 
-    // Update a notification
+    /**
+     * Updates a notification
+     * @param notification The notification object containing updated information
+     */
     public void updateNotification(Notification notification) {
         notificationsRef.document(notification.getNotificationId()).set(notification);
     }
 
-    // Delete a notification by ID
+    /**
+     * Deletes a notification by ID
+     * @param notificationId The ID of the notification to be deleted
+     */
     public void deleteNotification(String notificationId) {
         notificationsRef.document(notificationId).delete();
     }
 
-    // Read all notifications
-    public void getAllNotifications(OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        notificationsRef.get().addOnCompleteListener(onCompleteListener);
+    /**
+     * Reads all notifications
+     * @param eventListener Listener to handle real-time updates
+     */
+    public void getAllNotifications(EventListener<QuerySnapshot> eventListener) {
+        notificationsRef.addSnapshotListener(eventListener);
     }
 
-    // Read notifications by receiver user ID
-    public void getNotificationsByReceiverUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        notificationsRef.whereEqualTo("receiverId", userId).get().addOnCompleteListener(onCompleteListener);
+    /**
+     * Reads notifications by receiver user ID
+     * @param userId The ID of the receiver user
+     * @param eventListener Listener to handle real-time updates
+     */
+    public void getNotificationsByReceiverUserId(String userId, EventListener<QuerySnapshot> eventListener) {
+        notificationsRef.whereEqualTo("receiverId", userId).addSnapshotListener(eventListener);
     }
 
-    // Read notifications by sender user ID
-    public void getNotificationsBySenderUserId(String userId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
-        notificationsRef.whereEqualTo("senderId", userId).get().addOnCompleteListener(onCompleteListener);
+    /**
+     * Reads notifications by sender user ID
+     * @param userId The ID of the sender user
+     * @param eventListener Listener to handle real-time updates
+     */
+    public void getNotificationsBySenderUserId(String userId, EventListener<QuerySnapshot> eventListener) {
+        notificationsRef.whereEqualTo("senderId", userId).addSnapshotListener(eventListener);
     }
 
+    /**
+     * Adds a snapshot listener for real-time updates
+     * @param context The context in which the listener is added
+     */
     public void addSnapshotListener(Context context){
         if(listening)
             return;
@@ -145,24 +178,29 @@ public class NotificationRepository {
                     if(change.getType() == DocumentChange.Type.ADDED){
                         notificationList.add(notification);
                         user.addUserNotification(new UserNotification(notification.getNotificationId()));
-                        new EventRepository().getEventById(notification.getEventID(), task ->{
-                                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
-                                    .setSmallIcon(android.R.drawable.ic_menu_info_details)
-                                    .setContentTitle(task.getResult().getEventTitle())
-                                    .setContentText(notification.getMessage());
+                        EventRepository eventRepository = EventRepository.getInstance();
+                        eventRepository.getEventById(notification.getEventID(), (documentSnapshot, eventError) -> {
+                            if (eventError != null || documentSnapshot == null) {
+                                Log.e("NOTIF", "Failed to fetch event for notification: " + notification.getNotificationId(), eventError);
+                                return;
+                            }
 
+                            Event event = documentSnapshot.toObject(Event.class);
+                            if (event != null) {
+                                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
+                                        .setSmallIcon(android.R.drawable.ic_menu_info_details)
+                                        .setContentTitle(event.getEventTitle())
+                                        .setContentText(notification.getMessage());
 
                                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
                                 if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                                     notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
                                 }
-
-                                });
-
+                            }
+                        });
                     }
                     else if(change.getType() == DocumentChange.Type.REMOVED)
                         notificationList.remove(notification);
-
                 }
 
                 if(notificationAdapter != null)
@@ -171,9 +209,7 @@ public class NotificationRepository {
                 if(notifRecAdapter != null)
                     this.notifRecAdapter.notifyDataSetChanged();
             }
-
         });
-
     }
 
     public void attachAdapter(NotificationAdapter notificationAdapter){
