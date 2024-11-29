@@ -199,7 +199,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void navigateToUserProfileFragment() {
-        Navigation.findNavController(Objects.requireNonNull(getView())).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
+        Navigation.findNavController(requireView()).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
     }
 
     private void showUnsavedChangesDialog() {
