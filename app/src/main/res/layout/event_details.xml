@@ -110,13 +110,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/eventFlyer"
-                android:layout_marginTop="5dp"/>
+                android:layout_marginTop="10dp"/>
             <TextView
                 android:id="@+id/joinWaitingList"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Start Lottery"
+                android:text="Join Waiting List"
                 android:paddingVertical="10dp"
                 android:textColor="@color/text1"
                 android:drawableStart="@drawable/ic_add"
@@ -213,7 +213,7 @@
 
             <TextView
                 android:id="@+id/description"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:justificationMode="inter_word"
@@ -224,11 +224,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/entrantIcon" />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/createNotif"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/background1"
+                android:background="@drawable/ic_button_bg_main"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="5dp"
+                android:layout_marginEnd="10dp"
                 android:src="@drawable/baseline_send_24"
                 app:layout_constraintBottom_toBottomOf="@+id/title"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -237,13 +239,4 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <ImageButton
-        android:id="@+id/goToQrView"
-        android:layout_width="52dp"
-        android:layout_height="50dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/qr_code_2_24px"
-        app:layout_constraintBottom_toBottomOf="@+id/textView3"
-        app:layout_constraintEnd_toStartOf="@+id/endGuide"
-        app:layout_constraintTop_toTopOf="@+id/textView3" />
 </androidx.constraintlayout.widget.ConstraintLayout>

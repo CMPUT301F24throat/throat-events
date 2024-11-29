@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.example.pickme.controllers.EventViewModel;
 import com.example.pickme.databinding.EventCreateBinding;
 import com.example.pickme.models.Event;
@@ -87,6 +88,15 @@ public class EventCreationFragment extends Fragment {
             }
         });
 
+        binding.removePoster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                binding.imageView.setVisibility(View.GONE);
+                binding.removePoster.setVisibility(View.GONE);
+                posterUrl = "";
+            }
+        });
+
         binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
         binding.create.setOnClickListener(listener -> {
             if (validateInputs()) {
@@ -134,12 +144,15 @@ public class EventCreationFragment extends Fragment {
         binding.geoLocation.setChecked(event.isGeoLocationRequired());
 
         // Download and set the event image
-        Image image = new Image("1234567890", "123456789");
+        Image image = new Image(event.getOrganizerId(), event.getEventId());
         image.download(new ImageQuery() {
             @Override
             public void onSuccess(Image image) {
-                // TODO: FIXXXX Set image to ImageView
-                //Glide.with(binding.getRoot()).load(image.getImageUrl()).into(binding.camera);
+                if (isAdded()) {
+                    Glide.with(binding.getRoot())
+                            .load(image.getImageUrl())
+                            .into(binding.imageView);
+                }
             }
 
             @Override
@@ -148,6 +161,10 @@ public class EventCreationFragment extends Fragment {
 
         // Update UI elements for editing mode
         binding.deleteEvent.setVisibility(View.VISIBLE);
+
+        binding.imageView.setVisibility(View.VISIBLE);
+        binding.removePoster.setVisibility(View.VISIBLE);
+        binding.addImage.setText("Change event poster");
         binding.back.setText("Edit Event");
     }
 
@@ -179,8 +196,7 @@ public class EventCreationFragment extends Fragment {
                 !binding.date.getText().toString().isEmpty() &&
                 !binding.startTime.getText().toString().isEmpty() &&
                 !binding.endTime.getText().toString().isEmpty() &&
-                !binding.address.getText().toString().isEmpty() &&
-                !binding.entrants.getText().toString().isEmpty();
+                !binding.address.getText().toString().isEmpty();
     }
 
     /**
@@ -199,7 +215,7 @@ public class EventCreationFragment extends Fragment {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     selectedImageUri = result.getData().getData();
                     // TODO: FIXXXX Set image to ImageView
-                    //binding.addImage.setImageURI(selectedImageUri);
+                    binding.imageView.setImageURI(selectedImageUri);
                 }
             }
     );
@@ -231,7 +247,11 @@ public class EventCreationFragment extends Fragment {
         facilityRepository.getFacilityByOwnerId(organizerId, task -> {
             if (task.isSuccessful() && !task.getResult().isEmpty()) {
                 String facilityId = task.getResult().getDocuments().get(0).getId();
-
+                int entrantsValue = 0; // Default value
+                String entrantsText = binding.entrants.getText().toString().trim(); // Get and trim text
+                if (!entrantsText.isEmpty()) {
+                    entrantsValue = Integer.parseInt(entrantsText); // Parse only if not empty
+                }
                 if (event == null) {
                     // Create a new event
                     Event newEvent = new Event(
@@ -246,7 +266,7 @@ public class EventCreationFragment extends Fragment {
                             binding.address.getText().toString(),
                             binding.winners.getText().toString(),
                             binding.geoLocation.isChecked(),
-                            Integer.parseInt(binding.entrants.getText().toString()),
+                            entrantsValue,
                             System.currentTimeMillis(),
                             System.currentTimeMillis()
                     );
@@ -266,7 +286,7 @@ public class EventCreationFragment extends Fragment {
                             binding.address.getText().toString(),
                             binding.winners.getText().toString(),
                             binding.geoLocation.isChecked(),
-                            Integer.parseInt(binding.entrants.getText().toString()),
+                            entrantsValue,
                             event.getCreatedAt(),
                             System.currentTimeMillis()
                     );

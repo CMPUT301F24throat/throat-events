@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/button_squircle_background"
+    android:backgroundTint="@color/white"
+    android:padding="25dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Lottery"
+        android:textStyle="bold"
+        android:id="@+id/title"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="We will draw 100 winners from your waitlist of 564 entrants."
+        android:textSize="14sp"
+        android:id="@+id/subTitle"
+        android:gravity="center"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Proceed?"
+        android:textStyle="bold"
+        android:id="@+id/proceed"
+        android:textSize="18sp"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subTitle"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:background="@drawable/rounded_button"
+        android:id="@+id/start"
+        android:textSize="16sp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/proceed"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:background="@drawable/button_bg_stoke_dark"
+        android:id="@+id/cancel"
+        android:textSize="16sp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/proceed"
+        app:layout_constraintEnd_toStartOf="@id/start"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
