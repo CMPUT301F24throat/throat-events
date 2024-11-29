@@ -113,17 +113,15 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void configWaitlistBtn() {
-        if (waitingListUtils != null) {
+        if (waitingListUtils != null && event != null) {
             View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
             waitingListUtils.getEntrantsCountByStatus(event.getEventId(), EntrantStatus.WAITING, task -> {
-                int waitingEntrantsCount;
-                if (task.isSuccessful()) {
+                int waitingEntrantsCount = 0;
+                if (task.isSuccessful() && task.getResult() != null) {
                     waitingEntrantsCount = task.getResult();
-                } else {
-                    waitingEntrantsCount = 0;
                 }
 
-                if (waitingEntrantsCount >= event.getMaxEntrants()) {
+                if (event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()) {
                     ((TextView) waitlistBtn).setText("Waitlist is full - try again later");
                     waitlistBtn.setEnabled(false);
                     waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
