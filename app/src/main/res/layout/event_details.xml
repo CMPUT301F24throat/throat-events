@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background1"
+    android:visibility="visible"
     tools:context=".views.EventDetailsFragment"
     tools:visibility="visible">
 
@@ -42,7 +43,6 @@
             android:layout_height="50dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="View and share the event's QR"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -87,13 +87,25 @@
             android:id="@+id/eventDetails_editBtn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginEnd="15dp"
             android:backgroundTint="@color/buttonBG2"
             android:contentDescription="Edit event"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/eventDetails_deleteBtn"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_pencil" />
+
+        <ImageButton
+            android:id="@+id/eventDetails_deleteBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/red1"
+            android:contentDescription="Delete event"
+            android:src="@drawable/baseline_delete_outline_24"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -116,13 +128,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/joinWaitlistBtn"
+            android:id="@+id/eventDetails_joinWaitlistBtn"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/buttonBG1"
             android:fontFamily="@font/inter_medium"
             android:text="Join Waitlist"
+            app:cornerRadius="8dp"
             app:icon="@drawable/ic_add"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -136,7 +149,7 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/joinWaitlistBtn">
+            app:layout_constraintTop_toBottomOf="@+id/eventDetails_joinWaitlistBtn">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/eventDateTimeGroup"
@@ -291,7 +304,7 @@
         app:layout_constraintTop_toBottomOf="@+id/eventDetailsContent">
 
         <Button
-            android:id="@+id/runLotteryBtn"
+            android:id="@+id/eventDetails_runLotteryBtn"
             android:layout_width="320dp"
             android:layout_height="0dp"
             android:backgroundTint="@color/buttonBG2"

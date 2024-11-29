@@ -116,7 +116,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/joinWaitlistBtn"
+            android:id="@+id/eventDetails_joinWaitlistBtn"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -136,7 +136,7 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/joinWaitlistBtn">
+            app:layout_constraintTop_toBottomOf="@+id/eventDetails_joinWaitlistBtn">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/eventDateTimeGroup"
@@ -291,7 +291,7 @@
         app:layout_constraintTop_toBottomOf="@+id/eventDetailsContent">
 
         <Button
-            android:id="@+id/runLotteryBtn"
+            android:id="@+id/eventDetails_runLotteryBtn"
             android:layout_width="320dp"
             android:layout_height="0dp"
             android:backgroundTint="@color/buttonBG2"
