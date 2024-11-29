@@ -192,6 +192,27 @@ public class UserRepository {
     }
 
     /**
+     * Checks if a user exists in the Firestore database by their device ID.
+     *
+     * @param userDeviceId The device ID of the user to check
+     * @param onCompleteListener Listener to handle the completion of the task
+     */
+    public void checkUserExists(String userDeviceId, OnCompleteListener<Boolean> onCompleteListener) {
+        if (userDeviceId == null || userDeviceId.isEmpty()) {
+            Log.e("UserRepository", "DeviceID is required to check if user exists.");
+            onCompleteListener.onComplete(Tasks.forResult(false));
+            return;
+        }
+        usersRef.document(userDeviceId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                onCompleteListener.onComplete(Tasks.forResult(true));
+            } else {
+                onCompleteListener.onComplete(Tasks.forResult(false));
+            }
+        });
+    }
+
+    /**
      * Callback interface for user creation.
      */
     public interface OnUserCreatedCallback {
