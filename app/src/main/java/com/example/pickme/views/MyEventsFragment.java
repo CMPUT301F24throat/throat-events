@@ -122,8 +122,11 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
                 eventList.addAll(events);
                 eventAdapter.notifyDataSetChanged();
 
-                View noEventsText = requireView().findViewById(R.id.noEventsText);
-                noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
+                View view = getView();
+                if (view != null) {
+                    View noEventsText = view.findViewById(R.id.noEventsText);
+                    noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
+                }
             } else {
                 Log.d("MyEventsFragment", "No events found for user device ID: " + userDeviceId);
             }
