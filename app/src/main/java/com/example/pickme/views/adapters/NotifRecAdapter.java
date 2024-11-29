@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme.R;
 import com.example.pickme.models.Notification;
 import com.example.pickme.repositories.EventRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 
@@ -56,9 +59,16 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
         Notification notification = notifications.get(position);
 
         // Fetch event details asynchronously
-        new EventRepository().getEventById(notification.getEventID(), task -> {
-            String eventTitle = task.getResult().getEventTitle();
-            holder.eventName.setText(eventTitle);
+        EventRepository.getInstance().getEventById(notification.getEventID(), new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    holder.eventName.setText(documentSnapshot.getString("eventTitle"));
+                }
+            }
         });
 
         // Set the notification message
@@ -74,5 +84,4 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
     public int getItemCount() {
         return notifications.size();
     }
-
 }

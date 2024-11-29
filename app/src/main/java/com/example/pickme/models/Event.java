@@ -37,7 +37,7 @@ public class Event implements Serializable {
     private Integer maxEntrants;         // Maximum number of entrants [Nullable]
     private ArrayList<WaitingListEntrant> waitingList; // Event waiting list; a list of waiting list entrants
     private Boolean hasLotteryExecuted;  // Flag to indicate if the lottery has been executed
-    private final Timestamp createdAt;              // Creation timestamp
+    private Timestamp createdAt;              // Creation timestamp
     private Timestamp updatedAt;              // Last updated timestamp
 
     /**
@@ -353,6 +353,16 @@ public class Event implements Serializable {
      */
     public Timestamp getCreatedAt() {
         return createdAt;
+    }
+
+    /**
+     * Sets the creation timestamp.
+     *
+     * @param createdAt Creation timestamp
+     */
+    public void setCreatedAt(Timestamp createdAt) {
+
+        this.createdAt = createdAt;
     }
 
     /**

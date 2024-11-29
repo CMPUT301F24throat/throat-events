@@ -26,23 +26,27 @@ import androidx.navigation.Navigation;
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
+import com.example.pickme.models.QR;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
+import com.example.pickme.repositories.QrRepository;
 import com.example.pickme.utils.ImageQuery;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * Fragment for creating or updating an event.
+ * Fragment for creating and editing events.
  */
 public class EventCreationFragment extends Fragment {
     private String posterUrl;
     private Uri selectedImageUri;
     private Event event;
 
-    private FacilityRepository facilityRepository = new FacilityRepository();
+    private EventRepository eventRepository;
+    private FacilityRepository facilityRepository;
+    private QrRepository qrRepository;
     private String organizerId;
 
     private EditText eventTitleEdit, descriptionEdit, eventDateEdit, startTimeEdit, endTimeEdit, locationEdit, maxWinnersEdit, maxEntrantsEdit;
@@ -50,20 +54,54 @@ public class EventCreationFragment extends Fragment {
     private Button upsertEventBtn, deleteEventBtn, backBtn;
     private CheckBox requireGeolocation;
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return The View for the fragment's UI.
+     */
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.event_create, container, false);
     }
 
+    /**
+     * Called immediately after onCreateView has returned, but before any saved state has been restored in to the view.
+     *
+     * @param view The View returned by onCreateView.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         organizerId = User.getInstance().getDeviceId();
+        eventRepository = EventRepository.getInstance();
+        facilityRepository = FacilityRepository.getInstance();
+        qrRepository = QrRepository.getInstance();
 
-        // Initialize views
+        initializeViews(view);
+        setClickListeners();
+
+        if (getArguments() != null) {
+            event = (Event) getArguments().getSerializable("selectedEvent");
+            if (event != null) {
+                setEventData();
+                setupEditMode();
+            }
+        } else {
+            setCurrentDateTime();
+        }
+    }
+
+    /**
+     * Initializes the views in the fragment.
+     *
+     * @param view The View returned by onCreateView.
+     */
+    private void initializeViews(View view) {
         eventTitleEdit = view.findViewById(R.id.title);
         descriptionEdit = view.findViewById(R.id.description);
         eventDateEdit = view.findViewById(R.id.date);
@@ -77,8 +115,12 @@ public class EventCreationFragment extends Fragment {
         upsertEventBtn = view.findViewById(R.id.create);
         deleteEventBtn = view.findViewById(R.id.deleteEvent);
         requireGeolocation = view.findViewById(R.id.requireGeolocation);
+    }
 
-        // Set click listeners for UI elements
+    /**
+     * Sets click listeners for the views.
+     */
+    private void setClickListeners() {
         addImage.setOnClickListener(listener -> openGallery());
         eventDateEdit.setOnClickListener(listener -> pickDate());
         startTimeEdit.setOnClickListener(listener -> pickTime(true));
@@ -91,40 +133,29 @@ public class EventCreationFragment extends Fragment {
                 Toast.makeText(requireActivity(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             }
         });
-
-        // Check if there are arguments passed to the fragment
-        if (getArguments() != null) {
-            event = (Event) getArguments().getSerializable("selectedEvent");
-
-            // If an event is being edited, set the event data in the UI
-            if (event != null) {
-                setEventData();
-
-                deleteEventBtn.setVisibility(View.VISIBLE);
-                deleteEventBtn.setOnClickListener(listener -> {
-                    if (event == null) {
-                        // Navigate up if no event is being edited
-                        Navigation.findNavController(requireView()).navigateUp();
-                    } else {
-                        // Delete the event if it exists
-                        deleteEvent(event);
-                    }
-                });
-                backBtn.setText("Edit Event");
-                upsertEventBtn.setText("Save Changes");
-            }
-        }
-        // Set the current eventDateEdit and time in the UI
-        setCurrentDateTime();
     }
 
     /**
-     * Sets the event data in the UI if an event is being edited.
+     * Sets up the fragment for edit mode.
+     */
+    private void setupEditMode() {
+        deleteEventBtn.setVisibility(View.VISIBLE);
+        deleteEventBtn.setOnClickListener(listener -> {
+            if (event == null) {
+                Navigation.findNavController(requireView()).navigateUp();
+            } else {
+                deleteEvent(event);
+            }
+        });
+        backBtn.setText("Edit Event");
+        upsertEventBtn.setText("Save Changes");
+    }
+
+    /**
+     * Sets the event data in the views.
      */
     private void setEventData() {
-        if (event == null) {
-            return;
-        }
+        if (event == null) return;
 
         eventTitleEdit.setText(event.getEventTitle() != null ? event.getEventTitle() : "");
         descriptionEdit.setText(event.getEventDescription() != null ? event.getEventDescription() : "");
@@ -134,17 +165,16 @@ public class EventCreationFragment extends Fragment {
         startTimeEdit.setText(times[0]);
         endTimeEdit.setText(times.length > 1 ? times[1] : "");
         locationEdit.setText(event.getEventLocation() != null ? event.getEventLocation() : "");
-        maxWinnersEdit.setText(event.getMaxWinners());
+        maxWinnersEdit.setText(String.valueOf(event.getMaxWinners()));
         maxEntrantsEdit.setText(event.getMaxEntrants() != null ? event.getMaxEntrants().toString() : "");
         requireGeolocation.setChecked(event.isGeoLocationRequired());
 
-        // Download and set the event image
         Image image = new Image("1234567890", "123456789");
         image.download(new ImageQuery() {
             @Override
             public void onSuccess(Image image) {
-                // TODO: FIXXXX Set image to ImageView
-                //Glide.with(getView()).load(image.getImageUrl()).into(binding.camera);
+                // TODO: FIX - NEED TO SET UP IMAGE POSTER
+                // Glide.with(getView()).load(image.getImageUrl()).into(binding.camera);
             }
 
             @Override
@@ -153,35 +183,69 @@ public class EventCreationFragment extends Fragment {
     }
 
     /**
-     * Sets the current date and time in the UI.
+     * Sets the current date and time in the views.
      */
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-        String currentDate = dateFormat.format(calendar.getTime());
-        eventDateEdit.setText(currentDate);
+        eventDateEdit.setText(dateFormat.format(calendar.getTime()));
 
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-        String currentTime = timeFormat.format(calendar.getTime());
-        startTimeEdit.setText(currentTime);
+        startTimeEdit.setText(timeFormat.format(calendar.getTime()));
 
         calendar.add(Calendar.HOUR_OF_DAY, 3);
-        String endTime = timeFormat.format(calendar.getTime());
-        endTimeEdit.setText(endTime);
+        endTimeEdit.setText(timeFormat.format(calendar.getTime()));
     }
 
     /**
-     * Validates the input fields to ensure all required fields are filled.
+     * Validates the inputs in the views.
+     *
      * @return true if all required fields are filled, false otherwise.
      */
     private boolean validateInputs() {
-        return !eventTitleEdit.getText().toString().isEmpty() &&
-                !eventDateEdit.getText().toString().isEmpty() &&
-                !startTimeEdit.getText().toString().isEmpty() &&
-                !endTimeEdit.getText().toString().isEmpty() &&
-                !locationEdit.getText().toString().isEmpty() &&
-                !maxWinnersEdit.getText().toString().isEmpty();
+        if (isEmpty(eventTitleEdit) || isEmpty(eventDateEdit) || isEmpty(startTimeEdit) || isEmpty(endTimeEdit) || isEmpty(locationEdit) || isEmpty(maxWinnersEdit)) {
+            return false;
+        }
+
+        String maxWinnersText = maxWinnersEdit.getText().toString();
+        String maxEntrantsText = maxEntrantsEdit.getText().toString();
+
+        try {
+            int maxWinners = Integer.parseInt(maxWinnersText);
+            if (!maxEntrantsText.isEmpty()) {
+                int maxEntrants = Integer.parseInt(maxEntrantsText);
+                if (maxEntrants < maxWinners) {
+                    showToast("Max winners cannot be greater than max entrants");
+                    return false;
+                }
+            }
+        } catch (NumberFormatException e) {
+            showToast("Please enter valid numbers for max winners and max entrants");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if an EditText is empty.
+     *
+     * @param editText The EditText to check.
+     * @return true if the EditText is empty, false otherwise.
+     */
+    private boolean isEmpty(EditText editText) {
+        return editText.getText().toString().trim().isEmpty();
+    }
+
+    /**
+     * Shows a toast message.
+     *
+     * @param message The message to show.
+     */
+    private void showToast(String message) {
+        if (isAdded()) {
+            Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -193,20 +257,24 @@ public class EventCreationFragment extends Fragment {
         galleryLauncher.launch(intent);
     }
 
+    /**
+     * ActivityResultLauncher for handling the result of the gallery intent.
+     */
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     selectedImageUri = result.getData().getData();
-                    // TODO: FIXXXX Set image to ImageView
-                    //binding.addImage.setImageURI(selectedImageUri);
+                    // TODO: FIX
+                    // binding.addImage.setImageURI(selectedImageUri);
                 }
             }
     );
 
     /**
      * Uploads the selected image to Firebase.
-     * @param imageUri the URI of the selected image.
+     *
+     * @param imageUri The URI of the selected image.
      */
     private void uploadImageToFirebase(Uri imageUri) {
         Image image = new Image("1234567890", "123456789");
@@ -219,115 +287,129 @@ public class EventCreationFragment extends Fragment {
     }
 
     /**
-     * Creates or updates an event in Firestore.
+     * Creates or updates an event.
      */
     private void upsertEvent() {
         String eventTitle = eventTitleEdit.getText().toString();
         String eventDescription = descriptionEdit.getText().toString();
         String eventLocation = locationEdit.getText().toString();
-        final int maxWinners;
-        final Integer maxEntrants;
-
-        // Check if maxWinnersEdit is not empty
-        if (!maxWinnersEdit.getText().toString().isEmpty()) {
-            try {
-                maxWinners = Integer.parseInt(maxWinnersEdit.getText().toString());
-            } catch (NumberFormatException e) {
-                Toast.makeText(requireActivity(), "Please enter a valid number for max winners", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else {
-            Toast.makeText(requireActivity(), "Max winners is required", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Check if maxEntrantsEdit is not empty
-        if (!maxEntrantsEdit.getText().toString().isEmpty()) {
-            try {
-                maxEntrants = Integer.parseInt(maxEntrantsEdit.getText().toString());
-            } catch (NumberFormatException e) {
-                Toast.makeText(requireActivity(), "Please enter a valid number for max entrants", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else {
-            maxEntrants = null; // Optional field
-        }
-
+        int maxWinners = Integer.parseInt(maxWinnersEdit.getText().toString());
+        Integer maxEntrants = !maxEntrantsEdit.getText().toString().isEmpty() ? Integer.parseInt(maxEntrantsEdit.getText().toString()) : null;
         String dateTime = eventDateEdit.getText().toString() + ", " + startTimeEdit.getText().toString() + " - " + endTimeEdit.getText().toString();
         boolean isGeolocationRequired = requireGeolocation.isChecked();
 
-        facilityRepository.getFacilityByOwnerId(organizerId, task -> {
-            if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                String facilityId = task.getResult().getDocuments().get(0).getId();
+        facilityRepository.getFacilityByOwnerId(organizerId, (querySnapshot, e) -> {
+            if (e != null) {
+                showToast("Failed to retrieve facility");
+                return;
+            }
+
+            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                String facilityId = querySnapshot.getDocuments().get(0).getId();
 
                 if (event == null) {
-                    // Create a new event
-                    Event newEvent = new Event(
-                            null,
-                            organizerId,
-                            facilityId,
-                            eventTitle,
-                            eventDescription,
-                            dateTime,
-                            posterUrl,
-                            eventLocation,
-                            maxWinners,
-                            isGeolocationRequired,
-                            maxEntrants,
-                            null,  // set to null here, will be initialized in EventRepository
-                            null    // set to null here, will be initialized in EventRepository
-                    );
-
-                    EventRepository eventRepository = EventRepository.getInstance();
-                    eventRepository.addEvent(newEvent, task1 -> {
-                        if (task1.isSuccessful()) {
-                            Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
-                            Navigation.findNavController(requireView()).navigateUp();
-                        } else {
-                            Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    createNewEvent(eventTitle, eventDescription, dateTime, eventLocation, maxWinners, isGeolocationRequired, maxEntrants, facilityId);
                 } else {
-                    // Update the existing event
-                    event.setEventTitle(eventTitle);
-                    event.setEventDescription(eventDescription);
-                    event.setEventDate(dateTime);
-                    event.setEventLocation(eventLocation);
-                    event.setMaxWinners(maxWinners);
-                    if (maxEntrants != null) {
-                        event.setMaxEntrants(maxEntrants);
-                    }
-                    event.setGeoLocationRequired(isGeolocationRequired);
-
-                    EventRepository eventRepository = EventRepository.getInstance();
-                    eventRepository.updateEvent(event, task1 -> {
-                        if (task1.isSuccessful()) {
-                            Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
-                            Navigation.findNavController(requireView()).navigateUp();
-                        } else {
-                            Toast.makeText(requireActivity(), "Failed to update event", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    updateExistingEvent(eventTitle, eventDescription, dateTime, eventLocation, maxWinners, isGeolocationRequired, maxEntrants);
                 }
             }
         });
     }
 
     /**
-     * Deletes the specified event.
-     * @param event the event to be deleted.
+     * Creates a new event.
+     *
+     * @param eventTitle The title of the event.
+     * @param eventDescription The description of the event.
+     * @param dateTime The date and time of the event.
+     * @param eventLocation The location of the event.
+     * @param maxWinners The maximum number of winners.
+     * @param isGeolocationRequired Whether geolocation is required for the event.
+     * @param maxEntrants The maximum number of entrants.
+     * @param facilityId The ID of the facility where the event is held.
+     */
+    private void createNewEvent(String eventTitle, String eventDescription, String dateTime, String eventLocation, int maxWinners, boolean isGeolocationRequired, Integer maxEntrants, String facilityId) {
+        Event newEvent = new Event(
+                null, organizerId, facilityId, eventTitle, eventDescription, dateTime, posterUrl, eventLocation, maxWinners, isGeolocationRequired, maxEntrants, null, null
+        );
+        eventRepository.addEvent(newEvent, addEventTask -> {
+            if (addEventTask.isSuccessful()) {
+                String newEventId = addEventTask.getResult();
+                QR eventQr = new QR("/events/" + newEventId);
+
+                qrRepository.createQR(eventQr)
+                        .addOnSuccessListener(aVoid -> handleUpsertResult(true, "Event Created Successfully!", "Failed to create event QR"))
+                        .addOnFailureListener(e -> handleUpsertResult(false, "Event Created Successfully!", "Failed to create event QR"));
+
+                handleUpsertResult(true, "Event Created Successfully!", "Failed to create event");
+            } else {
+                handleUpsertResult(false, "Event Created Successfully!", "Failed to create event");
+            }
+        });
+    }
+
+    /**
+     * Updates an existing event.
+     *
+     * @param eventTitle The new title of the event.
+     * @param eventDescription The new description of the event.
+     * @param dateTime The new date and time of the event.
+     * @param eventLocation The new location of the event.
+     * @param maxWinners The new maximum number of winners.
+     * @param isGeolocationRequired Whether geolocation is required for the event.
+     * @param maxEntrants The new maximum number of entrants.
+     */
+    private void updateExistingEvent(String eventTitle, String eventDescription, String dateTime, String eventLocation, int maxWinners, boolean isGeolocationRequired, Integer maxEntrants) {
+        updateEventDetails(event, eventTitle, eventDescription, dateTime, eventLocation, maxWinners, isGeolocationRequired, maxEntrants);
+        eventRepository.updateEvent(event, task -> handleUpsertResult(task.isSuccessful(), "Event Updated Successfully!", "Failed to update event"));
+    }
+
+    /**
+     * Updates the details of an existing event.
+     *
+     * @param event The event to update.
+     * @param title The new title of the event.
+     * @param description The new description of the event.
+     * @param dateTime The new date and time of the event.
+     * @param location The new location of the event.
+     * @param maxWinners The new maximum number of winners.
+     * @param isGeolocationRequired Whether geolocation is required for the event.
+     * @param maxEntrants The new maximum number of entrants.
+     */
+    private void updateEventDetails(Event event, String title, String description, String dateTime, String location, int maxWinners, boolean isGeolocationRequired, Integer maxEntrants) {
+        event.setEventTitle(title);
+        event.setEventDescription(description);
+        event.setEventDate(dateTime);
+        event.setEventLocation(location);
+        event.setMaxWinners(maxWinners);
+        if (maxEntrants != null) {
+            event.setMaxEntrants(maxEntrants);
+        }
+        event.setGeoLocationRequired(isGeolocationRequired);
+    }
+
+    /**
+     * Handles the result of creating or updating an event.
+     *
+     * @param isSuccess Whether the operation was successful.
+     * @param successMessage The message to show if the operation was successful.
+     * @param failureMessage The message to show if the operation failed.
+     */
+    private void handleUpsertResult(boolean isSuccess, String successMessage, String failureMessage) {
+        showToast(isSuccess ? successMessage : failureMessage);
+        if (isSuccess) {
+            Navigation.findNavController(requireView()).navigateUp();
+        }
+    }
+
+    /**
+     * Deletes an event.
+     *
+     * @param event The event to delete.
      */
     private void deleteEvent(Event event) {
         EventRepository eventRepository = EventRepository.getInstance();
-
-        eventRepository.deleteEvent(event.getEventId(), task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();
-                Navigation.findNavController(requireView()).navigateUp();
-            } else {
-                Toast.makeText(requireActivity(), "Failed to delete event", Toast.LENGTH_SHORT).show();
-            }
-        });
+        eventRepository.deleteEvent(event.getEventId(), task -> handleUpsertResult(task.isSuccessful(), "Event deleted Successfully!", "Failed to delete event"));
     }
 
     /**
@@ -335,39 +417,31 @@ public class EventCreationFragment extends Fragment {
      */
     private void pickDate() {
         Calendar calendar = Calendar.getInstance();
-
         DatePickerDialog datePicker = new DatePickerDialog(requireActivity(), (view, year, month, dayOfMonth) -> {
             calendar.set(year, month, dayOfMonth);
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-            String formattedDate = dateFormat.format(calendar.getTime());
-
-            eventDateEdit.setText(formattedDate);
+            eventDateEdit.setText(dateFormat.format(calendar.getTime()));
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-
         datePicker.show();
     }
 
     /**
      * Opens a time picker dialog to select a time.
-     * @param isStartTime true if selecting start time, false if selecting end time.
+     *
+     * @param isStartTime Whether the time picker is for the start time.
      */
     private void pickTime(boolean isStartTime) {
         Calendar calendar = Calendar.getInstance();
         TimePickerDialog timePicker = new TimePickerDialog(requireActivity(), (timeView, hourOfDay, minute) -> {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
-
             SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-            String formattedTime = timeFormat.format(calendar.getTime());
-
             if (isStartTime) {
-                startTimeEdit.setText(formattedTime);
+                startTimeEdit.setText(timeFormat.format(calendar.getTime()));
             } else {
-                endTimeEdit.setText(formattedTime);
+                endTimeEdit.setText(timeFormat.format(calendar.getTime()));
             }
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
-
         timePicker.show();
     }
 }

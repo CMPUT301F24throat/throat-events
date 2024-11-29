@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.example.pickme.R;
 import com.example.pickme.models.Notification;
 import com.example.pickme.repositories.EventRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 
@@ -44,8 +47,16 @@ public class NotificationAdapter extends ArrayAdapter<Notification> {
         TextView eventName = convertView.findViewById(R.id.eventName);
         TextView message = convertView.findViewById(R.id.notifMessage);
 
-        new EventRepository().getEventById(notification.getEventID(), task -> {
-            eventName.setText(task.getResult().getEventTitle());
+        EventRepository.getInstance().getEventById(notification.getEventID(), new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    eventName.setText(documentSnapshot.getString("eventTitle"));
+                }
+            }
         });
 
         message.setText(notification.getMessage());
@@ -56,4 +67,3 @@ public class NotificationAdapter extends ArrayAdapter<Notification> {
         return convertView;
     }
 }
-

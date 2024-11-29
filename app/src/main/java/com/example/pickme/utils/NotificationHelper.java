@@ -14,7 +14,6 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Manages local notifications
- * @author Omar-Kattan-1
  * <p>
  * Responsibilities:
  * Create and send notifications to users
@@ -25,7 +24,7 @@ public class NotificationHelper {
     /**
      * empty constructor
      */
-    public NotificationHelper(){
+    public NotificationHelper() {
 
     }
 
@@ -34,22 +33,21 @@ public class NotificationHelper {
      * updates it on firebase
      * @param notification the notification to send
      */
-    public void sendNotification(Notification notification){
-
+    public void sendNotification(Notification notification) {
         UserNotification userNotification = new UserNotification(notification.getNotificationId());
-        UserRepository userRepository = new UserRepository();
+        UserRepository userRepository = UserRepository.getInstance();
 
-        for(String userID : notification.getSendTo()){
+        for (String userID : notification.getSendTo()) {
 
-            userRepository.getUserDocumentByDeviceId(userID, documentSnapshotTask -> {
-                if(!documentSnapshotTask.isSuccessful() || documentSnapshotTask.getResult() == null){
+            userRepository.getUserDocumentByDeviceId(userID, (documentSnapshot, e) -> {
+                if (e != null || documentSnapshot == null) {
                     Log.i("NOTIF", "Failed to find user to send notif; userID: " + userID);
                     return;
                 }
 
-                User user = documentSnapshotTask.getResult().toObject(User.class);
+                User user = documentSnapshot.toObject(User.class);
 
-                if(user == null || !user.isNotificationEnabled())
+                if (user == null || !user.isNotificationEnabled())
                     return;
 
                 user.addUserNotification(userNotification);
@@ -73,6 +71,8 @@ public class NotificationHelper {
      */
     public void cleanNotifications(Runnable toRun) {
         User user = User.getInstance();
+        UserRepository userRepository = UserRepository.getInstance();
+        EventRepository eventRepository = EventRepository.getInstance();
         List<UserNotification> notificationsToRemove = new ArrayList<>();
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
@@ -88,10 +88,11 @@ public class NotificationHelper {
             CompletableFuture<Void> future = new CompletableFuture<>();
             futures.add(future);
 
-            NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
-                if (documentSnapshot == null) {
+            NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), (documentSnapshot, e) -> {
+                if (e != null || documentSnapshot == null) {
                     notificationsToRemove.add(userNotification);
-                    new UserRepository().updateUser(user, task -> {
+
+                    userRepository.updateUser(user, task -> {
                         Log.i("NOTIF", "Cleaned Notifs; doc was null");
                         future.complete(null);
                     });
@@ -101,17 +102,17 @@ public class NotificationHelper {
                 Notification notification = documentSnapshot.toObject(Notification.class);
                 if (notification == null || notification.getEventID() == null) {
                     notificationsToRemove.add(userNotification);
-                    new UserRepository().updateUser(user, task -> {
+                    userRepository.updateUser(user, task -> {
                         Log.i("NOTIF", "Cleaned Notifs; notif was null");
                         future.complete(null);
                     });
                     return;
                 }
 
-                new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
-                    if (!documentSnapshot1.isSuccessful() || documentSnapshot1.getResult() == null) {
+                eventRepository.getEventById(notification.getEventID(), (documentSnapshot1, eventError) -> {
+                    if (eventError != null || documentSnapshot1 == null) {
                         notificationsToRemove.add(userNotification);
-                        new UserRepository().updateUser(user, task -> {
+                        userRepository.updateUser(user, task -> {
                             Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
                             future.complete(null);
                         });
@@ -125,7 +126,7 @@ public class NotificationHelper {
         // Wait for all futures to complete
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
             user.getUserNotifications().removeAll(notificationsToRemove);
-            new UserRepository().updateUser(user, task -> {
+            userRepository.updateUser(user, task -> {
                 Log.i("NOTIF", "Cleaned Notifs");
                 toRun.run();
             });

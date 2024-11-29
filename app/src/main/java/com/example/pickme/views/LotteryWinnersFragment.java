@@ -62,7 +62,7 @@ public class LotteryWinnersFragment extends Fragment {
         winnerList.setLayoutManager(new LinearLayoutManager(requireContext()));
         winnerList.setAdapter(winnerAdapter);
 
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
 
         if (getArguments() != null) {
             List<String> selectedUserDeviceIds = getArguments().getStringArrayList("selectedUserDeviceIds");
@@ -84,10 +84,17 @@ public class LotteryWinnersFragment extends Fragment {
     private void fetchWinners(List<String> selectedUserDeviceIds) {
         // Get User objects for each selected user device ID
         for (String userDeviceId : selectedUserDeviceIds) {
-            userRepository.getUserByDeviceId(userDeviceId, userTask -> {
-                if (userTask.isSuccessful() && userTask.getResult() != null) {
-                    winners.add(userTask.getResult());
-                    winnerAdapter.notifyDataSetChanged();
+            userRepository.getUserByDeviceId(userDeviceId, (documentSnapshot, e) -> {
+                if (e != null) {
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    User user = documentSnapshot.toObject(User.class);
+                    if (user != null) {
+                        winners.add(user);
+                        winnerAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         }

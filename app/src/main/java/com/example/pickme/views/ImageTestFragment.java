@@ -35,7 +35,7 @@ public class ImageTestFragment extends Fragment {
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
-    UserRepository ur = new UserRepository();
+    UserRepository ur = UserRepository.getInstance();
 
     String firstName = "Joe";
     String lastName = "Doe";

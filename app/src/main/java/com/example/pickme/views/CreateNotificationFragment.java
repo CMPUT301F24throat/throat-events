@@ -23,7 +23,6 @@ import com.example.pickme.repositories.NotificationRepository;
 import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.NotificationHelper;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +30,13 @@ import java.util.List;
 /**
  * This fragment handles the create/send screen for notifications
  *
- * @author Omar-Kattan-1
  * @version 1.1
  */
 public class CreateNotificationFragment extends Fragment {
-
-    private FirebaseFirestore db;
-
     private ImageButton backArrow;
     private Button sendButton;
     private EditText message;
     private Spinner recipientsSpinner;
-
-    private User user;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
@@ -77,38 +70,35 @@ public class CreateNotificationFragment extends Fragment {
 
         // clicking the send button will first make sure the values entered are valid, then will
         // create the Notification and send it
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Notification notification = new Notification();
+        sendButton.setOnClickListener(view1 -> {
+            Notification notification = new Notification();
 
-                if(!notification.setMessage(message.getText().toString())){
-                    message.setError("Message must be between 1 and 300 characters long");
-                    return;
-                }
+            if(!notification.setMessage(message.getText().toString())){
+                message.setError("Message must be between 1 and 300 characters long");
+                return;
+            }
 
-                notification.setSentFrom(User.getInstance().getUserId());
-                notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
-                notification.setDateTimeNow();
-                notification.setEventID(getArguments().getString("EventID"));
+            notification.setSentFrom(User.getInstance().getUserId());
+            notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
+            notification.setDateTimeNow();
+            notification.setEventID(getArguments().getString("EventID"));
 
-                createSendList(notification, () -> {
+            createSendList(notification, () -> {
 
-                    NotificationRepository repo = NotificationRepository.getInstance();
+                NotificationRepository repo = NotificationRepository.getInstance();
 
-                    repo.addNotification(notification, task ->{
-                            Toast.makeText(
-                            view.getContext(),
+                repo.addNotification(notification, task ->{
+                    Toast.makeText(
+                            view1.getContext(),
                             "Notification Sent",
                             Toast.LENGTH_SHORT).show();
 
-                            new NotificationHelper().sendNotification(notification);
-                        });
-
-                    getActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
+                    new NotificationHelper().sendNotification(notification);
                 });
 
-            }
+                getActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
+            });
+
         });
     }
 
@@ -119,18 +109,23 @@ public class CreateNotificationFragment extends Fragment {
      * @param task the task to run after this process is done
      */
     private void createSendList(Notification notification, Runnable task){
-        UserRepository userRepository = new UserRepository();
-
         switch(notification.getLevel()){
             case All:
-                userRepository.getAllUsers(query -> {
-                    List<DocumentSnapshot> docs = query.getResult().getDocuments();
-                    for(DocumentSnapshot doc : docs){
-                        Log.i("DOC", "DOC ID: " + doc.getId());
-                        notification.getSendTo().add(doc.getId());
+                UserRepository.getInstance().getAllUsers((querySnapshot, e) -> {
+                    if (e != null) {
+                        Log.w("CreateNotificationFragment", "Listen failed.", e);
+                        return;
                     }
 
-                    task.run();
+                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                        List<DocumentSnapshot> docs = querySnapshot.getDocuments();
+                        for(DocumentSnapshot doc : docs){
+                            Log.i("DOC", "DOC ID: " + doc.getId());
+                            notification.getSendTo().add(doc.getId());
+                        }
+
+                        task.run();
+                    }
                 });
 
                 //TODO: add more cases to send notifs to correct people based on selection

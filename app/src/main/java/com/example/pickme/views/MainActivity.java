@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadingScreen = findViewById(R.id.loading_screen); // Find the loading screen view
 
@@ -107,20 +107,19 @@ public class MainActivity extends AppCompatActivity {
      * @param deviceID The device ID to check in Firestore.
      */
     private void checkUserInFirestore(String deviceID) {
-        userRepository.getUserDocumentByDeviceId(deviceID, task -> {
+        userRepository.getUserByDeviceId(deviceID, (documentSnapshot, e) -> {
             hideLoadingScreen(); // Hide the loading screen after Firestore operation
-            if (!task.isSuccessful() || task.getResult() == null) {
-                handleFirestoreError(task.getException());
+            if (e != null || documentSnapshot == null) {
+                handleFirestoreError(e);
                 return;
             }
 
-            DocumentSnapshot document = task.getResult();
-            if (!isUserDocumentValid(document)) {
+            if (!isUserDocumentValid(documentSnapshot)) {
                 handleUserNotFound();
                 return;
             }
 
-            User user = document.toObject(User.class);
+            User user = documentSnapshot.toObject(User.class);
             if (!isUserDeserialized(user)) {
                 handleDeserializationError();
                 return;

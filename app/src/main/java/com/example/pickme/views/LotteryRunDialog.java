@@ -40,7 +40,7 @@ public class LotteryRunDialog extends DialogFragment {
         this.eventId = eventId;
         this.lotteryUtils = new LotteryUtils();
         this.waitingListUtils = new WaitingListUtils();
-        this.eventRepository = new EventRepository();
+        this.eventRepository = EventRepository.getInstance();
     }
 
     @NonNull

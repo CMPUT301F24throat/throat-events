@@ -4,14 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.example.pickme.models.QR;
 import com.example.pickme.repositories.QrRepository;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -51,39 +46,40 @@ public class QRCodeGenerator {
         }
 
         // Retrieve QR document from Firestore asynchronously
-        qrRepository.readQRByAssociation("/events/" + eventID)
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+        qrRepository.readQRByAssociation("/events/" + eventID, (querySnapshot, e) -> {
+            if (e != null) {
+                Log.e("QRCodeGenerator", "Listen failed.", e);
+                callback.onError("Error retrieving QR document");
+                return;
+            }
 
-                            // Log the entire document for debugging
-                            Log.d("QRCodeGenerator", "Retrieved document data: " + document.getData());
+            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                DocumentSnapshot document = querySnapshot.getDocuments().get(0);
 
-                            QR qr = document.toObject(QR.class);
+                // Log the entire document for debugging
+                Log.d("QRCodeGenerator", "Retrieved document data: " + document.getData());
 
-                            if (qr != null && qr.getQrId() != null) {
-                                // Generate and cache QR code
-                                Bitmap qrCodeBitmap = generateQRCode(qr.getQrId());
-                                if (qrCodeBitmap != null) {
-                                    saveBitmapToCache(cacheFile, qrCodeBitmap);
-                                    callback.onQRCodeReady(cacheFile.getAbsolutePath());
-                                } else {
-                                    Log.e("QRCodeGenerator", "Failed to generate QR code bitmap for qrID: " + qr.getQrId());
-                                    callback.onError("Error generating QR code");
-                                }
-                            } else {
-                                Log.e("QRCodeGenerator", "QR ID not found in document for eventID: " + eventID);
-                                callback.onError("QR ID not found");
-                            }
-                        } else {
-                            Log.e("QRCodeGenerator", "No QR document found for association: /events/" + eventID);
-                            callback.onError("QR document not found");
-                        }
+                QR qr = document.toObject(QR.class);
+
+                if (qr != null && qr.getQrId() != null) {
+                    // Generate and cache QR code
+                    Bitmap qrCodeBitmap = generateQRCode(qr.getQrId());
+                    if (qrCodeBitmap != null) {
+                        saveBitmapToCache(cacheFile, qrCodeBitmap);
+                        callback.onQRCodeReady(cacheFile.getAbsolutePath());
+                    } else {
+                        Log.e("QRCodeGenerator", "Failed to generate QR code bitmap for qrID: " + qr.getQrId());
+                        callback.onError("Error generating QR code");
                     }
-                });
-
+                } else {
+                    Log.e("QRCodeGenerator", "QR ID not found in document for eventID: " + eventID);
+                    callback.onError("QR ID not found");
+                }
+            } else {
+                Log.e("QRCodeGenerator", "No QR document found for association: /events/" + eventID);
+                callback.onError("QR document not found");
+            }
+        });
     }
 
     /**

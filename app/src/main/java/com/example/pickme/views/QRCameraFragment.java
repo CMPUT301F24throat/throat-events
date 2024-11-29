@@ -20,7 +20,6 @@ import androidx.navigation.Navigation;
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
-import com.example.pickme.utils.EventFetcher;
 import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
@@ -118,21 +117,31 @@ public class QRCameraFragment extends Fragment {
     private void fetchEventDetails(String qrID) {
         Log.d(TAG, "Starting fetcher for QR ID: " + qrID);
 
-        // Create an instance of EventFetcher with the EventRepository
-        EventFetcher eventFetcher = new EventFetcher(new EventRepository());
+        // Get the instance of EventRepository
+        EventRepository eventRepository = EventRepository.getInstance();
 
-        eventFetcher.getEventByEventId(qrID, new EventFetcher.EventCallback() {
-            @Override
-            public void onEventFetched(Event event) {
-                Log.d(TAG, "Event fetched: " + event.getEventTitle());
-                navigateToEventDetails(event); // Pass the Event object
+        eventRepository.getEventById(qrID, (documentSnapshot, e) -> {
+            if (e != null) {
+                Log.e(TAG, "Error fetching event: " + e.getMessage());
+                Toast.makeText(requireContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                isProcessingScan = false; // Allow scanning again for the next QR code
+                return;
             }
 
-            @Override
-            public void onError(String errorMessage) {
-                Log.e(TAG, "Error fetching event: " + errorMessage);
-                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                isProcessingScan = false; // Allow scanning again for the next QR code
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                Event event = documentSnapshot.toObject(Event.class);
+                if (event != null) {
+                    Log.d(TAG, "Event fetched: " + event.getEventTitle());
+                    navigateToEventDetails(event); // Pass the Event object
+                } else {
+                    Log.e(TAG, "Event object is null");
+                    Toast.makeText(requireContext(), "Event details missing", Toast.LENGTH_SHORT).show();
+                    isProcessingScan = false; // Allow scanning again if navigation fails
+                }
+            } else {
+                Log.e(TAG, "Event not found");
+                Toast.makeText(requireContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                isProcessingScan = false; // Allow scanning again if event not found
             }
         });
     }

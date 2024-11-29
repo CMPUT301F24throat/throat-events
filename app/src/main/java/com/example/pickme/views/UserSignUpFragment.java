@@ -68,8 +68,7 @@ public class UserSignUpFragment extends Fragment {
     }
 
     private void createUser(String firstName, String lastName, String email, String contact, String deviceId) {
-        UserRepository userRepository = new UserRepository();
-        userRepository.addUser(firstName, lastName, email, contact, deviceId, new UserRepository.OnUserCreatedCallback() {
+        UserRepository.getInstance().addUser(firstName, lastName, email, contact, deviceId, new UserRepository.OnUserCreatedCallback() {
             @Override
             public void onSuccess(User user) {
                 Toast.makeText(getContext(), firstName + " " + (lastName.isEmpty() ? "" : lastName) + " has been added successfully!", Toast.LENGTH_SHORT).show();

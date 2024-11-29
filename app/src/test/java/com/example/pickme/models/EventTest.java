@@ -74,7 +74,7 @@ public class EventTest {
 
         // Testing with a valid numeric value
         event.setMaxWinners(50);
-        assertEquals(50, event.getMaxWinners().intValue());
+        assertEquals(50, event.getMaxWinners());
     }
 
     @Test

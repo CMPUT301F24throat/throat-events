@@ -53,7 +53,7 @@ public class FacilityCreationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        facilityRepository = new FacilityRepository();
+        facilityRepository = FacilityRepository.getInstance();
         facilityNameEditText = view.findViewById(R.id.facilityNameEditText);
         facilityLocationEditText = view.findViewById(R.id.facilityLocationEditText);
         createFacilityButton = view.findViewById(R.id.createFacilityButton);

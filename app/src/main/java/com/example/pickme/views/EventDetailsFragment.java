@@ -110,6 +110,7 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_joinWaitlistBtn, !isOrganizer);
 
         configWaitlistBtn();
+        configLotteryBtn();
     }
 
     private void configWaitlistBtn() {

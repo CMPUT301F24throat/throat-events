@@ -24,8 +24,6 @@ import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.QrRepository;
 import com.example.pickme.utils.QRCodeGenerator;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import java.io.File;
 
@@ -81,8 +79,8 @@ public class QRCodeViewFragment extends Fragment {
         }
 
         // Initialize repositories and QR code generator
-        eventRepository = new EventRepository();
-        qrCodeGenerator = new QRCodeGenerator(new QrRepository());
+        eventRepository = EventRepository.getInstance();
+        qrCodeGenerator = new QRCodeGenerator(QrRepository.getInstance());
     }
 
     @Nullable
@@ -123,11 +121,16 @@ public class QRCodeViewFragment extends Fragment {
      */
     private void loadEventDetails() {
         // Fetch event details from Firestore based on eventID
-        eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
-            @Override
-            public void onComplete(@NonNull Task<Event> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    Event event = task.getResult();
+        eventRepository.getEventById(eventID, (documentSnapshot, e) -> {
+            if (e != null) {
+                Log.e("QRCodeViewFragment", "Listen failed: ", e);
+                Toast.makeText(getContext(), "Failed to load event details", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                Event event = documentSnapshot.toObject(Event.class);
+                if (event != null) {
                     // Retrieve "eventTitle" from the Event object
                     String eventTitle = event.getEventTitle();
                     if (eventTitle != null) {
@@ -140,10 +143,10 @@ public class QRCodeViewFragment extends Fragment {
 
                     // Generate and display the QR code
                     displayQRCode();
-                } else {
-                    Log.e("QRCodeViewFragment", "Failed to load event details: " + task.getException());
-                    Toast.makeText(getContext(), "Failed to load event details", Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                Log.e("QRCodeViewFragment", "Event document is null or does not exist.");
+                Toast.makeText(getContext(), "Event details not found", Toast.LENGTH_SHORT).show();
             }
         });
     }

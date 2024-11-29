@@ -7,6 +7,8 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -196,18 +198,28 @@ public class WaitingListUtils {
     @NonNull
     private static List<WaitingListEntrant> getWaitingListEntrants(EntrantStatus status, Event event) {
         List<WaitingListEntrant> waitingEntrants = new ArrayList<>();
+        List<Task<Void>> tasks = new ArrayList<>();
+
         for (WaitingListEntrant entrant : event.getWaitingList()) {
             if (entrant.getStatus() == status) {
-                UserRepository userRepository = new UserRepository();
+                TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
+                tasks.add(taskCompletionSource.getTask());
 
-                // Make sure user acc exists before adding to waitingEntrants
-                userRepository.checkUserExists(entrant.getEntrantId(), task -> {
-                    if (task.isSuccessful() && task.getResult()) {
+                UserRepository.getInstance().checkUserExists(entrant.getEntrantId(), (snapshot, e) -> {
+                    if (e == null && snapshot != null && snapshot.exists()) {
                         waitingEntrants.add(entrant);
                     }
+                    taskCompletionSource.setResult(null);
                 });
             }
         }
+
+        try {
+            Tasks.await(Tasks.whenAll(tasks));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return waitingEntrants;
     }
 

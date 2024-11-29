@@ -5,7 +5,6 @@ import android.util.Log;
 import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.QrRepository;
-import com.google.firebase.firestore.QuerySnapshot;
 
 public class qrCleanup {
 
@@ -13,42 +12,41 @@ public class qrCleanup {
      * Checks all QR codes and removes those associated with deleted events.
      */
     public static void cleanUpQRCodes() {
-        QrRepository qrRepository = new QrRepository();
-        EventRepository eventRepository = new EventRepository();
+        QrRepository qrRepository = QrRepository.getInstance();
+        EventRepository eventRepository = EventRepository.getInstance();
 
-        qrRepository.getAllQRs().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                QuerySnapshot qrDocuments = task.getResult();
-                if (qrDocuments.isEmpty()) {
-                    Log.d("qrCleanup", "No QR codes found in Firestore.");
-                    return;
-                }
+        qrRepository.getAllQRs((querySnapshot, e) -> {
+            if (e != null) {
+                Log.e("qrCleanup", "Listen failed.", e);
+                return;
+            }
 
-                Log.d("qrCleanup", "Found " + qrDocuments.size() + " QR codes.");
-                qrDocuments.getDocuments().forEach(qrDoc -> {
+            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                Log.d("qrCleanup", "Found " + querySnapshot.size() + " QR codes.");
+                querySnapshot.getDocuments().forEach(qrDoc -> {
                     String qrAssociation = qrDoc.getString("qrAssociation");
 
                     if (qrAssociation != null && qrAssociation.startsWith("/events/")) {
                         String eventId = qrAssociation.substring("/events/".length());
                         Log.d("qrCleanup", "Extracted event ID: " + eventId);
 
-                        eventRepository.getEventById(eventId, eventTask -> {
-                            if (!eventTask.isSuccessful()) {
+                        eventRepository.getEventById(eventId, (documentSnapshot, eventError) -> {
+                            if (eventError != null || documentSnapshot == null) {
                                 // Task failed, delete the QR code since we assume the event is invalid
                                 Log.e("qrCleanup", "Failed to check event existence for event ID: " + eventId + ", deleting associated QR code.");
                                 qrRepository.deleteQR(qrDoc.getId())
                                         .addOnSuccessListener(aVoid -> Log.d("qrCleanup", "Deleted QR code: " + qrDoc.getId()))
-                                        .addOnFailureListener(e -> Log.e("qrCleanup", "Failed to delete QR code: " + qrDoc.getId(), e));
+                                        .addOnFailureListener(e1 -> Log.e("qrCleanup", "Failed to delete QR code: " + qrDoc.getId(), e1));
                                 return;
                             }
 
-                            Event event = eventTask.getResult();
+                            Event event = documentSnapshot.toObject(Event.class);
                             if (event == null) {
                                 // Event does not exist, delete the QR code
                                 Log.d("qrCleanup", "Event not found for QR code: " + qrDoc.getId());
                                 qrRepository.deleteQR(qrDoc.getId())
                                         .addOnSuccessListener(aVoid -> Log.d("qrCleanup", "Deleted QR code: " + qrDoc.getId()))
-                                        .addOnFailureListener(e -> Log.e("qrCleanup", "Failed to delete QR code: " + qrDoc.getId(), e));
+                                        .addOnFailureListener(e1 -> Log.e("qrCleanup", "Failed to delete QR code: " + qrDoc.getId(), e1));
                             } else {
                                 // Event exists, do nothing
                                 Log.d("qrCleanup", "Event found for QR code: " + qrDoc.getId());
@@ -60,11 +58,8 @@ public class qrCleanup {
                     }
                 });
             } else {
-                Log.e("qrCleanup", "Failed to retrieve QR codes: ", task.getException());
+                Log.d("qrCleanup", "No QR codes found in Firestore.");
             }
         });
     }
-
-
-
 }

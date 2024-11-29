@@ -169,8 +169,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void pushUserToFirestore(User user) {
-        UserRepository userRepository = new UserRepository();
-        userRepository.updateUser(user, task -> {
+        UserRepository.getInstance().updateUser(user, task -> {
             if (task.isSuccessful()) {
                 showToast("Profile saved successfully!");
             } else {

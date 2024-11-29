@@ -188,12 +188,14 @@ public class HomeFragment extends Fragment {
             // if the current instance of NotificationList is empty, then populate from firebase
             if(NotificationList.getInstance().isEmpty()){
                 for(UserNotification userNotification : user.getUserNotifications()){
-                    NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
-                        Notification notification = documentSnapshot.toObject(Notification.class);
-                        notification.markRead(userNotification.isRead());
+                    NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), (documentSnapshot, e) -> {
+                        if (documentSnapshot != null) {
+                            Notification notification = documentSnapshot.toObject(Notification.class);
+                            notification.markRead(userNotification.isRead());
 
-                        NotificationList.getInstance().add(notification);
-                        notificationAdapter.notifyDataSetChanged();
+                            NotificationList.getInstance().add(notification);
+                            notificationAdapter.notifyDataSetChanged();
+                        }
                     });
                 }
             }

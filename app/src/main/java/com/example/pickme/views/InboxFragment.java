@@ -91,7 +91,7 @@ public class InboxFragment extends Fragment {
                     }
                 }
 
-                new UserRepository().updateUser(user, task -> {});
+                UserRepository.getInstance().updateUser(user, task -> {});
             }
 
             @Override
