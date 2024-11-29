@@ -35,15 +35,15 @@
 
         <ImageView
             android:id="@+id/deleteEvent"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            android:layout_marginTop="32dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/button_squircle_background"
             android:backgroundTint="@color/highlight1"
             android:src="@drawable/ic_delete"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@id/title"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/back"
+            app:layout_constraintBottom_toBottomOf="@id/back"/>
 
         <EditText
             android:id="@+id/title"
@@ -99,6 +99,7 @@
                 android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
+                android:paddingStart="15dp"
                 android:background="@drawable/rounded_button__no_border"
                 android:inputType="datetime"
                 android:hint="  *Start Time"
@@ -129,6 +130,7 @@
                 android:background="@drawable/rounded_button__no_border"
                 android:hint="  *End Time"
                 android:inputType="datetime"
+                android:paddingStart="15dp"
                 android:textColor="@color/text1"
                 android:textColorHint="@color/text3"
                 android:textSize="14sp"
