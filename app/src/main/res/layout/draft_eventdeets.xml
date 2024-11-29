@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
-            android:id="@+id/back"
+            android:id="@+id/eventDetails_backBtn"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/goToQrView"
+            android:id="@+id/eventDetails_qrBtn"
             android:layout_width="52dp"
             android:layout_height="50dp"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -59,7 +59,7 @@
         app:layout_constraintTop_toBottomOf="@+id/eventDetailsHeader">
 
         <TextView
-            android:id="@+id/eventDetailsEventTitle"
+            android:id="@+id/eventDetails_eventTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -73,18 +73,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/eventDetails_sendNotifBtn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:backgroundTint="@color/buttonBG2"
             android:contentDescription="Send notification to entrants"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton3"
+            app:layout_constraintEnd_toStartOf="@+id/eventDetails_editBtn"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/baseline_send_24" />
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/eventDetails_editBtn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_marginEnd="15dp"
@@ -106,7 +106,7 @@
         app:layout_constraintTop_toBottomOf="@+id/eventDetailsTitle">
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/eventDetails_poster"
             android:layout_width="175dp"
             android:layout_height="175dp"
             android:background="@color/icon"
@@ -126,7 +126,7 @@
             app:icon="@drawable/ic_add"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+            app:layout_constraintTop_toBottomOf="@+id/eventDetails_poster" />
 
         <LinearLayout
             android:id="@+id/eventDetailsGroup1"
@@ -241,7 +241,7 @@
                     app:srcCompat="@drawable/ic_entrants" />
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/eventDetails_maxEntrants"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter"
@@ -260,7 +260,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:background="@color/navbarBG"
+            android:background="@drawable/lottery_summary_bg"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -271,7 +271,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter"
-                android:padding="16dp"
+                android:padding="8dp"
                 android:text="Your long text goes here..."
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@color/text2" />
@@ -281,9 +281,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/eventDetailsButtons"
-        android:layout_width="409dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="68dp"
+        android:layout_marginBottom="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -292,12 +292,18 @@
 
         <Button
             android:id="@+id/runLotteryBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="320dp"
+            android:layout_height="0dp"
+            android:backgroundTint="@color/buttonBG2"
             android:text="Start Lottery"
+            android:textColor="@color/text1"
+            android:textColorLink="@color/buttonBG2"
+            android:visibility="visible"
+            app:cornerRadius="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

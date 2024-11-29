@@ -43,7 +43,7 @@ public class EventDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.back).setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+        view.findViewById(R.id.eventDetails_backBtn).setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
 
         if (getArguments() != null) {
             event = (Event) getArguments().getSerializable("selectedEvent");
@@ -55,10 +55,10 @@ public class EventDetailsFragment extends Fragment {
             Navigation.findNavController(requireView()).navigateUp();
         }
 
-        view.findViewById(R.id.back).setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+        view.findViewById(R.id.eventDetails_backBtn).setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
 
         // Set up navigation to QRCodeViewFragment
-        view.findViewById(R.id.goToQrView).setOnClickListener(v -> {
+        view.findViewById(R.id.eventDetails_qrBtn).setOnClickListener(v -> {
             if (event != null) {
                 String eventID = event.getEventId();
                 Bundle args = new Bundle();
@@ -77,12 +77,12 @@ public class EventDetailsFragment extends Fragment {
                 view.findViewById(R.id.scanQr).setVisibility(View.GONE);
             }
 
-            ((TextView) view.findViewById(R.id.title)).setText(event.getEventTitle());
-            ((TextView) view.findViewById(R.id.description)).setText(event.getEventDescription());
-            ((TextView) view.findViewById(R.id.date)).setText(event.getEventDate());
-            ((TextView) view.findViewById(R.id.address)).setText(event.getEventLocation());
-            ((TextView) view.findViewById(R.id.winners)).setText(event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners"));
-            ((TextView) view.findViewById(R.id.entrants)).setText(event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
+            ((TextView) view.findViewById(R.id.eventDetails_eventTitle)).setText(event.getEventTitle());
+            ((TextView) view.findViewById(R.id.eventDetails_eventDesc)).setText(event.getEventDescription());
+            ((TextView) view.findViewById(R.id.eventDetails_dateTime)).setText(event.getEventDate());
+            ((TextView) view.findViewById(R.id.eventDetails_location)).setText(event.getEventLocation());
+            ((TextView) view.findViewById(R.id.eventDetails_maxWinners)).setText(event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners"));
+            ((TextView) view.findViewById(R.id.eventDetails_maxEntrants)).setText(event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants"));
 
             Image image = new Image("1234567890", "123456789");
             image.download(new ImageQuery() {
@@ -91,7 +91,7 @@ public class EventDetailsFragment extends Fragment {
                     if (isAdded()) {
                         Glide.with(view)
                                 .load(image.getImageUrl())
-                                .into((ImageView) view.findViewById(R.id.eventFlyer));
+                                .into((ImageView) view.findViewById(R.id.eventDetails_poster));
                     }
                 }
 
