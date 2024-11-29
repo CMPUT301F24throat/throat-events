@@ -33,12 +33,12 @@ public class EventRepository {
      * @param onCompleteListener The listener to notify upon completion.
      */
     public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+        DocumentReference eventRef = eventsRef.document(event.getEventId());
         db.runTransaction(transaction -> {
-                    DocumentReference newEventRef = eventsRef.document();
-                    transaction.set(newEventRef, event);
+                    transaction.set(eventRef, event);
 
                     // Create an empty waitingList subcollection
-                    CollectionReference waitingListRef = newEventRef.collection("waitingList");
+                    CollectionReference waitingListRef = eventRef.collection("waitingList");
                     transaction.set(waitingListRef.document("placeholder"), new HashMap<>()); // Add a placeholder document
 
                     return null;
@@ -73,11 +73,25 @@ public class EventRepository {
      * @param eventId The ID of the event to be deleted.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
-        eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
+    public void deleteEvent(String eventId, OnCompleteListener<Object> onCompleteListener) {
+        db.runTransaction(transaction -> {
+                    // Reference to the event document you want to delete
+                    DocumentReference eventRef = eventsRef.document(eventId);
+
+                    // Delete the event document
+                    transaction.delete(eventRef);
+
+                    // Optionally, delete the subcollections (waitingList in this case)
+                    CollectionReference waitingListRef = eventRef.collection("waitingList");
+
+                    // Delete all documents in the "waitingList" subcollection
+                    transaction.delete(waitingListRef.document("placeholder"));
+
+                    return null;
+                }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
                     // Handle the error
-                    System.err.println("Deletion failed: " + e.getMessage());
+                    System.err.println("Transaction failed: " + e.getMessage());
                 });
     }
 

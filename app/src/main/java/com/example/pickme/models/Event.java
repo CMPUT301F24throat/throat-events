@@ -178,7 +178,7 @@ public class Event implements Serializable {
         if (maxEntrants == null) {
             throw new IllegalArgumentException("Max entrants cannot be null.");
         }
-        if (maxEntrants <= 0) {  // Check for negative and zero values
+        if (maxEntrants < 0) {  // Check for negative and zero values
             throw new IllegalArgumentException("Max entrants must be a positive value.");
         }
 
