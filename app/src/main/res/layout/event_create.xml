@@ -246,19 +246,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:background="@drawable/ic_button_bg_main"
-            app:drawableStartCompat="@drawable/ic_camera"
+            android:background="@drawable/button_bg_stroke"
+            app:drawableStartCompat="@drawable/ic_add"
             android:drawablePadding="8dp"
             android:gravity="center"
             android:paddingHorizontal="8dp"
-            android:paddingVertical="5dp"
+            android:paddingVertical="8dp"
             android:paddingLeft="3dp"
-            android:text="Add an image"
+            android:text="Add event poster"
             android:textColor="@color/text1"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toEndOf="@id/removePoster"
             app:layout_constraintTop_toBottomOf="@id/geoLocation" />
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@color/white"
+            app:layout_constraintTop_toTopOf="@id/addImage"
+            app:layout_constraintBottom_toBottomOf="@id/addImage"
+            app:layout_constraintStart_toStartOf="@id/geoLocation"
+            android:visibility="gone"
+            android:id="@+id/imageView"/>
+
+        <ImageView
+            android:id="@+id/removePoster"
+            android:background="@drawable/ic_button_bg_main"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:padding="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_close"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            app:layout_constraintTop_toTopOf="@id/imageView"
+            app:layout_constraintStart_toEndOf="@id/imageView"/>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:layout_width="wrap_content"

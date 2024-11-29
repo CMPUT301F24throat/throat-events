@@ -5,19 +5,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import com.example.pickme.R;
 import com.bumptech.glide.Glide;
+import com.example.pickme.R;
 import com.example.pickme.databinding.EventDetailsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
+import com.example.pickme.utils.GeoLocationUtils;
 import com.example.pickme.utils.ImageQuery;
 
 /**
@@ -58,19 +58,37 @@ public class EventDetailsFragment extends Fragment {
             // Handle the case where no event is passed
             Navigation.findNavController(requireView()).navigateUp();
         }
-        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
 
-        // Set up navigation to QRCodeViewFragment
-        binding.goToQrView.setOnClickListener(v -> {
-            if (event != null) {
-                String eventID = event.getEventId();
-                Bundle args = new Bundle();
-                args.putString("eventID", eventID);
-                Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_QRCodeViewFragment, args);
-            } else {
-                Toast.makeText(getContext(), "Event ID not available", Toast.LENGTH_SHORT).show();
+        binding.joinWaitingList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (event.isGeoLocationRequired()){
+                    GeoLocationUtils geoLocationUtils = new GeoLocationUtils();
+
+                    // Check location permissions
+                    if (!geoLocationUtils.areLocationPermissionsGranted(requireContext())) {
+                        geoLocationUtils.requestLocationPermission(requireActivity());
+                        return;
+                    }
+
+                    // Check if location is enabled
+                    if (!geoLocationUtils.isLocationEnabled(requireContext())) {
+                        Toast.makeText(getContext(), "Please enable location services", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Fetch current location
+                    geoLocationUtils.fetchCurrentLocation(getContext(), new GeoLocationUtils.OnLocationFetchedListener() {
+                        @Override
+                        public void onLocationFetched(double latitude, double longitude) {
+                            Toast.makeText(getContext(), "Lat: " + latitude + ", Lon: " + longitude, Toast.LENGTH_SHORT).show();
+                            // Perform actions with the location
+                        }
+                    });
+                }
             }
         });
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
     }
 
     // Displays the event information in the UI
@@ -103,9 +121,7 @@ public class EventDetailsFragment extends Fragment {
                 public void onEmpty() {}
             });
 
-            ImageButton createNotif = binding.createNotif;
-
-            createNotif.setOnClickListener(l -> {
+            binding.createNotif.setOnClickListener(l -> {
                 Bundle bundle = new Bundle();
                 bundle.putString("EventID", event.getEventId());
                 Navigation.findNavController(getView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);

@@ -19,4 +19,5 @@
     <string name="qr_camera">QR Camera</string>
     <string name="admin_tools">Admin Tools</string>
     <string name="geolocation_required">Geolocation Required</string>
+    <string name="winners_will_be_notified_of_their_status_nyou_may_redraw_in_the_future_for_declined_spots">Winners will be notified of their status.\nYou may redraw in the future for declined spots.</string>
 </resources>
