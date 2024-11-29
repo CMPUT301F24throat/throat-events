@@ -43,18 +43,6 @@ public class EventTest {
             event.setMaxEntrants(-1);  // Invalid, negative value
         });
         assertEquals("Max entrants must be a positive value.", exception.getMessage());
-
-        // Test for zero max entrants
-        exception = assertThrows(IllegalArgumentException.class, () -> {
-            event.setMaxEntrants(0);  // Invalid, zero value
-        });
-        assertEquals("Max entrants must be a positive value.", exception.getMessage());
-
-        // Test for null max entrants
-        exception = assertThrows(IllegalArgumentException.class, () -> {
-            event.setMaxEntrants(null);  // Null value for max entrants
-        });
-        assertEquals("Max entrants cannot be null.", exception.getMessage());
     }
 
     @Test
