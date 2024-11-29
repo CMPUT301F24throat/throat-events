@@ -146,18 +146,21 @@ public class NotificationRepository {
                         notificationList.add(notification);
                         user.addUserNotification(new UserNotification(notification.getNotificationId()));
                         new EventRepository().getEventById(notification.getEventID(), task ->{
-                                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
-                                    .setSmallIcon(android.R.drawable.ic_menu_info_details)
-                                    .setContentTitle(task.getResult().getEventTitle())
-                                    .setContentText(notification.getMessage());
+                            if(!task.isSuccessful())
+                                return;
+
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
+                                .setSmallIcon(android.R.drawable.ic_menu_info_details)
+                                .setContentTitle(task.getResult().getEventTitle())
+                                .setContentText(notification.getMessage());
 
 
-                                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                                    notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
-                                }
+                            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
+                            }
 
-                                });
+                            });
 
                     }
                     else if(change.getType() == DocumentChange.Type.REMOVED)
