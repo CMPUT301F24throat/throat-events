@@ -36,12 +36,13 @@ import java.util.Calendar;
  * Fragment for creating or updating an event.
  */
 public class EventCreationFragment extends Fragment {
-    private final User currentUser = User.getInstance();
-    private String posterUrl;
+
     private Uri selectedImageUri;
     private Event event;
 
-    private FacilityRepository facilityRepository = new FacilityRepository();
+    private FacilityRepository facilityRepository;
+    private EventRepository eventRepository;
+
     private String organizerId;
 
     private EditText eventTitleEdit, descriptionEdit, eventDateEdit, startTimeEdit, endTimeEdit, locationEdit, maxWinnersEdit, maxEntrantsEdit;
@@ -50,6 +51,15 @@ public class EventCreationFragment extends Fragment {
     private CheckBox requireGeolocation;
     private ImageView iv;
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     *
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -57,10 +67,19 @@ public class EventCreationFragment extends Fragment {
         return inflater.inflate(R.layout.event_create, container, false);
     }
 
+    /**
+     * Called after the view has been created.
+     * Initializes the views and sets click listeners for UI elements.
+     *
+     * @param view The created view.
+     * @param savedInstanceState Bundle containing saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        facilityRepository = FacilityRepository.getInstance();
+        eventRepository = EventRepository.getInstance();
         organizerId = User.getInstance().getDeviceId();
 
         // Initialize views
@@ -116,7 +135,9 @@ public class EventCreationFragment extends Fragment {
             }
         }
         // Set the current eventDateEdit and time in the UI
-        setCurrentDateTime();
+        if (event == null) {
+            setCurrentDateTime();
+        }
     }
 
     /**
@@ -127,6 +148,7 @@ public class EventCreationFragment extends Fragment {
             return;
         }
 
+        // Make sure to handle null data in event fields
         eventTitleEdit.setText(event.getEventTitle() != null ? event.getEventTitle() : "");
         descriptionEdit.setText(event.getEventDescription() != null ? event.getEventDescription() : "");
         String[] parts = event.getEventDate() != null ? event.getEventDate().split(", ") : new String[]{"", ""};
@@ -150,11 +172,12 @@ public class EventCreationFragment extends Fragment {
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
+        calendar.add(Calendar.DAY_OF_YEAR, 1);  // Set the default date to tomorrow to avoid creating events in the past
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy", java.util.Locale.getDefault());
         String currentDate = dateFormat.format(calendar.getTime());
         eventDateEdit.setText(currentDate);
 
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", java.util.Locale.getDefault());
         String currentTime = timeFormat.format(calendar.getTime());
         startTimeEdit.setText(currentTime);
 
@@ -185,6 +208,9 @@ public class EventCreationFragment extends Fragment {
                 .build());
     }
 
+    /**
+     * Activity result launcher for picking an image from the gallery.
+     */
     private final ActivityResultLauncher<PickVisualMediaRequest> galleryLauncher = registerForActivityResult (
             new ActivityResultContracts.PickVisualMedia(),
             uri -> {
@@ -212,6 +238,12 @@ public class EventCreationFragment extends Fragment {
         if (!maxWinnersEdit.getText().toString().isEmpty()) {
             try {
                 maxWinners = Integer.parseInt(maxWinnersEdit.getText().toString());
+
+                if (maxWinners < 1) {
+                    Toast.makeText(requireActivity(), "Max winners must be greater than 0", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
             } catch (NumberFormatException e) {
                 Toast.makeText(requireActivity(), "Please enter a valid number for max winners", Toast.LENGTH_SHORT).show();
                 return;
@@ -225,6 +257,17 @@ public class EventCreationFragment extends Fragment {
         if (!maxEntrantsEdit.getText().toString().isEmpty()) {
             try {
                 maxEntrants = Integer.parseInt(maxEntrantsEdit.getText().toString());
+
+                if (maxEntrants < 1) {
+                    Toast.makeText(requireActivity(), "Max entrants must be greater than 0", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (maxEntrants < maxWinners) {
+                    Toast.makeText(requireActivity(), "Max entrants must be greater than or equal to max winners", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
             } catch (NumberFormatException e) {
                 Toast.makeText(requireActivity(), "Please enter a valid number for max entrants", Toast.LENGTH_SHORT).show();
                 return;
@@ -249,7 +292,7 @@ public class EventCreationFragment extends Fragment {
                             eventTitle,
                             eventDescription,
                             dateTime,
-                            posterUrl,
+                            null,  // set to null here, will be initialized in EventRepository
                             eventLocation,
                             maxWinners,
                             isGeolocationRequired,
@@ -258,10 +301,8 @@ public class EventCreationFragment extends Fragment {
                             null    // set to null here, will be initialized in EventRepository
                     );
 
-
-                    EventRepository eventRepository = EventRepository.getInstance();
-                    eventRepository.addEvent(newEvent, selectedImageUri, task1 -> {
-                        if (task1.isSuccessful()) {
+                    eventRepository.addEvent(newEvent, selectedImageUri, addEventTask -> {
+                        if (addEventTask.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(requireView()).navigateUp();
                         } else {
@@ -269,20 +310,16 @@ public class EventCreationFragment extends Fragment {
                         }
                     });
                 } else {
-                    // Update the existing event
                     event.setEventTitle(eventTitle);
                     event.setEventDescription(eventDescription);
                     event.setEventDate(dateTime);
                     event.setEventLocation(eventLocation);
                     event.setMaxWinners(maxWinners);
-                    if (maxEntrants != null) {
-                        event.setMaxEntrants(maxEntrants);
-                    }
+                    event.setMaxEntrants(maxEntrants);
                     event.setGeoLocationRequired(isGeolocationRequired);
 
-                    EventRepository eventRepository = EventRepository.getInstance();
-                    eventRepository.updateEvent(event, selectedImageUri, task1 -> {
-                        if (task1.isSuccessful()) {
+                    eventRepository.updateEvent(event, selectedImageUri, updateEventTask -> {
+                        if (updateEventTask.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(requireView()).navigateUp();
                         } else {
@@ -299,10 +336,8 @@ public class EventCreationFragment extends Fragment {
      * @param event the event to be deleted.
      */
     private void deleteEvent(Event event) {
-        EventRepository eventRepository = EventRepository.getInstance();
-
-        eventRepository.deleteEvent(event.getEventId(), task -> {
-            if (task.isSuccessful()) {
+        eventRepository.deleteEvent(event.getEventId(), deleteEventTask -> {
+            if (deleteEventTask.isSuccessful()) {
                 Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).navigateUp();
             } else {
@@ -320,7 +355,7 @@ public class EventCreationFragment extends Fragment {
         DatePickerDialog datePicker = new DatePickerDialog(requireActivity(), (view, year, month, dayOfMonth) -> {
             calendar.set(year, month, dayOfMonth);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy", java.util.Locale.getDefault());
             String formattedDate = dateFormat.format(calendar.getTime());
 
             eventDateEdit.setText(formattedDate);
@@ -339,7 +374,7 @@ public class EventCreationFragment extends Fragment {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
 
-            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", java.util.Locale.getDefault());
             String formattedTime = timeFormat.format(calendar.getTime());
 
             if (isStartTime) {
