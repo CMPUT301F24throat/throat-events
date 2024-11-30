@@ -48,9 +48,22 @@
 
         <View
             android:id="@+id/divider"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="3dp"
             android:background="@color/icon" />
+
+        <ImageView
+            android:id="@+id/imageCatalogRefresh"
+            android:layout_marginStart="16dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="10dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/back"
+            android:src="@drawable/ic_refresh"
+            app:tint="@color/text1"
+            app:layout_constraintStart_toEndOf="@id/startGuide"
+            app:layout_constraintTop_toBottomOf="@id/topGuide"/>
 
     </LinearLayout>
 
