@@ -33,6 +33,7 @@ import java.util.Objects;
 public class EventDetailsFragment extends Fragment {
     private Event event;
     private User currentUser;
+    private EventRepository eventRepository;
     private WaitingListUtils waitingListUtils;
     private LotteryUtils lotteryUtils;
 
@@ -63,12 +64,13 @@ public class EventDetailsFragment extends Fragment {
             event = (Event) getArguments().getSerializable("selectedEvent");
             currentUser = User.getInstance();
 
+            eventRepository = EventRepository.getInstance();
             waitingListUtils = new WaitingListUtils();
             lotteryUtils = new LotteryUtils();
 
             configureView(view, currentUser);
             displayEventDetails(view);
-            EventRepository.getInstance().attachEvent(event, () -> {
+            eventRepository.attachEvent(event, () -> {
                 if (event.getEventId() == null){
                     Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
@@ -87,7 +89,7 @@ public class EventDetailsFragment extends Fragment {
         view.findViewById(R.id.eventDetails_sendNotifBtn).setOnClickListener(v -> navigateToCreateNotif());
         view.findViewById(R.id.eventDetails_deleteBtn).setOnClickListener(v -> {
             if (event != null) {
-                EventRepository.getInstance().deleteEvent(event.getEventId(), deleteTask -> {
+                eventRepository.deleteEvent(event.getEventId(), deleteTask -> {
                     if (deleteTask.isSuccessful()) {
                         if (isAdded() && getView() != null) {
                             Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
@@ -202,7 +204,7 @@ public class EventDetailsFragment extends Fragment {
             // If lottery has been run, set up click listener to navigate to lottery status fragment
             lotteryBtn.setOnClickListener(v -> {
                 Bundle bundle = new Bundle();
-                bundle.putString("eventId", event.getEventId());
+                bundle.putSerializable("event", event);
                 Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);
             });
         }
