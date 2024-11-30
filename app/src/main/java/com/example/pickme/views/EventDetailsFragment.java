@@ -53,6 +53,14 @@ public class EventDetailsFragment extends Fragment {
 
             configureView(view, currentUser);
             displayEventDetails(view);
+            EventRepository.getInstance().attachEvent(event, () -> {
+                if(event.getEventId() == null){
+                    Toast.makeText(getContext(), "Sorry, Event was deleted", Toast.LENGTH_SHORT);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_global_homeFragment);
+                }
+                else
+                    displayEventDetails(view);
+            });
         } else {
             Navigation.findNavController(requireView()).navigateUp();
         }
