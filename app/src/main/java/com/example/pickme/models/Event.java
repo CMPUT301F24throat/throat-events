@@ -9,6 +9,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -415,6 +417,32 @@ public class Event implements Serializable {
             return false;
         }
         return false;
+    }
+
+    /**
+     * Converts the event object to a map for Firestore.
+     *
+     * @return Map representation of the event object
+     */
+    public Map<String, Object> toMap() {
+        Map<String, Object> eventMap = new HashMap<>();
+        eventMap.put("eventId", eventId);
+        eventMap.put("organizerId", organizerId);
+        eventMap.put("facilityId", facilityId);
+        eventMap.put("eventTitle", eventTitle);
+        eventMap.put("eventDescription", eventDescription);
+        eventMap.put("eventDate", eventDate);
+        eventMap.put("posterImageId", posterImageId);
+        eventMap.put("eventLocation", eventLocation);
+        eventMap.put("maxWinners", maxWinners);
+        eventMap.put("geoLocationRequired", geoLocationRequired);
+        eventMap.put("maxEntrants", maxEntrants);
+        eventMap.put("waitingList", waitingList);
+        eventMap.put("hasLotteryExecuted", hasLotteryExecuted);
+        eventMap.put("createdAt", createdAt);
+        eventMap.put("updatedAt", updatedAt);
+
+        return eventMap;
     }
 
 }

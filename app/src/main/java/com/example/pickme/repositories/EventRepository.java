@@ -3,10 +3,12 @@ package com.example.pickme.repositories;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Image;
+import com.example.pickme.models.QR;
 import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
@@ -32,6 +34,7 @@ import java.util.List;
 public class EventRepository {
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
+    private final QrRepository qrRepository;
     private CollectionReference eventsRef;
 
     private static EventRepository instance;
@@ -49,6 +52,7 @@ public class EventRepository {
     private EventRepository() {
         this.db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
+        this.qrRepository = QrRepository.getInstance();
         this.eventsRef = db.collection("events");
     }
 
@@ -59,9 +63,10 @@ public class EventRepository {
      * @param auth Firebase Auth instance
      * @param eventsRef Collection reference for events
      */
-    private EventRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference eventsRef) {
+    private EventRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference eventsRef, QrRepository qrRepository) {
         this.db = db;
         this.auth = auth;
+        this.qrRepository = qrRepository;
         this.eventsRef = eventsRef;
     }
 
@@ -74,20 +79,39 @@ public class EventRepository {
      */
     public void addEvent(Event event, @Nullable Uri posterUri, OnCompleteListener<Object> onCompleteListener) {
         DocumentReference newEventRef = eventsRef.document();
-        if (posterUri != null) {
-            Image i = new Image(event.getOrganizerId(), newEventRef.getId());
-            i.upload(posterUri, task -> {
-                if (task.isSuccessful()) {
-                    event.setPosterImageId(i.getImageUrl());
-                    doEventTransaction(newEventRef, event, onCompleteListener);
-                } else {
-                    Log.d("EventRepository", "addEvent: Failure to upload image");
-                }
-            });
-        } else {
-            doEventTransaction(newEventRef, event, onCompleteListener);
-        }
 
+        // Create event first
+        event.setEventId(null);  // Make sure event ID is null to create new event in Firestore
+        doUpsertEventTransaction(newEventRef, event, addEventTask -> {
+            if (addEventTask.isSuccessful()) {
+                if (posterUri != null) {
+                    // If event has poster, upload image first
+                    Image i = new Image(event.getOrganizerId(), newEventRef.getId());
+                    i.upload(posterUri, uploadImageTask -> {
+                        if (uploadImageTask.isSuccessful()) {
+                            event.setPosterImageId(i.getImageUrl());
+
+                            // ensure event ID is set so transaction can update event after it's created
+                            if (event.getEventId() == null || event.getEventId().isEmpty()) {
+                                event.setEventId(newEventRef.getId());
+                            }
+
+                            // Update event with image URL
+                            doUpsertEventTransaction(newEventRef, event, onCompleteListener);
+                        } else {
+                            Log.d("EventRepository", "addEvent: Failure to upload image");
+                        }
+                    });
+                }
+
+                // Create QR code for event, no need to update anything for event since we don't store eventQR in event
+                QR qr = new QR("/events/" + newEventRef.getId());
+                qrRepository.createQR(qr)
+                        .addOnSuccessListener(aVoid -> System.out.println("QR created"))
+                        .addOnFailureListener(e -> System.err.println("QR creation failed: " + e.getMessage()));
+            }
+
+        });
     }
 
     /**
@@ -97,30 +121,72 @@ public class EventRepository {
      * @param posterUri Uri for the event poster. Null for none/no change.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void updateEvent(Event event, Uri posterUri, OnCompleteListener<Object> onCompleteListener) {
+    public void updateEvent(Event event, @Nullable Uri posterUri, OnCompleteListener<Object> onCompleteListener) {
         DocumentReference eventRef = eventsRef.document(event.getEventId());
-        if (posterUri != null) {
-            Image i = new Image(event.getOrganizerId(), event.getEventId());
-            i.upload(posterUri, task -> {
-                if (task.isSuccessful()) {
-                    event.setPosterImageId(i.getImageUrl());
-                    doEventTransaction(eventRef, event, onCompleteListener);
-                } else {
-                    Log.d("EventRepository", "updateEvent: Failure to upload image");
-                }
-            });
-        } else {
-            doEventTransaction(eventRef, event, onCompleteListener);
+
+        if (event.getEventId() == null) {
+            Log.d("EventRepository", "updateEvent: Event ID is null");
+            onCompleteListener.onComplete(Tasks.forException(new Exception("Event ID is null")));
+            return;
         }
+
+        // Update the event first
+        doUpsertEventTransaction(eventRef, event, task -> {
+            if (task.isSuccessful()) {
+                if (posterUri != null) {
+                    // Check if event poster changed, if it has then upload new image
+                    Image i = new Image(event.getOrganizerId(), event.getEventId());
+                    i.upload(posterUri, uploadTask -> {
+                        if (uploadTask.isSuccessful()) {
+                            event.setPosterImageId(i.getImageUrl());
+                            // Update the event with the new image URL
+                            doUpsertEventTransaction(eventRef, event, onCompleteListener);
+                        } else {
+                            Log.d("EventRepository", "updateEvent: Failure to upload image");
+                            onCompleteListener.onComplete(Tasks.forException(uploadTask.getException()));
+                        }
+                    });
+                } else {
+                    // No image change - notify completion
+                    onCompleteListener.onComplete(Tasks.forResult(null));
+                }
+            } else {
+                Log.d("EventRepository", "updateEvent: Failure to update event");
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
     }
 
-    private void doEventTransaction(DocumentReference eventsRef, Event event, OnCompleteListener<Object> onCompleteListener) {
-        db.runTransaction(transaction -> {
-                    event.setEventId(eventsRef.getId());
-                    event.setHasLotteryExecuted(false);
-                    event.setWaitingList(new ArrayList<WaitingListEntrant>());
+    /**
+     * Executes a Firestore transaction to create or update an event.
+     *
+     * @param eventRef The reference to the event document.
+     * @param event The event object to be added or updated.
+     * @param onCompleteListener The listener to notify upon completion.
+     */
+    private void doUpsertEventTransaction(@NonNull DocumentReference eventRef, Event event, OnCompleteListener<Object> onCompleteListener) {
+        boolean isUpdate = event.getEventId() != null;
 
-                    transaction.set(eventsRef, event);
+        db.runTransaction(transaction -> {
+                    if (isUpdate) {
+                        DocumentSnapshot snapshot = transaction.get(eventRef);
+                        if (!snapshot.exists()) {
+                            try {
+                                throw new Exception("Event does not exist");
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        // Update existing event
+                        transaction.update(eventRef, event.toMap());
+
+                    } else {
+                        // Create new event
+                        event.setEventId(eventRef.getId());
+                        event.setHasLotteryExecuted(false);
+                        event.setWaitingList(new ArrayList<WaitingListEntrant>());
+                        transaction.set(eventRef, event);
+                    }
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
@@ -135,7 +201,7 @@ public class EventRepository {
      * @param eventId The ID of the event to be deleted.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
+    public void deleteEvent(@NonNull String eventId, OnCompleteListener<Void> onCompleteListener) {
         eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
                     System.err.println("Deletion failed: " + e.getMessage());
