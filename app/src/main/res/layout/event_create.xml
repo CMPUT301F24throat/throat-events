@@ -271,23 +271,36 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/descCard">
-
-                <TextView
-                    android:id="@+id/addImage"
+                app:layout_constraintTop_toBottomOf="@id/descCard"
+                android:gravity="center_vertical">
+                
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_button_bg_main"
-                    android:drawablePadding="8dp"
-                    android:gravity="center"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="5dp"
-                    android:paddingLeft="3dp"
-                    android:text="Add an image"
-                    android:textColor="@color/text1"
-                    android:textSize="14sp"
-                    app:drawableStartCompat="@drawable/ic_camera" />
-
+                    android:gravity="center_vertical">
+                    
+                    <ImageView
+                        android:id="@+id/addImage_preview"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@color/dialogBG1"/>
+                    
+                    <TextView
+                        android:id="@+id/addImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_button_bg_main"
+                        android:drawablePadding="8dp"
+                        android:gravity="center"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="5dp"
+                        android:layout_marginStart="4dp"
+                        android:paddingLeft="3dp"
+                        android:text="+ Add an image"
+                        android:textColor="@color/text1"
+                        android:textSize="14sp"/>
+                </LinearLayout>
+                
                 <CheckBox
                     android:id="@+id/requireGeolocation"
                     android:layout_width="wrap_content"
