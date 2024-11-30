@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background1"
-    android:visibility="visible"
     tools:context=".views.EventDetailsFragment"
     tools:visibility="visible">
 
@@ -43,6 +42,7 @@
             android:layout_height="50dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="View and share the event's QR"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -87,25 +87,13 @@
             android:id="@+id/eventDetails_editBtn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
+            android:layout_marginEnd="15dp"
             android:backgroundTint="@color/buttonBG2"
             android:contentDescription="Edit event"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/eventDetails_deleteBtn"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_pencil" />
-
-        <ImageButton
-            android:id="@+id/eventDetails_deleteBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/red1"
-            android:contentDescription="Delete event"
-            android:src="@drawable/baseline_delete_outline_24"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -135,7 +123,6 @@
             android:backgroundTint="@color/buttonBG1"
             android:fontFamily="@font/inter_medium"
             android:text="Join Waitlist"
-            app:cornerRadius="8dp"
             app:icon="@drawable/ic_add"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -264,20 +251,6 @@
                     app:layout_constraintHorizontal_bias="0.064"
                     app:layout_constraintStart_toEndOf="@+id/eventDetails_usersIcon"
                     app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/eventDetails_moreInfoLink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter"
-                    android:text="tap for more info"
-                    android:textColor="@color/text3"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.212"
-                    app:layout_constraintStart_toEndOf="@+id/eventDetails_maxEntrants"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 

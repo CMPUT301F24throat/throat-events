@@ -1,16 +1,13 @@
 package com.example.pickme.utils;
 
+import androidx.annotation.NonNull;
+
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
-import com.example.pickme.models.WaitingList;
 import com.example.pickme.models.WaitingListEntrant;
+import com.example.pickme.repositories.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -21,46 +18,6 @@ import java.util.List;
  */
 public class WaitingListUtils {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference eventsRef = db.collection("events");
-
-    /**
-     * Retrieves an event along with its waiting list.
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getEventWithWaitingList(String eventId, OnCompleteListener<WaitingList> onCompleteListener) {
-        DocumentReference eventRef = eventsRef.document(eventId);
-        CollectionReference waitingListRef = eventRef.collection("waitingList");
-
-        eventRef.get().addOnCompleteListener(eventTask -> {
-            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
-                Event event = eventTask.getResult().toObject(Event.class);
-
-                if (event != null) {
-                    waitingListRef.get().addOnCompleteListener(waitingListTask -> {
-                        if (waitingListTask.isSuccessful() && waitingListTask.getResult() != null) {
-                            int numEntrants = waitingListTask.getResult().size() - 1; // Exclude the placeholder document
-
-                            WaitingList waitingList = new WaitingList();
-                            waitingList.setEventId(event.getEventId());
-                            waitingList.setMaxEntrants(event.getMaxEntrants());
-                            waitingList.setMaxWinners(Integer.parseInt(event.getMaxWinners()));
-                            waitingList.setNumEntrants(numEntrants);
-
-                            onCompleteListener.onComplete(Tasks.forResult(waitingList));
-                        } else {
-                            onCompleteListener.onComplete(Tasks.forException(waitingListTask.getException()));
-                        }
-                    });
-                } else {
-                    onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
-                }
-            } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
-            }
-        });
-    }
 
     /**
      * Retrieves a specific entrant from the waiting list.
@@ -69,41 +26,25 @@ public class WaitingListUtils {
      * @param entrantId The ID of the entrant.
      * @param onCompleteListener The listener to handle the completion of the task.
      */
-    public void getEntrantFromWaitingList(String eventId, String entrantId, OnCompleteListener<WaitingListEntrant> onCompleteListener) {
-        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
-        entrantRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                WaitingListEntrant entrant = task.getResult().toObject(WaitingListEntrant.class);
-                onCompleteListener.onComplete(Tasks.forResult(entrant));
+    public void getWaitingListEntrantByEntrantId(String eventId, String entrantId, OnCompleteListener<WaitingListEntrant> onCompleteListener) {
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    for (WaitingListEntrant entrant : event.getWaitingList()) {
+                        if (entrant.getEntrantId().equals(entrantId)) {
+                            onCompleteListener.onComplete(Tasks.forResult(entrant));
+                            return;
+                        }
+                    }
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
             }
         });
-    }
-
-    /**
-     * Retrieves all entrants from the waiting list.
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getAllEntrantsFromWaitingList(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        List<WaitingListEntrant> entrants = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                            WaitingListEntrant entrant = document.toObject(WaitingListEntrant.class);
-                            if (entrant != null) {
-                                entrants.add(entrant);
-                            }
-                        }
-                        onCompleteListener.onComplete(Tasks.forResult(entrants));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
-                    }
-                });
     }
 
     /**
@@ -114,14 +55,21 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void addEntrantToWaitingList(String eventId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        DocumentReference newEntrantRef = eventsRef.document(eventId).collection("waitingList").document();
-        waitingListEntrant.setWaitListEntrantId(newEntrantRef.getId());
-        newEntrantRef.set(waitingListEntrant)
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Addition failed: " + e.getMessage());
-                });
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    waitingList.add(waitingListEntrant);
+                    event.setWaitingList(new ArrayList<>(waitingList));
+                    db.collection("events").document(eventId).set(event).addOnCompleteListener(onCompleteListener);
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+            }
+        });
     }
 
     /**
@@ -133,30 +81,27 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void editEntrantInWaitingList(String eventId, String entrantId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
-        entrantRef.set(waitingListEntrant)
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Update failed: " + e.getMessage());
-                });
-    }
-
-    /**
-     * Removes an entrant from the waiting list.
-     *
-     * @param eventId The ID of the event.
-     * @param entrantId The ID of the entrant.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void deleteEntrantFromWaitingList(String eventId, String entrantId, OnCompleteListener<Void> onCompleteListener) {
-        DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrantId);
-        entrantRef.delete()
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Deletion failed: " + e.getMessage());
-                });
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    for (int i = 0; i < waitingList.size(); i++) {
+                        if (waitingList.get(i).getEntrantId().equals(entrantId)) {
+                            waitingList.set(i, waitingListEntrant);
+                            event.setWaitingList(new ArrayList<>(waitingList));
+                            db.collection("events").document(eventId).set(event).addOnCompleteListener(onCompleteListener);
+                            return;
+                        }
+                    }
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+            }
+        });
     }
 
     /**
@@ -167,130 +112,133 @@ public class WaitingListUtils {
      * @param newStatus The new status to be set for the entrant.
      */
     public void updateEntrantStatus(String eventId, String userId, EntrantStatus newStatus) {
-        CollectionReference waitingListRef = eventsRef.document(eventId).collection("waitingList");
-
-        waitingListRef.whereEqualTo("entrantId", userId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                DocumentReference entrantRef = waitingListRef.document(document.getId());
-
-                entrantRef.update("entrantStatus", newStatus).addOnCompleteListener(updateTask -> {
-                    if (updateTask.isSuccessful()) {
-                        System.out.println("Entrant status updated successfully.");
-                    } else {
-                        System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    for (WaitingListEntrant entrant : waitingList) {
+                        if (entrant.getEntrantId().equals(userId)) {
+                            entrant.setStatus(newStatus);
+                            break;
+                        }
                     }
-                });
+                    event.setWaitingList(new ArrayList<>(waitingList));
+                    db.collection("events").document(eventId).set(event).addOnCompleteListener(updateTask -> {
+                        if (updateTask.isSuccessful()) {
+                            System.out.println("Entrant status updated successfully.");
+                        } else {
+                            System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+                        }
+                    });
+                } else {
+                    System.err.println("Event not found.");
+                }
             } else {
-                System.err.println("User is not an entrant in the waiting list.");
+                System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
             }
         });
     }
 
     /**
-     * Retrieves entrants from the waiting list based on their status.
+     * Retrieves the number of entrants in the waiting list with a specific status.
+     *
+     * @param eventId The ID of the event.
+     * @param status The status of the entrants to be counted.
+     * @param onCompleteListener The listener to handle the completion of the task.
+     */
+    public void getEntrantsCountByStatus(String eventId, EntrantStatus status, OnCompleteListener<Integer> onCompleteListener) {
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    int entrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == status).count();
+                    onCompleteListener.onComplete(Tasks.forResult(entrantsCount));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found in Firestore")));
+                }
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(new Exception("Failed to retrieve event from Firestore")));
+            }
+        });
+    }
+
+    /**
+     * Retrieves the entrants in the waiting list with a specific status.
      *
      * @param eventId The ID of the event.
      * @param status The status of the entrants to be retrieved.
      * @param onCompleteListener The listener to handle the completion of the task.
      */
-    public void getEntrantsByStatus(String eventId, EntrantStatus status, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        eventsRef.document(eventId).collection("waitingList")
-                .whereNotEqualTo(FieldPath.documentId(), "placeholder") // Exclude the placeholder document
-                .whereEqualTo("entrantStatus", status)
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        List<WaitingListEntrant> entrants = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                            WaitingListEntrant entrant = document.toObject(WaitingListEntrant.class);
-                            if (entrant != null) {
-                                entrants.add(entrant);
-                            }
-                        }
-                        onCompleteListener.onComplete(Tasks.forResult(entrants));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
-                    }
-                });
-    }
-
-    /**
-     * Retrieves entrants from the waiting list who accepted their
-     * invite (ie. status is ACCEPTED).
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getAcceptedEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        getEntrantsByStatus(eventId, EntrantStatus.ACCEPTED, onCompleteListener);
-    }
-
-    /**
-     * Retrieves selected entrants from the waiting list who have not yet accepted or declined
-     * their invite (ie. status is SELECTED).
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getPendingEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        getEntrantsByStatus(eventId, EntrantStatus.SELECTED, onCompleteListener);
-    }
-
-    /**
-     * Retrieves entrants from the waiting list who rejected their
-     * invite (ie. status is REJECTED).
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getRejectedEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        getEntrantsByStatus(eventId, EntrantStatus.REJECTED, onCompleteListener);
-    }
-
-    /**
-     * Retrieves entrants from the waiting list who cancelled their spot
-     * (ie. status is CANCELLED).
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getCancelledEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        getEntrantsByStatus(eventId, EntrantStatus.CANCELLED, onCompleteListener);
-    }
-
-    /**
-     * Retrieves entrants from the waiting list who are still waiting to be selected
-     * (ie. status is WAITING).
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void getWaitingEntrants(String eventId, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
-        getEntrantsByStatus(eventId, EntrantStatus.WAITING, onCompleteListener);
-    }
-
-    /**
-     * Retrieves the pending entrants (with EntrantStatus.SELECTED) and changes their status to EntrantStatus.CANCELLED.
-     *
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
-     */
-    public void cancelPendingEntrants(String eventId, OnCompleteListener<Void> onCompleteListener) {
-        getPendingEntrants(eventId, pendingEntrantsTask -> {
-            if (pendingEntrantsTask.isSuccessful() && pendingEntrantsTask.getResult() != null) {
-                List<WaitingListEntrant> pendingEntrants = pendingEntrantsTask.getResult();
-                List<Task<Void>> updateTasks = new ArrayList<>();
-
-                for (WaitingListEntrant entrant : pendingEntrants) {
-                    DocumentReference entrantRef = eventsRef.document(eventId).collection("waitingList").document(entrant.getWaitListEntrantId());
-                    Task<Void> updateTask = entrantRef.update("entrantStatus", EntrantStatus.CANCELLED);
-                    updateTasks.add(updateTask);
+    public void getWaitingListEntrantsByStatus(String eventId, EntrantStatus status, OnCompleteListener<List<WaitingListEntrant>> onCompleteListener) {
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingEntrants = getWaitingListEntrants(status, event);
+                    onCompleteListener.onComplete(Tasks.forResult(waitingEntrants));
+                } else {
+                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
                 }
-
-                Tasks.whenAll(updateTasks).addOnCompleteListener(onCompleteListener);
             } else {
-                onCompleteListener.onComplete(Tasks.forException(pendingEntrantsTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
             }
         });
     }
+
+    /**
+     * Helper func; retrieves the entrants in the waiting list with a specific status.
+     *
+     * @param status The status of the entrants to be retrieved.
+     * @param event The event for which the entrants are to be retrieved.
+     * @return The list of entrants with the specified status.
+     */
+    @NonNull
+    private static List<WaitingListEntrant> getWaitingListEntrants(EntrantStatus status, Event event) {
+        List<WaitingListEntrant> waitingEntrants = new ArrayList<>();
+        for (WaitingListEntrant entrant : event.getWaitingList()) {
+            if (entrant.getStatus() == status) {
+                UserRepository userRepository = UserRepository.getInstance();
+
+                // Make sure user acc exists before adding to waitingEntrants
+                userRepository.checkUserExists(entrant.getEntrantId(), task -> {
+                    if (task.isSuccessful() && task.getResult()) {
+                        waitingEntrants.add(entrant);
+                    }
+                });
+            }
+        }
+        return waitingEntrants;
+    }
+
+    /**
+     * Cancels all rejected invites for an event - sets their status to EntrantStatus.CANCELLED.
+     *
+     * @param eventId The ID of the event.
+     */
+    public void cancelRejectedInvites(String eventId) {
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    for (WaitingListEntrant entrant : waitingList) {
+                        if (entrant.getStatus() == EntrantStatus.REJECTED) {
+                            entrant.setStatus(EntrantStatus.CANCELLED);
+                        }
+                    }
+                    event.setWaitingList(new ArrayList<>(waitingList));
+                    db.collection("events").document(eventId).set(event).addOnCompleteListener(updateTask -> {
+                        if (updateTask.isSuccessful()) {
+                            System.out.println("Rejected invites cancelled successfully.");
+                        } else {
+                            System.err.println("Failed to cancel rejected invites: " + updateTask.getException().getMessage());
+                        }
+                    });
+                } else {
+                System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+            }
+        }});
+    }
+
 }

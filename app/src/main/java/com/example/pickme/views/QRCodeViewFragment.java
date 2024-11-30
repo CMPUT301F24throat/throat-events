@@ -81,7 +81,7 @@ public class QRCodeViewFragment extends Fragment {
         }
 
         // Initialize repositories and QR code generator
-        eventRepository = new EventRepository();
+        eventRepository = EventRepository.getInstance();
         qrCodeGenerator = new QRCodeGenerator(new QrRepository());
     }
 

@@ -15,6 +15,15 @@ public class QrRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference qrRef = db.collection("QRs");
 
+    private static QrRepository instance;
+
+    public static QrRepository getInstance(){
+        if(instance == null)
+            instance = new QrRepository();
+
+        return instance;
+    }
+
     /**
      * Creates a new QR document using a QR object.
      *

@@ -1,9 +1,21 @@
 package com.example.pickme.repositories;
 
+import android.util.Log;
+
+import android.net.Uri;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
 import com.example.pickme.models.Event;
+import com.example.pickme.models.User;
+import com.example.pickme.models.Image;
+import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,43 +34,104 @@ import java.util.List;
  * @version 2.0
  */
 public class EventRepository {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference eventsRef = db.collection("events");
+    private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
+    private CollectionReference eventsRef;
+
+    private ArrayList<Event> listToUpdate;
+    private Event eventToUpdate;
+    private Runnable onUpdate;
+    private boolean listening = false;
+
+    private static EventRepository instance;
+
+    public static EventRepository getInstance(){
+        if(instance == null)
+            instance = new EventRepository();
+
+        return instance;
+    }
+
+    /**
+     * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
+     */
+    private EventRepository() {
+        this.db = FirebaseFirestore.getInstance();
+        this.auth = FirebaseAuth.getInstance();
+        this.eventsRef = db.collection("events");
+
+        addSnapshotListener();
+    }
+
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param db Firebase Firestore instance
+     * @param auth Firebase Auth instance
+     * @param eventsRef Collection reference for events
+     */
+    private EventRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference eventsRef) {
+        this.db = db;
+        this.auth = auth;
+        this.eventsRef = eventsRef;
+    }
 
     /**
      * Creates a new event in the Firestore database.
      *
      * @param event The event to be added.
+     * @param posterUri Uri for the event poster. Null for none/no change.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
-        db.runTransaction(transaction -> {
-                    DocumentReference newEventRef = eventsRef.document();
-                    event.setEventId(newEventRef.getId());
-                    transaction.set(newEventRef, event);
+    public void addEvent(Event event, @Nullable Uri posterUri, OnCompleteListener<Object> onCompleteListener) {
+        DocumentReference newEventRef = eventsRef.document();
+        if (posterUri != null) {
+            Image i = new Image(event.getOrganizerId(), newEventRef.getId());
+            i.upload(posterUri, task -> {
+                if (task.isSuccessful()) {
+                    event.setPosterImageId(i.getImageUrl());
+                    doEventTransaction(newEventRef, event, onCompleteListener);
+                } else {
+                    Log.d("EventRepository", "addEvent: Failure to upload image");
+                }
+            });
+        } else {
+            doEventTransaction(newEventRef, event, onCompleteListener);
+        }
 
-                    // Create an empty waitingList subcollection
-                    CollectionReference waitingListRef = newEventRef.collection("waitingList");
-                    //transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
-
-                    return null;
-                }).addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Transaction failed: " + e.getMessage());
-                });
     }
 
     /**
      * Updates an existing event in the Firestore database.
      *
      * @param event The event to be updated.
+     * @param posterUri Uri for the event poster. Null for none/no change.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+    public void updateEvent(Event event, Uri posterUri, OnCompleteListener<Object> onCompleteListener) {
         DocumentReference eventRef = eventsRef.document(event.getEventId());
+        if (posterUri != null) {
+            Image i = new Image(event.getOrganizerId(), event.getEventId());
+            i.upload(posterUri, task -> {
+                if (task.isSuccessful()) {
+                    event.setPosterImageId(i.getImageUrl());
+                    doEventTransaction(eventRef, event, onCompleteListener);
+                } else {
+                    Log.d("EventRepository", "updateEvent: Failure to upload image");
+                }
+            });
+        } else {
+            doEventTransaction(eventRef, event, onCompleteListener);
+        }
+    }
+
+    private void doEventTransaction(DocumentReference eventsRef, Event event, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {
-                    transaction.set(eventRef, event);
+                    event.setEventId(eventsRef.getId());
+                    event.setHasLotteryExecuted(false);
+                    event.setWaitingList(new ArrayList<WaitingListEntrant>());
+
+                    transaction.set(eventsRef, event);
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
@@ -76,7 +149,6 @@ public class EventRepository {
     public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
         eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
-                    // Handle the error
                     System.err.println("Deletion failed: " + e.getMessage());
                 });
     }
@@ -84,12 +156,12 @@ public class EventRepository {
     /**
      * Retrieves a list of events organized by a specific user.
      *
-     * @param userId The ID of the organizer.
-     * @param includePastEvents Whether to include past events in the result.
+     * @param userDeviceId       The ID of the organizer.
+     * @param includePastEvents  Whether to include past events in the result.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void getEventsByOrganizerId(String userId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(task -> {
+    public void getEventsByOrganizerId(String userDeviceId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userDeviceId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<Event> events = new ArrayList<>();
                 for (DocumentSnapshot document : task.getResult().getDocuments()) {
@@ -260,6 +332,90 @@ public class EventRepository {
                 onCompleteListener.onComplete(Tasks.forException(task.getException()));
             }
         });
+    }
+
+    public void addSnapshotListener(){
+        //dont want to add multiple listeners
+        if(listening)
+            return;
+
+        User user = User.getInstance();
+
+        Log.i("EVENT", "Adding Listener");
+
+        eventsRef.addSnapshotListener((query, error) -> {
+            if(!listening){
+                listening = true;
+                return;
+            }
+
+            if(error != null){
+                Log.e("EVENT", "Listen failed: ", error);
+                listening = false;
+                return;
+            }
+
+            if(query == null)
+                return;
+
+            //we're not looking to update anything
+            if(listToUpdate == null && eventToUpdate == null)
+                return;
+
+            for(DocumentChange change : query.getDocumentChanges()){
+                Event event = change.getDocument().toObject(Event.class);
+
+                if(change.getType() == DocumentChange.Type.MODIFIED){
+
+                    if(eventToUpdate != null && event.getEventId().equals(eventToUpdate.getEventId())){
+                        eventToUpdate.update(event);
+                    }
+
+                    if(listToUpdate != null){
+                        for(Event e : listToUpdate){
+                            if(!e.getEventId().equals(event.getEventId()))
+                                continue;
+
+                            e.update(event);
+                            break;
+                        }
+                    }
+
+                }
+
+                else if(change.getType() == DocumentChange.Type.REMOVED){
+
+                    if(eventToUpdate != null && event.getEventId().equals(eventToUpdate.getEventId())){
+                        eventToUpdate.setEventId(null);
+                    }
+
+                    if(listToUpdate != null){
+                        for(Event e : listToUpdate){
+                            if(!e.getEventId().equals(event.getEventId()))
+                                continue;
+
+                            e.setEventId(null);
+                            break;
+                        }
+                    }
+                }
+            }
+            if(onUpdate != null)
+                onUpdate.run();
+        });
+
+    }
+
+    public void attachList(ArrayList<Event> events, Runnable onUpdate){
+        this.listToUpdate = events;
+        this.eventToUpdate = null;
+        this.onUpdate = onUpdate;
+    }
+
+    public void attachEvent(Event event, Runnable onUpdate){
+        this.eventToUpdate = event;
+        this.listToUpdate = null;
+        this.onUpdate = onUpdate;
     }
 }
 /*

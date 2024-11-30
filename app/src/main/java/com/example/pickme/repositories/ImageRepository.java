@@ -46,6 +46,15 @@ public class ImageRepository {
     private final FirebaseFirestore db;
     private final CollectionReference imgCollection;
 
+    private static ImageRepository instance;
+
+    public static ImageRepository getInstance(){
+        if(instance == null)
+            instance = new ImageRepository();
+
+        return instance;
+    }
+
     /**
      * Callback for handling duplicate checking
      */
@@ -60,7 +69,7 @@ public class ImageRepository {
     /**
      * Constructs a new ImageRepository for image CRUD operations.
      */
-    public ImageRepository() {
+    private ImageRepository() {
         //region Attributes
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth_uid = auth.getUid();
@@ -171,19 +180,18 @@ public class ImageRepository {
      * @param uri The uri to update with
      */
     private void uploadUriToFirebase(Image i, DocumentReference doc, Uri uri, OnCompleteListener<Image> listener) {
-        
 
         String imageId = doc.getId();
         String uploaderId = i.getUploaderId();
         String imageType = i.getImageType().toString();
         StorageReference imgRef = imgStorage.child(imageType).child(uploaderId).child(imageId);
 
-        // update storage file
+        // upload storage file
         imgRef
             .putFile(uri)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Log.d(TAG, String.format("update: File %s updated", imageId));
+                    Log.d(TAG, String.format("upload: File %s uploaded", imageId));
 
                     // update document
                     imgRef.getDownloadUrl().addOnSuccessListener(url -> {
@@ -213,7 +221,7 @@ public class ImageRepository {
                 .putBytes(data)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d(TAG, String.format("update: File %s updated", imageId));
+                        Log.d(TAG, String.format("upload: File %s uploaded", imageId));
 
                         // update document
                         imgRef.getDownloadUrl().addOnSuccessListener(url -> {
@@ -307,10 +315,11 @@ public class ImageRepository {
                                     .delete()
                                     .addOnCompleteListener(deleteFileTask -> {
                                         if (deleteFileTask.isSuccessful()) {
-                                            Log.d(TAG, "DB: Deleting document " + imageId);
+                                            Log.d(TAG, "delete: Deleting document " + imageId);
                                             db
                                                     .runTransaction(transaction -> {
                                                         transaction.delete(doc);
+                                                        Log.d(TAG, "delete: Deletion completed");
                                                         return i;
                                                     })
                                                     .addOnCompleteListener(listener);
@@ -339,24 +348,23 @@ public class ImageRepository {
                 .get()
                 .addOnCompleteListener(querySnapshotTask -> {
                     if (querySnapshotTask.isSuccessful()) {
-                        Log.d(TAG, "DB: Query all successful");
+                        Log.d(TAG, "getAll: Query all successful");
                         QuerySnapshot queryRes = querySnapshotTask.getResult();
                         if (!queryRes.isEmpty()) {
                             // acquired list of image documents
+                            ArrayList<Image> images = new ArrayList<>();
                             List<DocumentSnapshot> docs = queryRes.getDocuments();
 
-                            // extracting list of image urls
-                            ArrayList<String> imageUrls = new ArrayList<>();
+                            // extracting list of images
                             for (DocumentSnapshot doc : docs) {
-                                String url = (String) doc.get("imageUrl");
-                                imageUrls.add(url);
+                                images.add(doc.toObject(Image.class));
                             }
                             // clearing and resetting adapter
                             gallery.setAdapter(null);
-                            GalleryAdapter adapter = new GalleryAdapter(context, imageUrls);
+                            GalleryAdapter adapter = new GalleryAdapter(context, images);
                             gallery.setAdapter(adapter);
                         } else {
-                            Log.d(TAG, "DB: Query all returned empty");
+                            Log.d(TAG, "getAll: Query all returned empty");
                         }
                     }
                 });

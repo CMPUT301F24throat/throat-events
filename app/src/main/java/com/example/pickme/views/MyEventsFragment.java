@@ -30,7 +30,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     private FragmentMyEventsBinding binding;
     private EventRepository eventRepository;
     private EventAdapter eventAdapter;
-    private List<Event> eventList = new ArrayList<>();
+    private ArrayList<Event> eventList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -44,7 +44,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         super.onViewCreated(view, savedInstanceState);
 
         facilityRepository = new FacilityRepository();
-        eventRepository = new EventRepository();
+        eventRepository = EventRepository.getInstance();
         User user = User.getInstance();
 
         eventAdapter = new EventAdapter(eventList, requireActivity(), this);
@@ -52,7 +52,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
 
         if (user != null) {
             // Check if the user has a facility
-            checkUserFacility(user.getUserId());
+            checkUserFacility(user.getDeviceId());
         }
 
         binding.fabAddEvent.setOnClickListener(v -> {
@@ -65,19 +65,19 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
             if (result.getBoolean("eventCreated")) {
                 Toast.makeText(requireActivity(), "Event successfully created", Toast.LENGTH_SHORT).show();
                 if (user != null) {
-                    loadUserEvents(user.getUserId());
+                    loadUserEvents(user.getDeviceId());
                 }
             }
         });
     }
 
-    private void checkUserFacility(String userId) {
-        facilityRepository.getFacilityByOwnerId(userId, task -> {
+    private void checkUserFacility(String userDeviceId) {
+        facilityRepository.getFacilityByOwnerId(userDeviceId, task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot querySnapshot = task.getResult();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
                     // Facility exists, proceed to show MyEventsFragment view
-                    loadUserEvents(userId);
+                    loadUserEvents(userDeviceId);
                 } else {
                     // Facility does not exist, navigate to FacilityCreationFragment
                     navigateToFacilityCreationFragment();
@@ -89,15 +89,26 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
-    private void loadUserEvents(String userId) {
-        boolean includePastEvents = false; // Set this based on your requirement
-        eventRepository.getEventsByOrganizerId(userId, includePastEvents, task -> {
-            if (task.isSuccessful()) {
-                List<Event> events = task.getResult();
+    // Method without includePastEvents parameter, defaulting to false
+    private void loadUserEvents(String userDeviceId) {
+        loadUserEvents(userDeviceId, false);
+    }
+
+    // Method with includePastEvents parameter
+    private void loadUserEvents(String userDeviceId, boolean includePastEvents) {
+        eventRepository.getEventsByOrganizerId(userDeviceId, includePastEvents, getEventsTask -> {
+            if (getEventsTask.isSuccessful()) {
+                List<Event> events = getEventsTask.getResult();
                 if (events != null) {
                     eventList.clear();
                     eventList.addAll(events);
                     eventAdapter.notifyDataSetChanged();
+
+                    eventRepository.attachList(eventList, () -> {
+                        eventList.removeIf(event -> event.getEventId() == null);
+                        eventAdapter.notifyDataSetChanged();
+                    });
+
                     // Show or hide the no events text based on the event list size
                     binding.noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
                 }

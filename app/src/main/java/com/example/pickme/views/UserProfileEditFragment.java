@@ -79,16 +79,35 @@ public class UserProfileEditFragment extends Fragment {
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                     if (uri != null) {
                         isChanged = true;
-                        // Handle the selected image URI
+                        Toast.makeText(
+                                this.getContext(),
+                                "Uploading...",
+                                Toast.LENGTH_SHORT).show();
+                        // uploads the image selected
+                        img.upload(uri, task -> {
+                            if (task.isSuccessful()) {
+                                Image i = task.getResult();
+                                img.setImageUrl(i.getImageUrl());
+                                // preview
+                                Glide.with(editProfilePicture.getRootView())
+                                        .load(img.getImageUrl())
+                                        .into(editProfilePicture);
+                                Toast.makeText(
+                                        this.getContext(),
+                                        "Profile picture uploaded!",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
                     }
                 });
 
         // launches the gallery picker when the user clicks the profile picture
-        editProfilePicture.setOnClickListener(v -> {
-            pickPfp.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build());
-        });
+        editProfilePicture.setOnClickListener(v -> pickPfp.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build()));
 
         removeProfilePicture.setOnClickListener(v -> {
             isChanged = true;
@@ -154,7 +173,7 @@ public class UserProfileEditFragment extends Fragment {
         }
 
         if (editProfilePicture.getTag() == "deleted") {
-            generateProfilePicture(user, task -> {
+            generateProfilePicture(task -> {
                 Log.d("Image", "generate: New profile picture generated");
                 updateUserInstanceWithInput(user);
                 pushUserToFirestore(user);
@@ -169,7 +188,7 @@ public class UserProfileEditFragment extends Fragment {
     }
 
     private void pushUserToFirestore(User user) {
-        UserRepository userRepository = new UserRepository();
+        UserRepository userRepository = UserRepository.getInstance();
         userRepository.updateUser(user, task -> {
             if (task.isSuccessful()) {
                 showToast("Profile saved successfully!");
@@ -188,7 +207,7 @@ public class UserProfileEditFragment extends Fragment {
         user.setProfilePictureUrl(img.getImageUrl());
     }
 
-    private void generateProfilePicture(User user, OnCompleteListener<Image> listener) {
+    private void generateProfilePicture(OnCompleteListener<Image> listener) {
         // Generate a new profile picture using the user's initials (default pfp)
         String firstName = editProfileFirstName.getText().toString().trim();
         String lastName = editProfileLastName.getText().toString().trim();

@@ -57,7 +57,7 @@ public class Image {
      *                         or an event ID for an event poster
      */
     public Image(@NonNull String userId, @NonNull String imageAssociation) {
-        this.ir = new ImageRepository();
+        this.ir = ImageRepository.getInstance();
         this.uploaderId = userId;
         this.imageAssociation = imageAssociation;
         this.imageType = userId.equals(imageAssociation) ?
@@ -145,16 +145,6 @@ public class Image {
      */
     public void upload(@NonNull Uri imageUri, OnCompleteListener<Image> listener) {
         ir.upload(this, imageUri, listener);
-    }
-
-    /**
-     * Uploads an image with attached image byte data to FirebaseStorage,
-     * then stores the image information to Firestore DB.
-     *
-     * @param data The byte data of the image to be uploaded
-     */
-    public void upload(@NonNull byte[] data, OnCompleteListener<Image> listener) {
-        ir.upload(this, data, listener);
     }
 
     /**

@@ -37,11 +37,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
+
     private NotificationAdapter notificationAdapter;
     private NotifRecAdapter notifRecAdapter;
     static boolean listening = false;
 
-    static NotificationRepository instance;
+    private static NotificationRepository instance;
 
     public static NotificationRepository getInstance(){
         if(instance == null)
@@ -132,6 +133,7 @@ public class NotificationRepository {
 
             if(error != null){
                 Log.e("NOTIF", "Listen failed: ", error);
+                listening = false;
                 return;
             }
 
@@ -145,7 +147,7 @@ public class NotificationRepository {
                     if(change.getType() == DocumentChange.Type.ADDED){
                         notificationList.add(notification);
                         user.addUserNotification(new UserNotification(notification.getNotificationId()));
-                        new EventRepository().getEventById(notification.getEventID(), task ->{
+                        EventRepository.getInstance().getEventById(notification.getEventID(), task ->{
                                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
                                     .setSmallIcon(android.R.drawable.ic_menu_info_details)
                                     .setContentTitle(task.getResult().getEventTitle())
