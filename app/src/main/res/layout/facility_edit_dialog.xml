@@ -1,6 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@color/icon"
+    android:backgroundTint="@null"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/facilityEdit_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Edit Facility Details"
+        android:textAlignment="center"
+        android:textColor="@color/buttonBG2"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/facilityEdit_facilityName"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/inter"
+        android:hint="Facility Name *"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/facilityEdit_title" />
+
+    <EditText
+        android:id="@+id/facilityEdit_facilityLocation"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:fontFamily="@font/inter"
+        android:hint="Enter location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/facilityEdit_facilityName" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/facilityEdit_btnGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/facilityEdit_facilityLocation"
+        app:layout_constraintVertical_bias="0.0">
+
+        <Button
+            android:id="@+id/facilityEdit_btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#00000000"
+            android:fontFamily="@font/inter"
+            android:text="Cancel"
+            android:textColor="@color/buttonBG2"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/facilityEdit_btnSave"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.5"
+            app:strokeColor="@color/buttonBG2"
+            app:strokeWidth="3dp" />
+
+        <Button
+            android:id="@+id/facilityEdit_btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:backgroundTint="@color/buttonBG2"
+            android:fontFamily="@font/inter"
+            android:text="Save"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.5" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

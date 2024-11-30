@@ -27,6 +27,9 @@ import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
 
+/**
+ * Fragment for editing the user's profile.
+ */
 public class UserProfileEditFragment extends Fragment {
 
     private EditText editProfileFirstName, editProfileLastName, editProfileEmailAddress, editProfileContactNumber;
@@ -134,6 +137,9 @@ public class UserProfileEditFragment extends Fragment {
         });
     }
 
+    /**
+     * Loads the user data and populates the EditText fields.
+     */
     private void loadUserData() {
         // Load user data from the User instance and populate the EditText fields
         User user = User.getInstance();
@@ -163,6 +169,11 @@ public class UserProfileEditFragment extends Fragment {
         }
     }
 
+    /**
+     * Validates the user input changes.
+     *
+     * @return true if the input is valid, false otherwise.
+     */
     private boolean validateUserChanges() {
         // Get the input data
         String firstName = editProfileFirstName.getText().toString().trim();
@@ -198,6 +209,9 @@ public class UserProfileEditFragment extends Fragment {
         return true;
     }
 
+    /**
+     * Saves the user data.
+     */
     private void saveUserData() {
         // Save user data here
         User user = User.getInstance();
@@ -227,8 +241,10 @@ public class UserProfileEditFragment extends Fragment {
         }
     }
 
+    /**
+     * Shows a dialog if the user tries to navigate away with unsaved changes.
+     */
     private void showUnsavedChangesDialog() {
-        // Show a dialog if the user tries to navigate away with unsaved changes
         new AlertDialog.Builder(getContext())
                 .setMessage("You have unsaved changes. Do you want to discard them?")
                 .setPositiveButton("Discard", (dialog, which) -> navigateToUserProfileFragment())
@@ -236,8 +252,10 @@ public class UserProfileEditFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Navigates back to the User Profile Fragment.
+     */
     private void navigateToUserProfileFragment() {
-        // Navigate back to the User Profile Fragment
         Navigation.findNavController(getView()).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
     }
 }
@@ -246,7 +264,7 @@ public class UserProfileEditFragment extends Fragment {
 /*
    Coding Sources
    <p>
-   ChatGBT
+   ChatGPT
    - "How do I set up a Firebase Firestore database collection?"
    - "How do I properly setup a Map / Hashmap?"
    <p>
