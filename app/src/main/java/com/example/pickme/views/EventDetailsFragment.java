@@ -18,11 +18,9 @@ import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
-import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
-import com.example.pickme.utils.ImageQuery;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
@@ -55,6 +53,14 @@ public class EventDetailsFragment extends Fragment {
 
             configureView(view, currentUser);
             displayEventDetails(view);
+            EventRepository.getInstance().attachEvent(event, () -> {
+                if(event.getEventId() == null){
+                    Toast.makeText(getContext(), "Sorry, Event was deleted", Toast.LENGTH_SHORT);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_global_homeFragment);
+                }
+                else
+                    displayEventDetails(view);
+            });
         } else {
             Navigation.findNavController(requireView()).navigateUp();
         }
@@ -89,8 +95,7 @@ public class EventDetailsFragment extends Fragment {
             setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() != 0 ? event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners") : " ");
             setText(view, R.id.eventDetails_maxEntrants, waitingEntrantsCount + " / " + (event.getMaxEntrants() != null ? event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants") : "No waitlist limit"));
 
-            // TODO: is this correct or dummy data?
-            loadImage(view, R.id.eventDetails_poster, "1234567890", "123456789");
+            loadImage(view, R.id.eventDetails_poster, event.getPosterImageId());
         }
     }
 
@@ -175,21 +180,10 @@ public class EventDetailsFragment extends Fragment {
         view.findViewById(viewId).setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private void loadImage(View view, int imageViewId, String imageId, String imageUrl) {
-        Image image = new Image(imageId, imageUrl);
-        image.download(new ImageQuery() {
-            @Override
-            public void onSuccess(Image image) {
-                if (isAdded()) {
-                    Glide.with(view)
-                            .load(image.getImageUrl())
-                            .into((ImageView) view.findViewById(imageViewId));
-                }
-            }
-
-            @Override
-            public void onEmpty() {}
-        });
+    private void loadImage(View view, int imageViewId, String imageUrl) {
+        Glide.with(view)
+                .load(imageUrl)
+                .into((ImageView) view.findViewById(imageViewId));
     }
 
     private void navigateToQRCodeView() {

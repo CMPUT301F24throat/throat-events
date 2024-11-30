@@ -37,6 +37,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class NotificationRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference notificationsRef = db.collection("notifications");
+
     private NotificationAdapter notificationAdapter;
     private NotifRecAdapter notifRecAdapter;
     static boolean listening = false;
@@ -132,6 +133,7 @@ public class NotificationRepository {
 
             if(error != null){
                 Log.e("NOTIF", "Listen failed: ", error);
+                listening = false;
                 return;
             }
 

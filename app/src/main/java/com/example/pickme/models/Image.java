@@ -148,16 +148,6 @@ public class Image {
     }
 
     /**
-     * Uploads an image with attached image byte data to FirebaseStorage,
-     * then stores the image information to Firestore DB.
-     *
-     * @param data The byte data of the image to be uploaded
-     */
-    public void upload(@NonNull byte[] data, OnCompleteListener<Image> listener) {
-        ir.upload(this, data, listener);
-    }
-
-    /**
      * Download the image from Firestore DB with query matching this image class.
      * <br>
      * <b>Requires the ImageQuery callback to access the query data.</b>

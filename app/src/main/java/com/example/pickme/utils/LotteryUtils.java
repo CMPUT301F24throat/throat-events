@@ -127,7 +127,7 @@ public class LotteryUtils {
                 event.setHasLotteryExecuted(true);
 
                 // Update new event data in Firestore
-                eventRepository.updateEvent(event, updateTask -> {
+                eventRepository.updateEvent(event, null, updateTask -> {
                     if (updateTask.isSuccessful()) {
                         onCompleteListener.onComplete(Tasks.forResult(selectedUserDeviceIds));
                     } else {
