@@ -112,8 +112,8 @@
         android:label="Admin Tools"
         tools:layout="@layout/fragment_admin_tools" >
         <action
-            android:id="@+id/action_adminToolsFragment_to_adminImageCatalogFragment"
-            app:destination="@id/adminImageCatalogFragment" />
+            android:id="@+id/action_adminToolsFragment_to_adminGalleryFragment"
+            app:destination="@id/adminGalleryFragment" />
     </fragment>
 
     <fragment
@@ -174,11 +174,11 @@
         android:id="@+id/action_global_adminToolsFragment"
         app:destination="@id/adminToolsFragment" />
     <fragment
-        android:id="@+id/adminImageCatalogFragment"
-        android:name="com.example.pickme.views.AdminImageCatalogFragment"
-        android:label="AdminImageCatalogFragment" >
+        android:id="@+id/adminGalleryFragment"
+        android:name="com.example.pickme.views.AdminGalleryFragment"
+        android:label="AdminGalleryFragment">
         <action
-            android:id="@+id/action_adminImageCatalogFragment_to_adminToolsFragment"
+            android:id="@+id/action_adminGalleryFragment_to_adminToolsFragment"
             app:destination="@id/adminToolsFragment" />
     </fragment>
 </navigation>
