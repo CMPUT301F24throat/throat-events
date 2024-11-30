@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
+import com.example.pickme.R;
 import com.example.pickme.databinding.EventsEventsArchiveBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
@@ -36,7 +38,11 @@ public class EventsArchiveFragment extends Fragment {
 
         eventRepository = EventRepository.getInstance();
 
-        eventAdapter = new AdminEventAdapter(requireActivity(), eventList);
+        eventAdapter = new AdminEventAdapter(requireActivity(), eventList, (event, position) -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedEvent", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventsArchiveFragment_to_eventDetailsFragment, bundle);
+        });
         binding.recyclerView.setAdapter(eventAdapter);
 
         loadEvents();

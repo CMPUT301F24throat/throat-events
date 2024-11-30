@@ -200,4 +200,13 @@
             android:id="@+id/action_adminGalleryFragment_to_adminToolsFragment"
             app:destination="@id/adminToolsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/eventsArchiveFragment"
+        android:name="com.example.pickme.views.EventsArchiveFragment"
+        android:label="events_events_archive"
+        tools:layout="@layout/events_events_archive" >
+        <action
+            android:id="@+id/action_eventsArchiveFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
 </navigation>
