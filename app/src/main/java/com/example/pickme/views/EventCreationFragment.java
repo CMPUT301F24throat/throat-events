@@ -1,10 +1,7 @@
 package com.example.pickme.views;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,23 +10,24 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
-import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
-import com.example.pickme.utils.ImageQuery;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,6 +36,7 @@ import java.util.Calendar;
  * Fragment for creating or updating an event.
  */
 public class EventCreationFragment extends Fragment {
+    private final User currentUser = User.getInstance();
     private String posterUrl;
     private Uri selectedImageUri;
     private Event event;
@@ -49,6 +48,7 @@ public class EventCreationFragment extends Fragment {
     private TextView addImage;
     private Button upsertEventBtn, deleteEventBtn, backBtn;
     private CheckBox requireGeolocation;
+    private ImageView iv;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -77,6 +77,7 @@ public class EventCreationFragment extends Fragment {
         upsertEventBtn = view.findViewById(R.id.create);
         deleteEventBtn = view.findViewById(R.id.deleteEvent);
         requireGeolocation = view.findViewById(R.id.requireGeolocation);
+        iv = view.findViewById(R.id.addImage_preview);
 
         // Set click listeners for UI elements
         addImage.setOnClickListener(listener -> openGallery());
@@ -98,7 +99,7 @@ public class EventCreationFragment extends Fragment {
 
             // If an event is being edited, set the event data in the UI
             if (event != null) {
-                setEventData();
+                setEventData(view);
 
                 deleteEventBtn.setVisibility(View.VISIBLE);
                 deleteEventBtn.setOnClickListener(listener -> {
@@ -121,7 +122,7 @@ public class EventCreationFragment extends Fragment {
     /**
      * Sets the event data in the UI if an event is being edited.
      */
-    private void setEventData() {
+    private void setEventData(View view) {
         if (event == null) {
             return;
         }
@@ -134,22 +135,13 @@ public class EventCreationFragment extends Fragment {
         startTimeEdit.setText(times[0]);
         endTimeEdit.setText(times.length > 1 ? times[1] : "");
         locationEdit.setText(event.getEventLocation() != null ? event.getEventLocation() : "");
-        maxWinnersEdit.setText(event.getMaxWinners());
+        maxWinnersEdit.setText(String.valueOf(event.getMaxWinners()));
         maxEntrantsEdit.setText(event.getMaxEntrants() != null ? event.getMaxEntrants().toString() : "");
         requireGeolocation.setChecked(event.isGeoLocationRequired());
-
-        // Download and set the event image
-        Image image = new Image("1234567890", "123456789");
-        image.download(new ImageQuery() {
-            @Override
-            public void onSuccess(Image image) {
-                // TODO: FIXXXX Set image to ImageView
-                //Glide.with(getView()).load(image.getImageUrl()).into(binding.camera);
-            }
-
-            @Override
-            public void onEmpty() {}
-        });
+        Glide
+                .with(view.getContext())
+                .load(event.getPosterImageId())
+                .into(iv);
     }
 
     /**
@@ -188,35 +180,23 @@ public class EventCreationFragment extends Fragment {
      * Opens the gallery to select an image.
      */
     private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        galleryLauncher.launch(intent);
+        galleryLauncher.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
     }
 
-    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    selectedImageUri = result.getData().getData();
-                    // TODO: FIXXXX Set image to ImageView
-                    //binding.addImage.setImageURI(selectedImageUri);
+    private final ActivityResultLauncher<PickVisualMediaRequest> galleryLauncher = registerForActivityResult (
+            new ActivityResultContracts.PickVisualMedia(),
+            uri -> {
+                if (uri != null) {
+                    selectedImageUri = uri;
+                    Glide
+                            .with(iv.getRootView())
+                            .load(selectedImageUri)
+                            .into(iv);
                 }
             }
     );
-
-    /**
-     * Uploads the selected image to Firebase.
-     * @param imageUri the URI of the selected image.
-     */
-    private void uploadImageToFirebase(Uri imageUri) {
-        Image image = new Image("1234567890", "123456789");
-        image.upload(imageUri, task -> {
-            if (task.isSuccessful()) {
-                posterUrl = task.getResult().getImageUrl();
-                upsertEvent();
-            }
-        });
-    }
 
     /**
      * Creates or updates an event in Firestore.
@@ -278,8 +258,9 @@ public class EventCreationFragment extends Fragment {
                             null    // set to null here, will be initialized in EventRepository
                     );
 
+
                     EventRepository eventRepository = EventRepository.getInstance();
-                    eventRepository.addEvent(newEvent, task1 -> {
+                    eventRepository.addEvent(newEvent, selectedImageUri, task1 -> {
                         if (task1.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(requireView()).navigateUp();
@@ -300,7 +281,7 @@ public class EventCreationFragment extends Fragment {
                     event.setGeoLocationRequired(isGeolocationRequired);
 
                     EventRepository eventRepository = EventRepository.getInstance();
-                    eventRepository.updateEvent(event, task1 -> {
+                    eventRepository.updateEvent(event, selectedImageUri, task1 -> {
                         if (task1.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(requireView()).navigateUp();
