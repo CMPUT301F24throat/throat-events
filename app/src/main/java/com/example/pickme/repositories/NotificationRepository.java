@@ -41,7 +41,7 @@ public class NotificationRepository {
     private NotifRecAdapter notifRecAdapter;
     static boolean listening = false;
 
-    static NotificationRepository instance;
+    private static NotificationRepository instance;
 
     public static NotificationRepository getInstance(){
         if(instance == null)
@@ -145,7 +145,7 @@ public class NotificationRepository {
                     if(change.getType() == DocumentChange.Type.ADDED){
                         notificationList.add(notification);
                         user.addUserNotification(new UserNotification(notification.getNotificationId()));
-                        new EventRepository().getEventById(notification.getEventID(), task ->{
+                        EventRepository.getInstance().getEventById(notification.getEventID(), task ->{
                                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
                                     .setSmallIcon(android.R.drawable.ic_menu_info_details)
                                     .setContentTitle(task.getResult().getEventTitle())

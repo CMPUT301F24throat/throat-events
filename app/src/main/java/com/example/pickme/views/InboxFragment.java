@@ -91,7 +91,7 @@ public class InboxFragment extends Fragment {
                     }
                 }
 
-                new UserRepository().updateUser(user, task -> {});
+                UserRepository.getInstance().updateUser(user, task -> {});
             }
 
             @Override
@@ -105,7 +105,7 @@ public class InboxFragment extends Fragment {
                 Paint paint = new Paint();
                 if (dX > 0) {
                     // Swiping to the right
-                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.highlight2));
+                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.green1));
                     canvas.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom(), paint);
 
                     // Draw a custom icon (optional)
@@ -121,7 +121,7 @@ public class InboxFragment extends Fragment {
                     }
                 } else if (dX < 0) {
                     // Swiping to the left
-                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.highlight1));
+                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.red1));
                     canvas.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom(), paint);
 
                     // Draw a delete icon (optional)

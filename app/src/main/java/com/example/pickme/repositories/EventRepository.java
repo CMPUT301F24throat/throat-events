@@ -1,8 +1,10 @@
 package com.example.pickme.repositories;
 
 import com.example.pickme.models.Event;
+import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -22,8 +24,40 @@ import java.util.List;
  * @version 2.0
  */
 public class EventRepository {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference eventsRef = db.collection("events");
+    private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
+    private CollectionReference eventsRef;
+
+    private static EventRepository instance;
+
+    public static EventRepository getInstance(){
+        if(instance == null)
+            instance = new EventRepository();
+
+        return instance;
+    }
+
+    /**
+     * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
+     */
+    private EventRepository() {
+        this.db = FirebaseFirestore.getInstance();
+        this.auth = FirebaseAuth.getInstance();
+        this.eventsRef = db.collection("events");
+    }
+
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param db Firebase Firestore instance
+     * @param auth Firebase Auth instance
+     * @param eventsRef Collection reference for events
+     */
+    private EventRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference eventsRef) {
+        this.db = db;
+        this.auth = auth;
+        this.eventsRef = eventsRef;
+    }
 
     /**
      * Creates a new event in the Firestore database.
@@ -35,11 +69,9 @@ public class EventRepository {
         db.runTransaction(transaction -> {
                     DocumentReference newEventRef = eventsRef.document();
                     event.setEventId(newEventRef.getId());
+                    event.setHasLotteryExecuted(false);
+                    event.setWaitingList(new ArrayList<WaitingListEntrant>());
                     transaction.set(newEventRef, event);
-
-                    // Create an empty waitingList subcollection
-                    CollectionReference waitingListRef = newEventRef.collection("waitingList");
-                    //transaction.set(waitingListRef.document(), new Object()); // Add an empty document to initialize the subcollection
 
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
@@ -62,7 +94,6 @@ public class EventRepository {
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
-                    // Handle the error
                     System.err.println("Transaction failed: " + e.getMessage());
                 });
     }
@@ -76,7 +107,6 @@ public class EventRepository {
     public void deleteEvent(String eventId, OnCompleteListener<Void> onCompleteListener) {
         eventsRef.document(eventId).delete().addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
-                    // Handle the error
                     System.err.println("Deletion failed: " + e.getMessage());
                 });
     }
@@ -84,12 +114,12 @@ public class EventRepository {
     /**
      * Retrieves a list of events organized by a specific user.
      *
-     * @param userId The ID of the organizer.
-     * @param includePastEvents Whether to include past events in the result.
+     * @param userDeviceId       The ID of the organizer.
+     * @param includePastEvents  Whether to include past events in the result.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void getEventsByOrganizerId(String userId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("organizerId", userId).get().addOnCompleteListener(task -> {
+    public void getEventsByOrganizerId(String userDeviceId, boolean includePastEvents, OnCompleteListener<List<Event>> onCompleteListener) {
+        eventsRef.whereEqualTo("organizerId", userDeviceId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<Event> events = new ArrayList<>();
                 for (DocumentSnapshot document : task.getResult().getDocuments()) {

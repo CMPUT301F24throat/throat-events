@@ -86,8 +86,23 @@
             android:id="@+id/action_eventDetailsFragment_to_createNotif"
             app:destination="@id/createNotif" />
         <action
-        android:id="@+id/action_eventDetailsFragment_to_lotteryWinnersFragment"
+         android:id="@+id/action_eventDetailsFragment_to_lotteryWinnersFragment"
         app:destination="@id/lotteryWinnersFragment" />
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_editEventFragment"
+            app:destination="@id/eventCreationFragment" />
+
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_lotteryOverviewFragment"
+            app:destination="@id/lotteryOverviewFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lotteryOverviewFragment"
+        android:name="com.example.pickme.views.LotteryOverviewFragment"
+        android:label="Event Lottery Overview"
+        tools:layout="@layout/lottery_overview">
+
     </fragment>
 
     <fragment
@@ -138,7 +153,11 @@
         android:id="@+id/lotteryWinnersFragment"
         android:name="com.example.pickme.views.LotteryWinnersFragment"
         android:label="Lottery Winners"
-        tools:layout="@layout/lottery_winners" />
+        tools:layout="@layout/lottery_winners">
+        <action
+            android:id="@+id/action_lotteryWinnersFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/createNotif"

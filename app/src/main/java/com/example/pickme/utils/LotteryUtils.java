@@ -1,11 +1,12 @@
 package com.example.pickme.utils;
 
+import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
+import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -17,9 +18,9 @@ import java.util.List;
  */
 public class LotteryUtils {
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final WaitingListUtils waitingListUtils = new WaitingListUtils();
-    private final EventRepository eventRepository = new EventRepository();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final EventRepository eventRepository = EventRepository.getInstance();
 
     /**
      * Runs the lottery for the specified event.
@@ -28,52 +29,21 @@ public class LotteryUtils {
      * @param onCompleteListener The listener to be called upon completion of the lottery process.
      */
     public void runLottery(String eventId, OnCompleteListener<List<String>> onCompleteListener) {
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        User currentUser = User.getInstance();
+        String currentUserDeviceId = currentUser.getDeviceId();
 
         db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
             if (eventTask.isSuccessful() && eventTask.getResult() != null) {
                 Event event = eventTask.getResult().toObject(Event.class);
 
-                if (event != null && event.getOrganizerId().equals(currentUserId) && !eventRepository.hasEventPassed(event)) {
-                    isMaxEntrantsReached(event, eventId, maxEntrantsTask -> {
-                        if (maxEntrantsTask.isSuccessful() && maxEntrantsTask.getResult() != null && !maxEntrantsTask.getResult()) {
-                            getNumToDraw(event, eventId, numToDrawTask -> {
-                                if (numToDrawTask.isSuccessful() && numToDrawTask.getResult() != null) {
-                                    int numToDraw = numToDrawTask.getResult();
+                if (isValidEvent(event, currentUserDeviceId)) {
+                    int numToDraw = determineNumToDraw(event);
 
-                                    if (numToDraw > 0) {
-                                        waitingListUtils.getWaitingEntrants(eventId, waitingEntrantsTask -> {
-                                            if (waitingEntrantsTask.isSuccessful() && waitingEntrantsTask.getResult() != null) {
-                                                List<WaitingListEntrant> waitingEntrants = waitingEntrantsTask.getResult();
-                                                Collections.shuffle(waitingEntrants);
-
-                                                List<String> selectedUserIds = new ArrayList<>();
-                                                for (int i = 0; i < Math.min(numToDraw, waitingEntrants.size()); i++) {
-                                                    selectedUserIds.add(waitingEntrants.get(i).getEntrantId());
-                                                }
-
-                                                onCompleteListener.onComplete(Tasks.forResult(selectedUserIds));
-                                            } else {
-                                                onCompleteListener.onComplete(Tasks.forException(waitingEntrantsTask.getException()));
-                                            }
-                                        });
-                                    } else {
-                                        db.collection("events").document(eventId).set(event).addOnCompleteListener(statusUpdateTask -> {
-                                            if (statusUpdateTask.isSuccessful()) {
-                                                onCompleteListener.onComplete(Tasks.forResult(new ArrayList<>()));
-                                            } else {
-                                                onCompleteListener.onComplete(Tasks.forException(statusUpdateTask.getException()));
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    onCompleteListener.onComplete(Tasks.forException(numToDrawTask.getException()));
-                                }
-                            });
-                        } else {
-                            onCompleteListener.onComplete(Tasks.forException(new Exception("Maximum number of entrants reached or error occurred")));
-                        }
-                    });
+                    if (numToDraw > 0) {
+                        drawLottery(eventId, event, numToDraw, onCompleteListener);
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forResult(new ArrayList<>()));
+                    }
                 } else {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("User is not the organizer of the event or event has passed")));
                 }
@@ -84,50 +54,88 @@ public class LotteryUtils {
     }
 
     /**
-     * Checks if the maximum number of entrants has been reached.
+     * Replaces the rejected entrants with new entrants from the waiting list.
      *
-     * @param event The event to check.
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
+     * @param eventId The ID of the event for which the lottery is to be run.
+     * @param onCompleteListener The listener to be called upon completion of the lottery process.
      */
-    private void isMaxEntrantsReached(Event event, String eventId, OnCompleteListener<Boolean> onCompleteListener) {
-        waitingListUtils.getPendingEntrants(eventId, pendingEntrantsTask -> {
-            if (pendingEntrantsTask.isSuccessful() && pendingEntrantsTask.getResult() != null) {
-                List<WaitingListEntrant> pendingEntrants = pendingEntrantsTask.getResult();
-                boolean isMaxReached = event.getMaxEntrants() != null && pendingEntrants.size() >= event.getMaxEntrants();
-                onCompleteListener.onComplete(Tasks.forResult(isMaxReached));
+    public void replaceRejectedEntrants(String eventId, OnCompleteListener<List<String>> onCompleteListener) {
+        waitingListUtils.getWaitingListEntrantsByStatus(eventId, EntrantStatus.REJECTED, task -> {
+            if (task.isSuccessful()) {
+                List<WaitingListEntrant> rejectedEntrants = task.getResult();
+                if (!rejectedEntrants.isEmpty()) {
+                    // Cancel all rejected entrants
+                    for (WaitingListEntrant entrant : rejectedEntrants) {
+                        waitingListUtils.updateEntrantStatus(eventId, entrant.getEntrantId(), EntrantStatus.CANCELLED);
+                    }
+
+                    // Draw new entrants to replace the rejected ones
+                    db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+                        if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                            Event event = eventTask.getResult().toObject(Event.class);
+                            if (isValidEvent(event, User.getInstance().getDeviceId())) {
+                                int numToDraw = rejectedEntrants.size();
+                                drawLottery(eventId, event, numToDraw, onCompleteListener);
+                            } else {
+                                onCompleteListener.onComplete(Tasks.forException(new Exception("User is not the organizer of the event or event has passed")));
+                            }
+                        } else {
+                            onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                        }
+                    });
+                } else {
+                    onCompleteListener.onComplete(Tasks.forResult(new ArrayList<>()));
+                }
             } else {
-                onCompleteListener.onComplete(Tasks.forException(pendingEntrantsTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
             }
         });
     }
 
     /**
-     * Calculates the number of entrants to draw in the lottery.
+     * Validates if the event is valid for running the lottery.
      *
-     * @param event The event for which the lottery is being run.
-     * @param eventId The ID of the event.
-     * @param onCompleteListener The listener to handle the completion of the task.
+     * @param event The event to be validated.
+     * @param currentUserDeviceId The device ID of the current user.
+     * @return True if the event is valid, false otherwise.
      */
-    public void getNumToDraw(Event event, String eventId, OnCompleteListener<Integer> onCompleteListener) {
-        waitingListUtils.getAcceptedEntrants(eventId, acceptedEntrantsTask -> {
-            if (acceptedEntrantsTask.isSuccessful() && acceptedEntrantsTask.getResult() != null) {
-                List<WaitingListEntrant> acceptedEntrants = acceptedEntrantsTask.getResult();
-                int numAcceptedEntrants = acceptedEntrants.size();
-                int numWinners = Integer.parseInt(event.getMaxWinners());
+    private boolean isValidEvent(Event event, String currentUserDeviceId) {
+        return event != null && event.getOrganizerId().equals(currentUserDeviceId) && !eventRepository.hasEventPassed(event);
+    }
 
-                waitingListUtils.getWaitingEntrants(eventId, waitingEntrantsTask -> {
-                    if (waitingEntrantsTask.isSuccessful() && waitingEntrantsTask.getResult() != null) {
-                        List<WaitingListEntrant> waitingEntrants = waitingEntrantsTask.getResult();
-                        int numToDraw = determineNumToDraw(waitingEntrants, numAcceptedEntrants, numWinners);
+    /**
+     * Draws the lottery for the event.
+     *
+     * @param eventId The ID of the event.
+     * @param event The event object.
+     * @param numToDraw The number of entrants to draw.
+     * @param onCompleteListener The listener to be called upon completion of the lottery process.
+     */
+    private void drawLottery(String eventId, Event event, int numToDraw, OnCompleteListener<List<String>> onCompleteListener) {
+        waitingListUtils.getWaitingListEntrantsByStatus(eventId, EntrantStatus.WAITING, task -> {
+            if (task.isSuccessful()) {
+                List<WaitingListEntrant> waitingEntrants = task.getResult();
+                Collections.shuffle(waitingEntrants);
 
-                        onCompleteListener.onComplete(Tasks.forResult(numToDraw));
+                List<String> selectedUserDeviceIds = new ArrayList<>();
+                for (int i = 0; i < Math.min(numToDraw, waitingEntrants.size()); i++) {
+                    selectedUserDeviceIds.add(waitingEntrants.get(i).getEntrantId());
+                    waitingEntrants.get(i).setStatus(EntrantStatus.SELECTED);   // Update entrant status to selected
+                }
+
+                event.setWaitingList(new ArrayList<>(waitingEntrants)); // Update event's waiting list to reflect entrantStatus changes
+                event.setHasLotteryExecuted(true);
+
+                // Update new event data in Firestore
+                eventRepository.updateEvent(event, updateTask -> {
+                    if (updateTask.isSuccessful()) {
+                        onCompleteListener.onComplete(Tasks.forResult(selectedUserDeviceIds));
                     } else {
-                        onCompleteListener.onComplete(Tasks.forException(waitingEntrantsTask.getException()));
+                        onCompleteListener.onComplete(Tasks.forException(updateTask.getException()));
                     }
                 });
             } else {
-                onCompleteListener.onComplete(Tasks.forException(acceptedEntrantsTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
             }
         });
     }
@@ -135,24 +143,20 @@ public class LotteryUtils {
     /**
      * Determines the number of entrants to draw in the lottery.
      *
-     * @param waitingEntrants The list of entrants currently waiting.
-     * @param numAcceptedEntrants The number of entrants that have already been accepted.
-     * @param numWinners The maximum number of winners allowed.
+     * @param event The event for which the lottery is being run.
      * @return The number of entrants to draw.
      */
-    private static int determineNumToDraw(List<WaitingListEntrant> waitingEntrants, int numAcceptedEntrants, int numWinners) {
-        int numWaitingEntrants = waitingEntrants.size();
-        int numToDraw;
+    private int determineNumToDraw(Event event) {
+        int currentNumInvited = 0;
+        int targetNumWinners = event.getMaxWinners();
 
-        if (numAcceptedEntrants == numWinners) {
-            numToDraw = 0;  // If num of accepted entrants is equal to num of winners, no need to draw
-        } else if (numAcceptedEntrants == 0 && numWaitingEntrants > numWinners) {
-            numToDraw = numWinners;  // If no entrants have been accepted and there are more waiting entrants than winners, draw max num of winners
-        } else if (numAcceptedEntrants != 0 && numWaitingEntrants > numWinners) {
-            numToDraw = numWinners - numAcceptedEntrants;  // If there are already accepted entrants and there are more waiting entrants than winners, draw the difference
-        } else {
-            numToDraw = numWaitingEntrants;  // If there are less waiting entrants than winners, draw all waiting entrants
+        for (WaitingListEntrant entrant : event.getWaitingList()) {
+            if (entrant.getStatus() == EntrantStatus.ACCEPTED || entrant.getStatus() == EntrantStatus.SELECTED || entrant.getStatus() == EntrantStatus.REJECTED) {
+                currentNumInvited++;
+            }
         }
-        return numToDraw;
+
+        int numWaitingEntrants = (int) event.getWaitingList().stream().filter(e -> e.getStatus() == EntrantStatus.WAITING).count();
+        return Math.min(targetNumWinners - currentNumInvited, numWaitingEntrants);
     }
 }
