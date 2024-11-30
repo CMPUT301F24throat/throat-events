@@ -44,7 +44,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         super.onViewCreated(view, savedInstanceState);
 
         facilityRepository = new FacilityRepository();
-        eventRepository = new EventRepository();
+        eventRepository = EventRepository.getInstance();
         User user = User.getInstance();
 
         recyclerView = view.findViewById(R.id.recyclerView);

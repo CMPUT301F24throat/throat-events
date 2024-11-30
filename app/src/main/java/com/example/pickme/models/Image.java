@@ -57,7 +57,7 @@ public class Image {
      *                         or an event ID for an event poster
      */
     public Image(@NonNull String userId, @NonNull String imageAssociation) {
-        this.ir = new ImageRepository();
+        this.ir = ImageRepository.getInstance();
         this.uploaderId = userId;
         this.imageAssociation = imageAssociation;
         this.imageType = userId.equals(imageAssociation) ?

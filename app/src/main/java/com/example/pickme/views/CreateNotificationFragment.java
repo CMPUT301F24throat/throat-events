@@ -119,7 +119,7 @@ public class CreateNotificationFragment extends Fragment {
      * @param task the task to run after this process is done
      */
     private void createSendList(Notification notification, Runnable task){
-        UserRepository userRepository = new UserRepository();
+        UserRepository userRepository = UserRepository.getInstance();
 
         switch(notification.getLevel()){
             case All:

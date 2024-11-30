@@ -198,7 +198,7 @@ public class WaitingListUtils {
         List<WaitingListEntrant> waitingEntrants = new ArrayList<>();
         for (WaitingListEntrant entrant : event.getWaitingList()) {
             if (entrant.getStatus() == status) {
-                UserRepository userRepository = new UserRepository();
+                UserRepository userRepository = UserRepository.getInstance();
 
                 // Make sure user acc exists before adding to waitingEntrants
                 userRepository.checkUserExists(entrant.getEntrantId(), task -> {

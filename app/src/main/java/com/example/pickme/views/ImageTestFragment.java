@@ -35,7 +35,7 @@ public class ImageTestFragment extends Fragment {
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
-    UserRepository ur = new UserRepository();
+    UserRepository ur = UserRepository.getInstance();
 
     String firstName = "Joe";
     String lastName = "Doe";
@@ -214,7 +214,7 @@ public class ImageTestFragment extends Fragment {
 
 
         getAllButton.setOnClickListener(view1 -> {
-            ImageRepository ir = new ImageRepository();
+            ImageRepository ir = ImageRepository.getInstance();
             ir.getAllImages(view1.getContext() ,gridView);
         });
 

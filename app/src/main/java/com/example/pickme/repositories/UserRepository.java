@@ -28,10 +28,19 @@ public class UserRepository {
     private final FirebaseAuth auth;
     private CollectionReference usersRef;
 
+    private static UserRepository instance;
+
+    public static UserRepository getInstance(){
+        if(instance == null)
+            instance = new UserRepository();
+
+        return instance;
+    }
+
     /**
      * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
      */
-    public UserRepository() {
+    private UserRepository() {
         this.db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
 
@@ -46,7 +55,7 @@ public class UserRepository {
      * @param auth Firebase Auth instance
      * @param usersRef Collection reference for users
      */
-    public UserRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference usersRef) {
+    private UserRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference usersRef) {
         this.db = db;
         this.auth = auth;
         this.usersRef = usersRef;

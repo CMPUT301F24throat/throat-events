@@ -28,7 +28,8 @@ public class EventRepository {
     private final FirebaseAuth auth;
     private CollectionReference eventsRef;
 
-    static EventRepository instance;
+    private static EventRepository instance;
+
     public static EventRepository getInstance(){
         if(instance == null)
             instance = new EventRepository();
@@ -39,7 +40,7 @@ public class EventRepository {
     /**
      * Default constructor that initializes Firebase Firestore and FirebaseAuth instances.
      */
-    public EventRepository() {
+    private EventRepository() {
         this.db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
         this.eventsRef = db.collection("events");
@@ -52,7 +53,7 @@ public class EventRepository {
      * @param auth Firebase Auth instance
      * @param eventsRef Collection reference for events
      */
-    public EventRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference eventsRef) {
+    private EventRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference eventsRef) {
         this.db = db;
         this.auth = auth;
         this.eventsRef = eventsRef;

@@ -62,7 +62,7 @@ public class LotteryWinnersFragment extends Fragment {
         winnerList.setLayoutManager(new LinearLayoutManager(requireContext()));
         winnerList.setAdapter(winnerAdapter);
 
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
 
         if (getArguments() != null) {
             List<String> selectedUserDeviceIds = getArguments().getStringArrayList("selectedUserDeviceIds");

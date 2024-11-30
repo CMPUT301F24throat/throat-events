@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadingScreen = findViewById(R.id.loading_screen); // Find the loading screen view
 
