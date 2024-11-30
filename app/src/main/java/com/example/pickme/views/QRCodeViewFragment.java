@@ -42,7 +42,7 @@ import java.io.File;
 public class QRCodeViewFragment extends Fragment {
 
     private static final String ARG_EVENT_ID = "eventID";
-    private static final String TAG = "QRCodeViewFragment"; // Add a TAG for logging
+    private static final String TAG = "QRCodeViewFragment";
 
     private String eventID;
 
@@ -85,9 +85,11 @@ public class QRCodeViewFragment extends Fragment {
             eventID = getArguments().getString(ARG_EVENT_ID);
         }
 
-        // Initialize repositories and QR code generator
+        // Initialize repositories using singleton pattern
         eventRepository = EventRepository.getInstance();
         qrRepository = QrRepository.getInstance();
+
+        // Pass the singleton QRRepository instance to QRCodeGenerator
         qrCodeGenerator = new QRCodeGenerator(qrRepository);
     }
 
@@ -112,27 +114,18 @@ public class QRCodeViewFragment extends Fragment {
         // Retrieve and log the User instance
         User user = User.getInstance();
         if (user != null) {
-            // Log the entire User instance (assuming `toString` is implemented)
             Log.d(TAG, "User instance: " + user.toString());
 
-            // Log specific fields if `toString` isn't implemented
-            Log.d(TAG, "User details: " +
-                    "ID=" + user.getUserId() +
-                    ", FirstName=" + user.getFirstName() +
-                    ", LastName=" + user.getLastName() +
-                    ", Email=" + user.getEmailAddress() +
-                    ", IsAdmin=" + user.isAdmin());
-
             if (user.isAdmin()) {
-                deleteButton.setVisibility(View.VISIBLE); // Show for admin users
+                deleteButton.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Delete button made visible.");
             } else {
-                deleteButton.setVisibility(View.GONE); // Hide for non-admin users
+                deleteButton.setVisibility(View.GONE);
                 Log.d(TAG, "Delete button hidden for non-admin user.");
             }
         } else {
             Log.e(TAG, "User instance is null. Cannot determine admin status.");
-            deleteButton.setVisibility(View.GONE); // Hide if user instance is null
+            deleteButton.setVisibility(View.GONE);
         }
 
         // Define the delete action
@@ -143,28 +136,24 @@ public class QRCodeViewFragment extends Fragment {
         return view;
     }
 
-
     private void deleteAndRegenerateQRCode() {
         String qrPath = "/events/" + eventID;
 
-        // Attempt to delete the QR document from the repository
         qrRepository.deleteQRByAssociation(qrPath)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "QR code removed successfully", Toast.LENGTH_SHORT).show();
-                    regenerateQRCode(); // Proceed to regenerate the QR code
+                    regenerateQRCode();
                 })
                 .addOnFailureListener(e -> {
-                    // Log the failure but proceed to regenerate a new QR code
                     Log.e(TAG, "Failed to remove QR code: ", e);
                     Toast.makeText(getContext(), "Failed to remove old QR code, generating a new one", Toast.LENGTH_SHORT).show();
-                    regenerateQRCode(); // Proceed to regenerate the QR code
+                    regenerateQRCode();
                 });
     }
 
     private void regenerateQRCode() {
         String newEncodedPath = "/events/" + eventID;
 
-        // Clear old cached QR code file
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override
             public void onQRCodeReady(String filePath) {
@@ -184,20 +173,18 @@ public class QRCodeViewFragment extends Fragment {
             }
         });
 
-        // Create a new QR object
         QR qr = new QR(newEncodedPath);
 
         qrRepository.createQR(qr)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "QR code regenerated successfully", Toast.LENGTH_SHORT).show();
-                    displayQRCode(); // Reload and display the new QR code
+                    displayQRCode();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to regenerate QR code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Failed to regenerate QR code: ", e);
                 });
     }
-
 
     private void loadEventDetails() {
         eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
