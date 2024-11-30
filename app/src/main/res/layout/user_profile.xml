@@ -157,9 +157,8 @@
             android:layout_marginStart="40dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="40dp"
-            android:orientation="horizontal"
             android:background="@drawable/button_squircle_background"
-            app:layout_constraintBottom_toTopOf="@+id/profileAdminLayout"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.489"
             app:layout_constraintStart_toStartOf="parent"
@@ -185,47 +184,7 @@
                 android:textAlignment="textStart"
                 android:textColor="@color/text2"
                 android:textSize="16sp"
-                tools:ignore="RtlCompat"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/profileAdminLayout"
-            android:layout_width="330dp"
-            android:layout_height="50dp"
-            android:layout_gravity="start"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginBottom="40dp"
-            android:orientation="horizontal"
-            android:background="@drawable/button_squircle_background"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.489"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileNotificationLayout"
-            tools:ignore="MissingConstraints">
-
-            <ImageView
-                android:id="@+id/profileAdminIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="8dp"
-                android:src="@drawable/ic_disabled" />
-
-            <TextView
-                android:id="@+id/profileAdminText"
-                style="@style/Widget.AppCompat.TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:fontFamily="sans-serif-medium"
-                android:text="Admin Access"
-                android:textAlignment="textStart"
-                android:textColor="@color/text2"
-                android:textSize="16sp"
-                tools:ignore="RtlCompat"/>
+                tools:ignore="RtlCompat" />
         </LinearLayout>
 
         <TextView

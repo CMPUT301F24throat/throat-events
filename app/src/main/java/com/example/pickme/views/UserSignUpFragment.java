@@ -57,10 +57,14 @@ public class UserSignUpFragment extends Fragment {
         }
 
         String deviceId = getDeviceID();
-        String dummyEmail = "temp@tempmail.com";
-        String dummyContact = "0-000-000-0000";
+        String tempEmail = "User@domain.com";
+        String tempContact = "000-000-0000";
 
-        createUser(firstName, lastName.isEmpty() ? "" : lastName, dummyEmail, dummyContact, deviceId);
+        String finalLastName = lastName;
+        if (lastName.isEmpty()) {
+            finalLastName = "";
+        }
+        createUser(firstName, finalLastName, tempEmail, tempContact, deviceId);
     }
 
     private String getDeviceID() {

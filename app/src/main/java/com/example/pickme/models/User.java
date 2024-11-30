@@ -74,10 +74,6 @@ public class User implements Serializable {
         return userAuthId;
     }
 
-    public void setUserId(String userId) {
-        this.userAuthId = userId;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -163,11 +159,6 @@ public class User implements Serializable {
         return isAdmin;
     }
 
-    public void setAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
-        this.updatedAt = Timestamp.now();
-    }
-
     public boolean isNotificationEnabled() {
         return notificationEnabled;
     }
@@ -209,13 +200,13 @@ public class User implements Serializable {
     }
 
     public static boolean validateLastName(String lastName) {
-        return lastName != null && lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
+        return lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
     }
 
     public static boolean validateEmailAddress(String emailAddress) {
         String[] validEmailAddressDomains = {".com", ".ca", ".net", ".org", ".kr", ".co", ".uk", "ir", ".ch"};
 
-        if (emailAddress == null || !emailAddress.contains("@")) {
+        if (!emailAddress.contains("@")) {
             return false;
         }
 
@@ -228,7 +219,7 @@ public class User implements Serializable {
     }
 
     public static boolean validateContactInformation(String contactNumber) {
-        return contactNumber != null && contactNumber.matches("\\+?[0-9\\-() ]{7,15}");
+        return contactNumber.matches("\\+?[0-9\\-() ]{7,15}");
     }
 
     //---------- Information Transformations --------------------

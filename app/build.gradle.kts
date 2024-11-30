@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.play.services.location)
+
 
     // Firebase Services
     implementation(platform(libs.firebase.bom))

@@ -24,7 +24,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class UserProfileFragment extends Fragment {
 
     private TextView profileFullName, profileEmailAddress, profileContactNumber;
-    private TextView profileLocationText, profileNotificationText, profileAdminText;
     private ImageView profileLocationIcon, profileNotificationIcon, profileAdminIcon;
     private CircleImageView profilePicture;
 
@@ -42,12 +41,8 @@ public class UserProfileFragment extends Fragment {
         profileFullName = view.findViewById(R.id.profileFullName);
         profileEmailAddress = view.findViewById(R.id.profileEmailAddress);
         profileContactNumber = view.findViewById(R.id.profileContactNumber);
-        profileLocationText = view.findViewById(R.id.profileLocationText);
-        profileNotificationText = view.findViewById(R.id.profileNotificationText);
-        profileAdminText = view.findViewById(R.id.profileAdminText);
         profileLocationIcon = view.findViewById(R.id.profileLocationIcon);
         profileNotificationIcon = view.findViewById(R.id.profileNotificationIcon);
-        profileAdminIcon = view.findViewById(R.id.profileAdminIcon);
         profilePicture = view.findViewById(R.id.profilePicture);
         ImageButton editButton = view.findViewById(R.id.profileEditButton);
         Button editGoBackButton = view.findViewById(R.id.profileMainGoBackButton);
@@ -76,7 +71,6 @@ public class UserProfileFragment extends Fragment {
             // Set drawable icons based on user settings
             profileLocationIcon.setImageResource(user.isGeoLocationEnabled() ? R.drawable.ic_enabled : R.drawable.ic_disabled);
             profileNotificationIcon.setImageResource(user.isNotificationEnabled() ? R.drawable.ic_enabled : R.drawable.ic_disabled);
-            profileAdminIcon.setImageResource(user.isAdmin() ? R.drawable.ic_enabled : R.drawable.ic_disabled);
 
             Glide.with(this)
                     .load(user.getProfilePictureUrl())
