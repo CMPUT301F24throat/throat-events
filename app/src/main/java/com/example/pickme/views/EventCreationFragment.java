@@ -25,7 +25,6 @@ import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
-import com.example.pickme.models.QR;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
@@ -292,10 +291,6 @@ public class EventCreationFragment extends Fragment {
                     eventRepository.addEvent(newEvent, selectedImageUri, task1 -> {
                         if (task1.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
-
-                            // set up qr here
-                            QR eventQr = new QR();
-
                             Navigation.findNavController(requireView()).navigateUp();
                         } else {
                             Toast.makeText(requireActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
