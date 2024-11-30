@@ -32,7 +32,7 @@
         android:id="@+id/userProfileEditFragment"
         android:name="com.example.pickme.views.UserProfileEditFragment"
         android:label="Edit Profile"
-        tools:layout="@layout/user_profile__edit">
+        tools:layout="@layout/user_profile_edit">
         <action
             android:id="@+id/action_userProfileEditFragment_to_userProfileFragment"
             app:destination="@id/userProfileFragment" />
@@ -95,6 +95,14 @@
         <action
             android:id="@+id/action_eventDetailsFragment_to_lotteryOverviewFragment"
             app:destination="@id/lotteryOverviewFragment" />
+
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_myEventsFragment"
+            app:destination="@id/myEventsFragment" />
+
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_eventWaitingListFragment"
+            app:destination="@id/eventWaitingListFragment" />
     </fragment>
 
     <fragment
@@ -168,6 +176,17 @@
         android:name="com.example.pickme.views.CreateNotificationFragment"
         android:label="Create Notif"
         tools:layout="@layout/notif_create_fragment">
+    </fragment>
+
+    <fragment
+        android:id="@+id/eventWaitingListFragment"
+        android:name="com.example.pickme.views.EventWaitingListFragment"
+        android:label="Event Waiting List"
+        tools:layout="@layout/event_waitinglist">
+
+        <action
+            android:id="@+id/action_eventWaitingListFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
     </fragment>
 
     <!-- Global actions -->

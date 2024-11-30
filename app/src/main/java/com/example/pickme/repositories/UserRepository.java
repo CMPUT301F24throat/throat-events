@@ -26,7 +26,7 @@ import java.util.Objects;
 public class UserRepository {
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
-    private CollectionReference usersRef;
+    private static CollectionReference usersRef;
 
     private static UserRepository instance;
 
@@ -55,7 +55,7 @@ public class UserRepository {
      * @param auth Firebase Auth instance
      * @param usersRef Collection reference for users
      */
-    private UserRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference usersRef) {
+    public UserRepository(FirebaseFirestore db, FirebaseAuth auth, CollectionReference usersRef) {
         this.db = db;
         this.auth = auth;
         this.usersRef = usersRef;
@@ -131,7 +131,7 @@ public class UserRepository {
      * @param user The user object containing updated information
      * @param onCompleteListener Listener to handle the completion of the task
      */
-    public void updateUser(User user, OnCompleteListener<Void> onCompleteListener) {
+    public static void updateUser(User user, OnCompleteListener<Void> onCompleteListener) {
         if (user == null || user.getDeviceId() == null || user.getDeviceId().isEmpty()) {
             Log.e("UserRepository", "Invalid user or user ID.");
             return;
@@ -146,11 +146,11 @@ public class UserRepository {
 //            updates.put("notificationEnabled", user.isNotificationEnabled());
 //            updates.put("profilePictureUrl", user.getProfilePictureUrl());
 
-            usersRef.document(user.getDeviceId())
-                    .set(user)
-                    .addOnCompleteListener(onCompleteListener)
-                    .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
-        }
+        usersRef.document(user.getDeviceId())
+                .set(user)
+                .addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> Log.e("UserRepository", "Failed to update user data in Firestore", e));
+    }
 
     /**
      * Deletes a user from the Firestore database.
