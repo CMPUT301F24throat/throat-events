@@ -343,17 +343,16 @@ public class ImageRepository {
                         QuerySnapshot queryRes = querySnapshotTask.getResult();
                         if (!queryRes.isEmpty()) {
                             // acquired list of image documents
+                            ArrayList<Image> images = new ArrayList<>();
                             List<DocumentSnapshot> docs = queryRes.getDocuments();
 
-                            // extracting list of image urls
-                            ArrayList<String> imageUrls = new ArrayList<>();
+                            // extracting list of images
                             for (DocumentSnapshot doc : docs) {
-                                String url = (String) doc.get("imageUrl");
-                                imageUrls.add(url);
+                                images.add(doc.toObject(Image.class));
                             }
                             // clearing and resetting adapter
                             gallery.setAdapter(null);
-                            GalleryAdapter adapter = new GalleryAdapter(context, imageUrls);
+                            GalleryAdapter adapter = new GalleryAdapter(context, images);
                             gallery.setAdapter(adapter);
                         } else {
                             Log.d(TAG, "DB: Query all returned empty");
