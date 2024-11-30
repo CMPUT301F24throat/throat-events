@@ -445,6 +445,11 @@ public class Event implements Serializable {
         return eventMap;
     }
 
+    /**
+     * Updates the event object with new data.
+     *
+     * @param event The updated event object
+     */
     public void update(Event event){
         eventId = event.getEventId();
         organizerId = event.getOrganizerId();

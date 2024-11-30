@@ -54,7 +54,7 @@ public class EventDetailsFragment extends Fragment {
             configureView(view, currentUser);
             displayEventDetails(view);
             EventRepository.getInstance().attachEvent(event, () -> {
-                if(event.getEventId() == null){
+                if (event.getEventId() == null){
                     Toast.makeText(getContext(), "Sorry, Event was deleted", Toast.LENGTH_SHORT);
                     Navigation.findNavController(requireView()).navigate(R.id.action_global_homeFragment);
                 }
@@ -74,10 +74,14 @@ public class EventDetailsFragment extends Fragment {
 
                 eventRepository.deleteEvent(event.getEventId(), deleteTask -> {
                     if (deleteTask.isSuccessful()) {
-                        Navigation.findNavController(requireView()).navigateUp();
-                        Toast.makeText(getContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                        if (isAdded() && getView() != null) {
+                            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
+                            Toast.makeText(getContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(getContext(), "Failed to delete event: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        if (isAdded() && getView() != null) {
+                            Toast.makeText(getContext(), "Failed to delete event: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }
