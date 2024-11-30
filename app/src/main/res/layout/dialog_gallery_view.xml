@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/dialogBG1">
+
+    <TextView
+        android:id="@+id/dialogGalleryHeaderText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/delete_this_image"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/dialogGalleryImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:maxHeight="512dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialogGalleryHeaderText" />
+
+    <LinearLayout
+        android:id="@+id/dialogGalleryInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialogGalleryImageView">
+
+        <TextView
+            android:id="@+id/dialogGalleryInfo_uploaderId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="uploaderId: "
+            android:textColor="@color/text2" />
+
+        <TextView
+            android:id="@+id/dialogGalleryInfo_imageAssociation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="imageAssociation: "
+            android:textColor="@color/text2" />
+
+        <TextView
+            android:id="@+id/dialogGalleryInfo_imageType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="imageType: "
+            android:textColor="@color/text2" />
+
+        <TextView
+            android:id="@+id/dialogGalleryInfo_updatedAt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="updatedAt: "
+            android:textColor="@color/text2" />
+
+        <TextView
+            android:id="@+id/dialogGalleryInfo_createdAt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="createdAt: "
+            android:textColor="@color/text2" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dialogGalleryWarningText"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginTop="32dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="This action is irreversible!"
+        android:textAllCaps="false"
+        android:textColor="@color/highlight1"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialogGalleryInfo"
+         />
+
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/dialogGalleryWarningText"
+        tools:layout_editor_absoluteX="16dp">
+
+        <Button
+            android:id="@+id/dialogGalleryDeleteButton"
+            android:layout_width="120dp"
+            android:layout_height="55dp"
+            android:backgroundTint="@color/buttonDefault"
+            android:fontFamily="sans-serif"
+            android:paddingStart="5dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="5dp"
+            android:paddingBottom="5dp"
+            android:text="Delete"
+            android:textAlignment="center"
+            android:textColor="@color/highlight1"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/dialogGalleryCancelButton"
+            android:layout_width="120dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="64dp"
+            android:backgroundTint="@color/buttonDefault"
+            android:fontFamily="sans-serif"
+            android:paddingStart="5dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="5dp"
+            android:paddingBottom="5dp"
+            android:text="Cancel"
+            android:textAlignment="center"
+            android:textColor="@color/text1"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
