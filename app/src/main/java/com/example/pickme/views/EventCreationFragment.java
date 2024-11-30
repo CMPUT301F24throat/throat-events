@@ -28,8 +28,6 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
-import com.example.pickme.repositories.QrRepository;
-import com.example.pickme.repositories.UserRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,15 +36,12 @@ import java.util.Calendar;
  * Fragment for creating or updating an event.
  */
 public class EventCreationFragment extends Fragment {
-    private final User currentUser = User.getInstance();
-    private String posterUrl;
+
     private Uri selectedImageUri;
     private Event event;
 
     private FacilityRepository facilityRepository;
     private EventRepository eventRepository;
-    private UserRepository userRepository;
-    private QrRepository qrRepository;
 
     private String organizerId;
 
@@ -56,6 +51,15 @@ public class EventCreationFragment extends Fragment {
     private CheckBox requireGeolocation;
     private ImageView iv;
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     *
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -63,15 +67,19 @@ public class EventCreationFragment extends Fragment {
         return inflater.inflate(R.layout.event_create, container, false);
     }
 
+    /**
+     * Called after the view has been created.
+     * Initializes the views and sets click listeners for UI elements.
+     *
+     * @param view The created view.
+     * @param savedInstanceState Bundle containing saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         facilityRepository = FacilityRepository.getInstance();
         eventRepository = EventRepository.getInstance();
-        userRepository = UserRepository.getInstance();
-        qrRepository = QrRepository.getInstance();
-
         organizerId = User.getInstance().getDeviceId();
 
         // Initialize views
@@ -140,6 +148,7 @@ public class EventCreationFragment extends Fragment {
             return;
         }
 
+        // Make sure to handle null data in event fields
         eventTitleEdit.setText(event.getEventTitle() != null ? event.getEventTitle() : "");
         descriptionEdit.setText(event.getEventDescription() != null ? event.getEventDescription() : "");
         String[] parts = event.getEventDate() != null ? event.getEventDate().split(", ") : new String[]{"", ""};
@@ -163,7 +172,7 @@ public class EventCreationFragment extends Fragment {
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        calendar.add(Calendar.DAY_OF_YEAR, 1);  // Set the default date to tomorrow to avoid creating events in the past
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy", java.util.Locale.getDefault());
         String currentDate = dateFormat.format(calendar.getTime());
         eventDateEdit.setText(currentDate);
@@ -199,6 +208,9 @@ public class EventCreationFragment extends Fragment {
                 .build());
     }
 
+    /**
+     * Activity result launcher for picking an image from the gallery.
+     */
     private final ActivityResultLauncher<PickVisualMediaRequest> galleryLauncher = registerForActivityResult (
             new ActivityResultContracts.PickVisualMedia(),
             uri -> {
@@ -280,7 +292,7 @@ public class EventCreationFragment extends Fragment {
                             eventTitle,
                             eventDescription,
                             dateTime,
-                            posterUrl,
+                            null,  // set to null here, will be initialized in EventRepository
                             eventLocation,
                             maxWinners,
                             isGeolocationRequired,
@@ -289,8 +301,8 @@ public class EventCreationFragment extends Fragment {
                             null    // set to null here, will be initialized in EventRepository
                     );
 
-                    eventRepository.addEvent(newEvent, selectedImageUri, task1 -> {
-                        if (task1.isSuccessful()) {
+                    eventRepository.addEvent(newEvent, selectedImageUri, addEventTask -> {
+                        if (addEventTask.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(requireView()).navigateUp();
                         } else {
@@ -306,8 +318,8 @@ public class EventCreationFragment extends Fragment {
                     event.setMaxEntrants(maxEntrants);
                     event.setGeoLocationRequired(isGeolocationRequired);
 
-                    eventRepository.updateEvent(event, selectedImageUri, task1 -> {
-                        if (task1.isSuccessful()) {
+                    eventRepository.updateEvent(event, selectedImageUri, updateEventTask -> {
+                        if (updateEventTask.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(requireView()).navigateUp();
                         } else {
@@ -324,8 +336,8 @@ public class EventCreationFragment extends Fragment {
      * @param event the event to be deleted.
      */
     private void deleteEvent(Event event) {
-        eventRepository.deleteEvent(event.getEventId(), task -> {
-            if (task.isSuccessful()) {
+        eventRepository.deleteEvent(event.getEventId(), deleteEventTask -> {
+            if (deleteEventTask.isSuccessful()) {
                 Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).navigateUp();
             } else {
@@ -343,7 +355,7 @@ public class EventCreationFragment extends Fragment {
         DatePickerDialog datePicker = new DatePickerDialog(requireActivity(), (view, year, month, dayOfMonth) -> {
             calendar.set(year, month, dayOfMonth);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy", java.util.Locale.getDefault());
             String formattedDate = dateFormat.format(calendar.getTime());
 
             eventDateEdit.setText(formattedDate);
@@ -362,7 +374,7 @@ public class EventCreationFragment extends Fragment {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
 
-            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", java.util.Locale.getDefault());
             String formattedTime = timeFormat.format(calendar.getTime());
 
             if (isStartTime) {

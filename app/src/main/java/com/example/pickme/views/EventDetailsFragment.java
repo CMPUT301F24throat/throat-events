@@ -27,35 +27,52 @@ import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Objects;
 
+/**
+ * Fragment to display the details of a selected event.
+ */
 public class EventDetailsFragment extends Fragment {
     private Event event;
     private User currentUser;
+    private EventRepository eventRepository;
     private WaitingListUtils waitingListUtils;
     private LotteryUtils lotteryUtils;
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater LayoutInflater to inflate the view.
+     * @param container ViewGroup container for the fragment.
+     * @param savedInstanceState Bundle containing saved state.
+     * @return Inflated view.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.event_details, container, false);
     }
 
+    /**
+     * Called after the view has been created.
+     *
+     * @param view The created view.
+     * @param savedInstanceState Bundle containing saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        view.findViewById(R.id.eventDetails_backBtn).setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
 
         if (getArguments() != null) {
             event = (Event) getArguments().getSerializable("selectedEvent");
             currentUser = User.getInstance();
 
+            eventRepository = EventRepository.getInstance();
             waitingListUtils = new WaitingListUtils();
             lotteryUtils = new LotteryUtils();
 
             configureView(view, currentUser);
             displayEventDetails(view);
-            EventRepository.getInstance().attachEvent(event, () -> {
+            eventRepository.attachEvent(event, () -> {
                 if (event.getEventId() == null){
-                    Toast.makeText(getContext(), "Sorry, Event was deleted", Toast.LENGTH_SHORT);
+                    Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
                 }
                 else
@@ -65,29 +82,20 @@ public class EventDetailsFragment extends Fragment {
             Navigation.findNavController(requireView()).navigateUp();
         }
 
+        // Set up click listeners for buttons
+        view.findViewById(R.id.eventDetails_backBtn).setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
         view.findViewById(R.id.eventDetails_qrBtn).setOnClickListener(v -> navigateToQRCodeView());
         view.findViewById(R.id.eventDetails_editBtn).setOnClickListener(v -> navigateToEditEvent());
         view.findViewById(R.id.eventDetails_sendNotifBtn).setOnClickListener(v -> navigateToCreateNotif());
-        view.findViewById(R.id.eventDetails_deleteBtn).setOnClickListener(v -> {
-            if (event != null) {
-                EventRepository eventRepository = EventRepository.getInstance();
-
-                eventRepository.deleteEvent(event.getEventId(), deleteTask -> {
-                    if (deleteTask.isSuccessful()) {
-                        if (isAdded() && getView() != null) {
-                            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
-                            Toast.makeText(getContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        if (isAdded() && getView() != null) {
-                            Toast.makeText(getContext(), "Failed to delete event: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
+        view.findViewById(R.id.eventDetails_moreInfoLink).setOnClickListener(v -> navigateToWaitlistInfo());
+        view.findViewById(R.id.eventDetails_deleteBtn).setOnClickListener(v -> deleteEvent());
     }
 
+    /**
+     * Displays the details of the event.
+     *
+     * @param view The view to display the event details in.
+     */
     private void displayEventDetails(View view) {
         if (event != null) {
             int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
@@ -103,6 +111,12 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    /**
+     * Configures the view based on the current user.
+     *
+     * @param view The view to configure.
+     * @param currentUser The current user.
+     */
     private void configureView(View view, User currentUser) {
         String userDeviceId = currentUser.getDeviceId();
         String organizerId = event.getOrganizerId();
@@ -117,10 +131,14 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_sendNotifBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_runLotteryBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_joinWaitlistBtn, !isOrganizer);
+        setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
 
         configWaitlistBtn();
     }
 
+    /**
+     * Configures the waitlist button based on the event and waiting list status.
+     */
     private void configWaitlistBtn() {
         if (waitingListUtils != null && event != null) {
             View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
@@ -160,6 +178,9 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    /**
+     * Configures the lottery button based on the event status.
+     */
     private void configLotteryBtn() {
         View lotteryBtn = requireView().findViewById(R.id.eventDetails_runLotteryBtn);
 
@@ -170,26 +191,70 @@ public class EventDetailsFragment extends Fragment {
             // If lottery has been run, set up click listener to navigate to lottery status fragment
             lotteryBtn.setOnClickListener(v -> {
                 Bundle bundle = new Bundle();
-                bundle.putString("eventId", event.getEventId());
+                bundle.putSerializable("event", event);
                 Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);
             });
         }
     }
 
+    /**
+     * Sets the text of a TextView.
+     *
+     * @param view The view containing the TextView.
+     * @param viewId The ID of the TextView.
+     * @param text The text to set.
+     */
     private void setText(View view, int viewId, String text) {
         ((TextView) view.findViewById(viewId)).setText(text);
     }
 
+    /**
+     * Sets the visibility of a view.
+     *
+     * @param view The view containing the target view.
+     * @param viewId The ID of the target view.
+     * @param isVisible Whether the view should be visible.
+     */
     private void setVisibility(View view, int viewId, boolean isVisible) {
         view.findViewById(viewId).setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
     }
 
+    /**
+     * Loads an image into an ImageView using Glide.
+     *
+     * @param view The view containing the ImageView.
+     * @param imageViewId The ID of the ImageView.
+     * @param imageUrl The URL of the image to load.
+     */
     private void loadImage(View view, int imageViewId, String imageUrl) {
         Glide.with(view)
                 .load(imageUrl)
                 .into((ImageView) view.findViewById(imageViewId));
     }
 
+    /**
+     * Deletes the event.
+     */
+    private void deleteEvent() {
+        if (event != null) {
+            eventRepository.deleteEvent(event.getEventId(), deleteTask -> {
+                if (deleteTask.isSuccessful()) {
+                    if (isAdded() && getView() != null) {
+                        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
+                        Toast.makeText(getContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    if (isAdded() && getView() != null) {
+                        Toast.makeText(getContext(), "Failed to delete event: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Navigates to the QR code view.
+     */
     private void navigateToQRCodeView() {
         if (event != null) {
             String eventID = event.getEventId();
@@ -201,15 +266,30 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    /**
+     * Navigates to the create notification view.
+     */
     private void navigateToCreateNotif() {
         Bundle bundle = new Bundle();
         bundle.putString("EventID", event.getEventId());
         Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
     }
 
+    /**
+     * Navigates to the edit event view.
+     */
     private void navigateToEditEvent() {
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", event);
         Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+    }
+
+    /**
+     * Navigates to the waitlist info view.
+     */
+    private void navigateToWaitlistInfo() {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("event", event);
+        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
     }
 }
