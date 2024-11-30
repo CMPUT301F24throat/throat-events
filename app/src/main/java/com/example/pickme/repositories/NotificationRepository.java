@@ -132,6 +132,7 @@ public class NotificationRepository {
 
             if(error != null){
                 Log.e("NOTIF", "Listen failed: ", error);
+                listening = false;
                 return;
             }
 

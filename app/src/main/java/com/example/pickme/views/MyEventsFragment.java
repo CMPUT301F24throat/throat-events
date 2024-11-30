@@ -31,7 +31,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     private EventRepository eventRepository;
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
-    private List<Event> eventList = new ArrayList<>();
+    private ArrayList<Event> eventList = new ArrayList<>();
 
     @Nullable
     @Override

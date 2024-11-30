@@ -417,6 +417,23 @@ public class Event implements Serializable {
         return false;
     }
 
+    public void update(Event event){
+        eventId = event.getEventId();
+        organizerId = event.getOrganizerId();
+        facilityId = event.getFacilityId();
+        eventTitle = event.getEventTitle();
+        eventDescription = event.getEventDescription();
+        eventDate = event.getEventDate();
+        posterImageId = event.getPosterImageId();
+        eventLocation = event.getEventLocation();
+        maxWinners = event.getMaxWinners();
+        geoLocationRequired = event.isGeoLocationRequired();
+        maxEntrants = event.getMaxEntrants();
+        waitingList = new ArrayList<>(event.getWaitingList());
+        hasLotteryExecuted = event.hasLotteryExecuted();
+        updatedAt = Timestamp.now();
+    }
+
 }
 
 /*

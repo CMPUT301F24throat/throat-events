@@ -1,11 +1,16 @@
 package com.example.pickme.repositories;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.example.pickme.models.Event;
+import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -27,6 +32,10 @@ public class EventRepository {
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
     private CollectionReference eventsRef;
+
+    private ArrayList<Event> listToUpdate;
+    private Event eventToUpdate;
+    private boolean listening = false;
 
     private static EventRepository instance;
 
@@ -290,6 +299,81 @@ public class EventRepository {
                 onCompleteListener.onComplete(Tasks.forException(task.getException()));
             }
         });
+    }
+
+    public void addSnapshotListener(Context context){
+        if(listening)
+            return;
+
+        User user = User.getInstance();
+
+        Log.i("EVENT", "Adding Listener");
+
+        eventsRef.addSnapshotListener((query, error) -> {
+            if(!listening){
+                listening = true;
+                return;
+            }
+
+            if(error != null){
+                Log.e("EVENT", "Listen failed: ", error);
+                listening = false;
+                return;
+            }
+
+            if(query == null)
+                return;
+
+            //we're not looking to update anything
+            if(listToUpdate == null && eventToUpdate == null)
+                return;
+
+            for(DocumentChange change : query.getDocumentChanges()){
+                Event event = change.getDocument().toObject(Event.class);
+
+                if(change.getType() == DocumentChange.Type.MODIFIED){
+
+                    if(eventToUpdate != null && event.getEventId().equals(eventToUpdate.getEventId())){
+                        eventToUpdate.update(event);
+                    }
+
+                    if(listToUpdate != null){
+                        for(Event e : listToUpdate){
+                            if(!e.getEventId().equals(event.getEventId()))
+                                continue;
+
+                            e.update(event);
+                        }
+                    }
+
+                }
+
+                else if(change.getType() == DocumentChange.Type.REMOVED){
+
+                    if(eventToUpdate != null && event.getEventId().equals(eventToUpdate.getEventId())){
+                        eventToUpdate.setEventId(null);
+                    }
+
+                    if(listToUpdate != null){
+                        for(Event e : listToUpdate){
+                            if(!e.getEventId().equals(event.getEventId()))
+                                continue;
+
+                            e.setEventId(null);
+                        }
+                    }
+                }
+            }
+        });
+
+    }
+
+    public void attachList(ArrayList<Event> events){
+        this.listToUpdate = events;
+    }
+
+    public void attachEvent(Event event){
+        this.eventToUpdate = event;
     }
 }
 /*
