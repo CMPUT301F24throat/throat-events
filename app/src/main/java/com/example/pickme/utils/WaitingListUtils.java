@@ -1,7 +1,5 @@
 package com.example.pickme.utils;
 
-import androidx.annotation.NonNull;
-
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingListEntrant;
@@ -27,22 +25,33 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void getWaitingListEntrantByEntrantId(String eventId, String entrantId, OnCompleteListener<WaitingListEntrant> onCompleteListener) {
-        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
-            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
-                Event event = eventTask.getResult().toObject(Event.class);
-                if (event != null) {
-                    for (WaitingListEntrant entrant : event.getWaitingList()) {
-                        if (entrant.getEntrantId().equals(entrantId)) {
-                            onCompleteListener.onComplete(Tasks.forResult(entrant));
-                            return;
+        UserRepository userRepository = UserRepository.getInstance();
+
+        // Make sure user actually exists first
+        userRepository.checkUserExists(entrantId, userTask -> {
+            if (userTask.isSuccessful() && userTask.getResult()) {
+
+                // If user exists, check that event also exists
+                db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+                    if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                        Event event = eventTask.getResult().toObject(Event.class);
+                        if (event != null) {
+                            for (WaitingListEntrant entrant : event.getWaitingList()) {
+                                if (entrant.getEntrantId().equals(entrantId)) {
+                                    onCompleteListener.onComplete(Tasks.forResult(entrant));
+                                    return;
+                                }
+                            }
+                            onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
+                        } else {
+                            onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
                         }
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
                     }
-                    onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
-                } else {
-                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
-                }
+                });
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(new Exception("User not found")));
             }
         });
     }
@@ -55,19 +64,30 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void addEntrantToWaitingList(String eventId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
-            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
-                Event event = eventTask.getResult().toObject(Event.class);
-                if (event != null) {
-                    List<WaitingListEntrant> waitingList = event.getWaitingList();
-                    waitingList.add(waitingListEntrant);
-                    event.setWaitingList(new ArrayList<>(waitingList));
-                    db.collection("events").document(eventId).set(event).addOnCompleteListener(onCompleteListener);
-                } else {
-                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
-                }
+        UserRepository userRepository = UserRepository.getInstance();
+
+        // Make sure user actually exists first
+        userRepository.checkUserExists(waitingListEntrant.getEntrantId(), userTask -> {
+            if (userTask.isSuccessful() && userTask.getResult()) {
+
+                // If user exists, check that event also exists
+                db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+                    if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                        Event event = eventTask.getResult().toObject(Event.class);
+                        if (event != null && event.getEventId() != null) {
+                            List<WaitingListEntrant> waitingList = event.getWaitingList();
+                            waitingList.add(waitingListEntrant);
+                            event.setWaitingList(new ArrayList<>(waitingList));
+                            db.collection("events").document(eventId).set(event).addOnCompleteListener(onCompleteListener);
+                        } else {
+                            onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found or has been deleted")));
+                        }
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                    }
+                });
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(new Exception("User not found")));
             }
         });
     }
@@ -81,25 +101,36 @@ public class WaitingListUtils {
      * @param onCompleteListener The listener to handle the completion of the task.
      */
     public void editEntrantInWaitingList(String eventId, String entrantId, WaitingListEntrant waitingListEntrant, OnCompleteListener<Void> onCompleteListener) {
-        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
-            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
-                Event event = eventTask.getResult().toObject(Event.class);
-                if (event != null) {
-                    List<WaitingListEntrant> waitingList = event.getWaitingList();
-                    for (int i = 0; i < waitingList.size(); i++) {
-                        if (waitingList.get(i).getEntrantId().equals(entrantId)) {
-                            waitingList.set(i, waitingListEntrant);
-                            event.setWaitingList(new ArrayList<>(waitingList));
-                            db.collection("events").document(eventId).set(event).addOnCompleteListener(onCompleteListener);
-                            return;
+        UserRepository userRepository = UserRepository.getInstance();
+
+        // Make sure user actually exists first
+        userRepository.checkUserExists(entrantId, userTask -> {
+            if (userTask.isSuccessful() && userTask.getResult()) {
+
+                // If user exists, check that event also exists
+                db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+                    if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                        Event event = eventTask.getResult().toObject(Event.class);
+                        if (event != null) {
+                            List<WaitingListEntrant> waitingList = event.getWaitingList();
+                            for (int i = 0; i < waitingList.size(); i++) {
+                                if (waitingList.get(i).getEntrantId().equals(entrantId)) {
+                                    waitingList.set(i, waitingListEntrant);
+                                    event.setWaitingList(new ArrayList<>(waitingList));
+                                    db.collection("events").document(eventId).set(event).addOnCompleteListener(onCompleteListener);
+                                    return;
+                                }
+                            }
+                            onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
+                        } else {
+                            onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
                         }
+                    } else {
+                        onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
                     }
-                    onCompleteListener.onComplete(Tasks.forException(new Exception("Entrant not found")));
-                } else {
-                    onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
-                }
+                });
             } else {
-                onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
+                onCompleteListener.onComplete(Tasks.forException(new Exception("User not found")));
             }
         });
     }
@@ -112,30 +143,41 @@ public class WaitingListUtils {
      * @param newStatus The new status to be set for the entrant.
      */
     public void updateEntrantStatus(String eventId, String userId, EntrantStatus newStatus) {
-        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
-            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
-                Event event = eventTask.getResult().toObject(Event.class);
-                if (event != null) {
-                    List<WaitingListEntrant> waitingList = event.getWaitingList();
-                    for (WaitingListEntrant entrant : waitingList) {
-                        if (entrant.getEntrantId().equals(userId)) {
-                            entrant.setStatus(newStatus);
-                            break;
-                        }
-                    }
-                    event.setWaitingList(new ArrayList<>(waitingList));
-                    db.collection("events").document(eventId).set(event).addOnCompleteListener(updateTask -> {
-                        if (updateTask.isSuccessful()) {
-                            System.out.println("Entrant status updated successfully.");
+        UserRepository userRepository = UserRepository.getInstance();
+
+        // Make sure user actually exists first
+        userRepository.checkUserExists(userId, userTask -> {
+            if (userTask.isSuccessful() && userTask.getResult()) {
+
+                // If user exists, check that event also exists
+                db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+                    if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                        Event event = eventTask.getResult().toObject(Event.class);
+                        if (event != null) {
+                            List<WaitingListEntrant> waitingList = event.getWaitingList();
+                            for (WaitingListEntrant entrant : waitingList) {
+                                if (entrant.getEntrantId().equals(userId)) {
+                                    entrant.setStatus(newStatus);
+                                    break;
+                                }
+                            }
+                            event.setWaitingList(new ArrayList<>(waitingList));
+                            db.collection("events").document(eventId).set(event).addOnCompleteListener(updateTask -> {
+                                if (updateTask.isSuccessful()) {
+                                    System.out.println("Entrant status updated successfully.");
+                                } else {
+                                    System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+                                }
+                            });
                         } else {
-                            System.err.println("Failed to update entrant status: " + updateTask.getException().getMessage());
+                            System.err.println("Event not found.");
                         }
-                    });
-                } else {
-                    System.err.println("Event not found.");
-                }
+                    } else {
+                        System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+                    }
+                });
             } else {
-                System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+                System.err.println("User not found.");
             }
         });
     }
@@ -152,7 +194,19 @@ public class WaitingListUtils {
             if (eventTask.isSuccessful() && eventTask.getResult() != null) {
                 Event event = eventTask.getResult().toObject(Event.class);
                 if (event != null) {
-                    int entrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == status).count();
+                    UserRepository userRepository = UserRepository.getInstance();
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    List<WaitingListEntrant> validEntrants = new ArrayList<>();
+
+                    for (WaitingListEntrant entrant : waitingList) {
+                        userRepository.checkUserExists(entrant.getEntrantId(), userTask -> {
+                            if (userTask.isSuccessful() && userTask.getResult()) {
+                                validEntrants.add(entrant);
+                            }
+                        });
+                    }
+
+                    int entrantsCount = (int) validEntrants.stream().filter(entrant -> entrant.getStatus() == status).count();
                     onCompleteListener.onComplete(Tasks.forResult(entrantsCount));
                 } else {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found in Firestore")));
@@ -175,7 +229,16 @@ public class WaitingListUtils {
             if (eventTask.isSuccessful() && eventTask.getResult() != null) {
                 Event event = eventTask.getResult().toObject(Event.class);
                 if (event != null) {
-                    List<WaitingListEntrant> waitingEntrants = getWaitingListEntrants(status, event);
+                    List<WaitingListEntrant> waitingEntrants = new ArrayList<>();
+                    for (WaitingListEntrant entrant : event.getWaitingList()) {
+                        checkUserExists(entrant.getEntrantId(), userTask -> {
+                            if (userTask.isSuccessful() && userTask.getResult()) {
+                                if (entrant.getStatus() == status) {
+                                    waitingEntrants.add(entrant);
+                                }
+                            }
+                        });
+                    }
                     onCompleteListener.onComplete(Tasks.forResult(waitingEntrants));
                 } else {
                     onCompleteListener.onComplete(Tasks.forException(new Exception("Event not found")));
@@ -184,31 +247,6 @@ public class WaitingListUtils {
                 onCompleteListener.onComplete(Tasks.forException(eventTask.getException()));
             }
         });
-    }
-
-    /**
-     * Helper func; retrieves the entrants in the waiting list with a specific status.
-     *
-     * @param status The status of the entrants to be retrieved.
-     * @param event The event for which the entrants are to be retrieved.
-     * @return The list of entrants with the specified status.
-     */
-    @NonNull
-    private static List<WaitingListEntrant> getWaitingListEntrants(EntrantStatus status, Event event) {
-        List<WaitingListEntrant> waitingEntrants = new ArrayList<>();
-        for (WaitingListEntrant entrant : event.getWaitingList()) {
-            if (entrant.getStatus() == status) {
-                UserRepository userRepository = UserRepository.getInstance();
-
-                // Make sure user acc exists before adding to waitingEntrants
-                userRepository.checkUserExists(entrant.getEntrantId(), task -> {
-                    if (task.isSuccessful() && task.getResult()) {
-                        waitingEntrants.add(entrant);
-                    }
-                });
-            }
-        }
-        return waitingEntrants;
     }
 
     /**
@@ -223,9 +261,13 @@ public class WaitingListUtils {
                 if (event != null) {
                     List<WaitingListEntrant> waitingList = event.getWaitingList();
                     for (WaitingListEntrant entrant : waitingList) {
-                        if (entrant.getStatus() == EntrantStatus.REJECTED) {
-                            entrant.setStatus(EntrantStatus.CANCELLED);
-                        }
+                        checkUserExists(entrant.getEntrantId(), userTask -> {
+                            if (userTask.isSuccessful() && userTask.getResult()) {
+                                if (entrant.getStatus() == EntrantStatus.REJECTED) {
+                                    entrant.setStatus(EntrantStatus.CANCELLED);
+                                }
+                            }
+                        });
                     }
                     event.setWaitingList(new ArrayList<>(waitingList));
                     db.collection("events").document(eventId).set(event).addOnCompleteListener(updateTask -> {
@@ -236,9 +278,49 @@ public class WaitingListUtils {
                         }
                     });
                 } else {
-                System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+                    System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+                }
             }
-        }});
+        });
+    }
+
+    public void cleanupWaitingList(String eventId) {
+        db.collection("events").document(eventId).get().addOnCompleteListener(eventTask -> {
+            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                Event event = eventTask.getResult().toObject(Event.class);
+                if (event != null) {
+                    List<WaitingListEntrant> waitingList = event.getWaitingList();
+                    ArrayList<WaitingListEntrant> updatedList = new ArrayList<>();
+                    for (WaitingListEntrant entrant : waitingList) {
+                        checkUserExists(entrant.getEntrantId(), userTask -> {
+                            if (userTask.isSuccessful() && userTask.getResult()) {
+                                updatedList.add(entrant);
+                            }
+                        });
+                    }
+                    event.setWaitingList(updatedList);
+                    db.collection("events").document(eventId).set(event).addOnCompleteListener(updateTask -> {
+                        if (updateTask.isSuccessful()) {
+                            System.out.println("Waiting list cleaned up successfully.");
+                        } else {
+                            System.err.println("Failed to clean up waiting list: " + updateTask.getException().getMessage());
+                        }
+                    });
+                } else {
+                    System.err.println("Failed to retrieve event: " + eventTask.getException().getMessage());
+                }
+            }
+        });
+    }
+
+    private void checkUserExists(String userId, OnCompleteListener<Boolean> onCompleteListener) {
+        db.collection("users").document(userId).get().addOnCompleteListener(userTask -> {
+            if (userTask.isSuccessful() && userTask.getResult() != null) {
+                onCompleteListener.onComplete(Tasks.forResult(true));
+            } else {
+                onCompleteListener.onComplete(Tasks.forResult(false));
+            }
+        });
     }
 
 }
