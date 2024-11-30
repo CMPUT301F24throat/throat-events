@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Facilitates CRUD operations and interactions with the Firestore events collection.
@@ -100,8 +101,12 @@ public class EventRepository {
                             doUpsertEventTransaction(newEventRef, event, onCompleteListener);
                         } else {
                             Log.d("EventRepository", "addEvent: Failure to upload image");
+                            onCompleteListener.onComplete(Tasks.forException(uploadImageTask.getException()));
                         }
                     });
+                } else {
+                    // No posterUri, complete the listener
+                    onCompleteListener.onComplete(Tasks.forResult(null));
                 }
 
                 // Create QR code for event, no need to update anything for event since we don't store eventQR in event
@@ -109,8 +114,9 @@ public class EventRepository {
                 qrRepository.createQR(qr)
                         .addOnSuccessListener(aVoid -> System.out.println("QR created"))
                         .addOnFailureListener(e -> System.err.println("QR creation failed: " + e.getMessage()));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(addEventTask.getException()));
             }
-
         });
     }
 
@@ -171,11 +177,7 @@ public class EventRepository {
                     if (isUpdate) {
                         DocumentSnapshot snapshot = transaction.get(eventRef);
                         if (!snapshot.exists()) {
-                            try {
-                                throw new Exception("Event does not exist");
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
+                            throw new RuntimeException("Event does not exist");
                         }
                         // Update existing event
                         transaction.update(eventRef, event.toMap());
@@ -263,12 +265,12 @@ public class EventRepository {
      * @return true if the event date has passed, false otherwise.
      */
     public boolean hasEventPassed(Event event) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a", Locale.getDefault());
         try {
             Date eventDate = dateFormat.parse(event.getEventDate());
             return eventDate.before(new Date());
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid event date format.");
+            throw new IllegalArgumentException("Invalid event date format.", e);
         }
     }
 
