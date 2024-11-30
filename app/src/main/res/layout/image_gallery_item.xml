@@ -14,12 +14,8 @@
 
     <ImageView
         android:id="@+id/gallery_deleteButton"
-        android:paddingStart="16dp"
-        android:paddingEnd="4dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="16dp"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         app:tint="@color/highlight1"
         android:src="@drawable/ic_close"
         app:layout_constraintEnd_toEndOf="parent"
