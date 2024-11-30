@@ -2,8 +2,14 @@ package com.example.pickme.repositories;
 
 import android.util.Log;
 
+import android.net.Uri;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
 import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
+import com.example.pickme.models.Image;
 import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
@@ -74,37 +80,62 @@ public class EventRepository {
      * Creates a new event in the Firestore database.
      *
      * @param event The event to be added.
+     * @param posterUri Uri for the event poster. Null for none/no change.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void addEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
-        db.runTransaction(transaction -> {
-                    DocumentReference newEventRef = eventsRef.document();
-                    event.setEventId(newEventRef.getId());
-                    event.setHasLotteryExecuted(false);
-                    event.setWaitingList(new ArrayList<WaitingListEntrant>());
-                    transaction.set(newEventRef, event);
+    public void addEvent(Event event, @Nullable Uri posterUri, OnCompleteListener<Object> onCompleteListener) {
+        DocumentReference newEventRef = eventsRef.document();
+        if (posterUri != null) {
+            Image i = new Image(event.getOrganizerId(), newEventRef.getId());
+            i.upload(posterUri, task -> {
+                if (task.isSuccessful()) {
+                    event.setPosterImageId(i.getImageUrl());
+                    doEventTransaction(newEventRef, event, onCompleteListener);
+                } else {
+                    Log.d("EventRepository", "addEvent: Failure to upload image");
+                }
+            });
+        } else {
+            doEventTransaction(newEventRef, event, onCompleteListener);
+        }
 
-                    return null;
-                }).addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(e -> {
-                    // Handle the error
-                    System.err.println("Transaction failed: " + e.getMessage());
-                });
     }
 
     /**
      * Updates an existing event in the Firestore database.
      *
      * @param event The event to be updated.
+     * @param posterUri Uri for the event poster. Null for none/no change.
      * @param onCompleteListener The listener to notify upon completion.
      */
-    public void updateEvent(Event event, OnCompleteListener<Object> onCompleteListener) {
+    public void updateEvent(Event event, Uri posterUri, OnCompleteListener<Object> onCompleteListener) {
         DocumentReference eventRef = eventsRef.document(event.getEventId());
+        if (posterUri != null) {
+            Image i = new Image(event.getOrganizerId(), event.getEventId());
+            i.upload(posterUri, task -> {
+                if (task.isSuccessful()) {
+                    event.setPosterImageId(i.getImageUrl());
+                    doEventTransaction(eventRef, event, onCompleteListener);
+                } else {
+                    Log.d("EventRepository", "updateEvent: Failure to upload image");
+                }
+            });
+        } else {
+            doEventTransaction(eventRef, event, onCompleteListener);
+        }
+    }
+
+    private void doEventTransaction(DocumentReference eventsRef, Event event, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {
-                    transaction.set(eventRef, event);
+                    event.setEventId(eventsRef.getId());
+                    event.setHasLotteryExecuted(false);
+                    event.setWaitingList(new ArrayList<WaitingListEntrant>());
+
+                    transaction.set(eventsRef, event);
                     return null;
                 }).addOnCompleteListener(onCompleteListener)
                 .addOnFailureListener(e -> {
+                    // Handle the error
                     System.err.println("Transaction failed: " + e.getMessage());
                 });
     }
