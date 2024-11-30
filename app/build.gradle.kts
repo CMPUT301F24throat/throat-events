@@ -31,14 +31,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
 }
 
 dependencies {
-//    implementation(files("/Users/omarkattan/Library/Android/sdk/platforms/android-34/android.jar"))
-
     // Core Android Libraries
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -88,6 +86,8 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.navigation.testing)
 
-    implementation ("com.google.android.gms:play-services-location:21.0.1")
-    implementation ("com.google.android.gms:play-services-maps:18.1.0")
+    // Google Services
+    implementation("com.google.android.gms:play-services-maps:18.0.2")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.lifecycle:lifecycle-common:2.6.1")
 }
