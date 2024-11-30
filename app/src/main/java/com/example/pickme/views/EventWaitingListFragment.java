@@ -1,4 +1,7 @@
 package com.example.pickme.views;
 
-public class EventWaitingListFragment {
+import androidx.fragment.app.Fragment;
+
+public class EventWaitingListFragment extends Fragment {
+
 }

@@ -68,7 +68,7 @@ public class UserSignUpFragment extends Fragment {
     }
 
     private void createUser(String firstName, String lastName, String email, String contact, String deviceId) {
-        UserRepository userRepository = new UserRepository();
+        UserRepository userRepository = UserRepository.getInstance();
         userRepository.addUser(firstName, lastName, email, contact, deviceId, new UserRepository.OnUserCreatedCallback() {
             @Override
             public void onSuccess(User user) {

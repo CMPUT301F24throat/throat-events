@@ -14,7 +14,7 @@ public class qrCleanup {
      */
     public static void cleanUpQRCodes() {
         QrRepository qrRepository = new QrRepository();
-        EventRepository eventRepository = new EventRepository();
+        EventRepository eventRepository = EventRepository.getInstance();
 
         qrRepository.getAllQRs().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {

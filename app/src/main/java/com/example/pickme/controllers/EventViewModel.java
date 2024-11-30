@@ -32,7 +32,7 @@ public class EventViewModel {
     private final QrRepository qrRepository;  // QR repository for QR code creation
 
     public EventViewModel() {
-        this.eventRepository = new EventRepository();
+        this.eventRepository = EventRepository.getInstance();
         this.qrRepository = new QrRepository();  // Initialize QrRepository
         this.events = new ArrayList<>(); // Initialize the event list
     }

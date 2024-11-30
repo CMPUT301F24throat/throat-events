@@ -46,6 +46,15 @@ public class ImageRepository {
     private final FirebaseFirestore db;
     private final CollectionReference imgCollection;
 
+    private static ImageRepository instance;
+
+    public static ImageRepository getInstance(){
+        if(instance == null)
+            instance = new ImageRepository();
+
+        return instance;
+    }
+
     /**
      * Callback for handling duplicate checking
      */
@@ -60,7 +69,7 @@ public class ImageRepository {
     /**
      * Constructs a new ImageRepository for image CRUD operations.
      */
-    public ImageRepository() {
+    private ImageRepository() {
         //region Attributes
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth_uid = auth.getUid();

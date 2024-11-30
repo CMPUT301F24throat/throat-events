@@ -18,6 +18,15 @@ public class FacilityRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference facilitiesRef = db.collection("facilities");
 
+    private static FacilityRepository instance;
+
+    public static FacilityRepository getInstance(){
+        if(instance == null)
+            instance = new FacilityRepository();
+
+        return instance;
+    }
+
     // Create a new facility
     public void addFacility(Facility facility, OnCompleteListener<Object> onCompleteListener) {
         db.runTransaction(transaction -> {

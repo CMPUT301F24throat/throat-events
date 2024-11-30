@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadingScreen = findViewById(R.id.loading_screen); // Find the loading screen view
 
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
      * @param deviceID The device ID to check in Firestore.
      */
     private void checkUserInFirestore(String deviceID) {
-        userRepository.getUserByDeviceId(deviceID, task -> {
+        userRepository.getUserDocumentByDeviceId(deviceID, task -> {
             hideLoadingScreen(); // Hide the loading screen after Firestore operation
             if (!task.isSuccessful() || task.getResult() == null) {
                 handleFirestoreError(task.getException());
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            User.setInstance(user);
+            User.setInstance(user);  // Set the user instance
             // Show the Admin Tools menu item if the user is an admin
             if (user.isAdmin()) {
                 bottomNavigationView.getMenu().findItem(R.id.navigation_admin_tools).setVisible(true);
