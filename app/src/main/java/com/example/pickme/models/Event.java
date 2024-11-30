@@ -344,7 +344,7 @@ public class Event implements Serializable {
      *
      * @return hasLotteryExecuted
      */
-    public boolean hasLotteryExecuted() {
+    public Boolean hasLotteryExecuted() {
         return hasLotteryExecuted;
     }
 
@@ -443,6 +443,23 @@ public class Event implements Serializable {
         eventMap.put("updatedAt", updatedAt);
 
         return eventMap;
+    }
+
+    public void update(Event event){
+        eventId = event.getEventId();
+        organizerId = event.getOrganizerId();
+        facilityId = event.getFacilityId();
+        eventTitle = event.getEventTitle();
+        eventDescription = event.getEventDescription();
+        eventDate = event.getEventDate();
+        posterImageId = event.getPosterImageId();
+        eventLocation = event.getEventLocation();
+        maxWinners = event.getMaxWinners();
+        geoLocationRequired = event.isGeoLocationRequired();
+        maxEntrants = event.getMaxEntrants();
+        waitingList = new ArrayList<>(event.getWaitingList());
+        hasLotteryExecuted = event.hasLotteryExecuted();
+        updatedAt = Timestamp.now();
     }
 
 }

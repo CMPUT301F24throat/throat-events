@@ -1,5 +1,7 @@
 package com.example.pickme.repositories;
 
+import android.util.Log;
+
 import android.net.Uri;
 import android.util.Log;
 
@@ -7,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.pickme.models.Event;
+import com.example.pickme.models.User;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.QR;
 import com.example.pickme.models.WaitingListEntrant;
@@ -14,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,6 +42,11 @@ public class EventRepository {
     private final QrRepository qrRepository;
     private CollectionReference eventsRef;
 
+    private ArrayList<Event> listToUpdate;
+    private Event eventToUpdate;
+    private Runnable onUpdate;
+    private boolean listening = false;
+
     private static EventRepository instance;
 
     public static EventRepository getInstance(){
@@ -55,6 +64,8 @@ public class EventRepository {
         this.auth = FirebaseAuth.getInstance();
         this.qrRepository = QrRepository.getInstance();
         this.eventsRef = db.collection("events");
+
+        addSnapshotListener();
     }
 
     /**
@@ -389,6 +400,90 @@ public class EventRepository {
                 onCompleteListener.onComplete(Tasks.forException(task.getException()));
             }
         });
+    }
+
+    public void addSnapshotListener(){
+        //dont want to add multiple listeners
+        if(listening)
+            return;
+
+        User user = User.getInstance();
+
+        Log.i("EVENT", "Adding Listener");
+
+        eventsRef.addSnapshotListener((query, error) -> {
+            if(!listening){
+                listening = true;
+                return;
+            }
+
+            if(error != null){
+                Log.e("EVENT", "Listen failed: ", error);
+                listening = false;
+                return;
+            }
+
+            if(query == null)
+                return;
+
+            //we're not looking to update anything
+            if(listToUpdate == null && eventToUpdate == null)
+                return;
+
+            for(DocumentChange change : query.getDocumentChanges()){
+                Event event = change.getDocument().toObject(Event.class);
+
+                if(change.getType() == DocumentChange.Type.MODIFIED){
+
+                    if(eventToUpdate != null && event.getEventId().equals(eventToUpdate.getEventId())){
+                        eventToUpdate.update(event);
+                    }
+
+                    if(listToUpdate != null){
+                        for(Event e : listToUpdate){
+                            if(!e.getEventId().equals(event.getEventId()))
+                                continue;
+
+                            e.update(event);
+                            break;
+                        }
+                    }
+
+                }
+
+                else if(change.getType() == DocumentChange.Type.REMOVED){
+
+                    if(eventToUpdate != null && event.getEventId().equals(eventToUpdate.getEventId())){
+                        eventToUpdate.setEventId(null);
+                    }
+
+                    if(listToUpdate != null){
+                        for(Event e : listToUpdate){
+                            if(!e.getEventId().equals(event.getEventId()))
+                                continue;
+
+                            e.setEventId(null);
+                            break;
+                        }
+                    }
+                }
+            }
+            if(onUpdate != null)
+                onUpdate.run();
+        });
+
+    }
+
+    public void attachList(ArrayList<Event> events, Runnable onUpdate){
+        this.listToUpdate = events;
+        this.eventToUpdate = null;
+        this.onUpdate = onUpdate;
+    }
+
+    public void attachEvent(Event event, Runnable onUpdate){
+        this.eventToUpdate = event;
+        this.listToUpdate = null;
+        this.onUpdate = onUpdate;
     }
 }
 /*

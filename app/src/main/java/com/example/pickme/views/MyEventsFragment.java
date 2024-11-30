@@ -31,7 +31,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     private EventRepository eventRepository;
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
-    private List<Event> eventList = new ArrayList<>();
+    private ArrayList<Event> eventList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -105,6 +105,11 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
                     eventList.clear();
                     eventList.addAll(events);
                     eventAdapter.notifyDataSetChanged();
+
+                    eventRepository.attachList(eventList, () -> {
+                        eventList.removeIf(event -> event.getEventId() == null);
+                        eventAdapter.notifyDataSetChanged();
+                    });
 
                     // Show or hide the no events text based on the event list size
                     View noEventsText = requireView().findViewById(R.id.noEventsText);
