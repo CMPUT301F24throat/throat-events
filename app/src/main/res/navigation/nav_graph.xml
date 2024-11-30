@@ -125,7 +125,11 @@
         android:id="@+id/adminToolsFragment"
         android:name="com.example.pickme.views.AdminToolsFragment"
         android:label="Admin Tools"
-        tools:layout="@layout/fragment_admin_tools" />
+        tools:layout="@layout/fragment_admin_tools" >
+        <action
+            android:id="@+id/action_adminToolsFragment_to_adminGalleryFragment"
+            app:destination="@id/adminGalleryFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/eventCreationFragment"
@@ -185,4 +189,15 @@
     <action
         android:id="@+id/action_global_facilityCreationFragment"
         app:destination="@id/facilityCreationFragment" />
+    <action
+        android:id="@+id/action_global_adminToolsFragment"
+        app:destination="@id/adminToolsFragment" />
+    <fragment
+        android:id="@+id/adminGalleryFragment"
+        android:name="com.example.pickme.views.AdminGalleryFragment"
+        android:label="AdminGalleryFragment">
+        <action
+            android:id="@+id/action_adminGalleryFragment_to_adminToolsFragment"
+            app:destination="@id/adminToolsFragment" />
+    </fragment>
 </navigation>

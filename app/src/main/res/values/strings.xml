@@ -18,4 +18,6 @@
     <string name="required_field">* Required Field</string>
     <string name="qr_camera">QR Camera</string>
     <string name="admin_tools">Admin Tools</string>
+    <string name="image_catalog">Image Catalog</string>
+    <string name="delete_this_image">Delete this image?</string>
 </resources>
