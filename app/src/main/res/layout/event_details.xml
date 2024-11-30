@@ -41,6 +41,7 @@
             android:id="@+id/eventDetails_qrBtn"
             android:layout_width="52dp"
             android:layout_height="50dp"
+            android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="View and share the event's QR"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -69,13 +70,18 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/eventDetails_sendNotifBtn"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.523" />
 
         <ImageButton
             android:id="@+id/eventDetails_sendNotifBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/button_squircle_background"
             android:backgroundTint="@color/buttonBG2"
             android:contentDescription="Send notification to entrants"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -85,8 +91,10 @@
 
         <ImageButton
             android:id="@+id/eventDetails_editBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/button_squircle_background"
             android:backgroundTint="@color/buttonBG2"
             android:contentDescription="Edit event"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -96,9 +104,10 @@
 
         <ImageButton
             android:id="@+id/eventDetails_deleteBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginEnd="16dp"
+            android:background="@drawable/delete_button_squircle_background"
             android:backgroundTint="@color/red1"
             android:contentDescription="Delete event"
             android:src="@drawable/baseline_delete_outline_24"
@@ -121,6 +130,7 @@
             android:id="@+id/eventDetails_poster"
             android:layout_width="175dp"
             android:layout_height="175dp"
+            android:layout_marginTop="16dp"
             android:background="@color/icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.504"
@@ -131,7 +141,7 @@
             android:id="@+id/eventDetails_joinWaitlistBtn"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:backgroundTint="@color/buttonBG1"
             android:fontFamily="@font/inter_medium"
             android:text="Join Waitlist"
@@ -169,7 +179,7 @@
                 <TextView
                     android:id="@+id/eventDetails_dateTime"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
                     android:layout_marginEnd="15dp"
                     android:fontFamily="@font/inter"
                     android:text="September 9 2025, 9:00 AM - 5:00 PM"
@@ -183,7 +193,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/eventLocationGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="30dp">
 
                 <ImageView
                     android:id="@+id/eventDetails_locationIcon"
@@ -212,7 +222,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/eventMaxWinnersGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="30dp">
 
                 <ImageView
                     android:id="@+id/eventDetails_starIcon"
@@ -241,7 +251,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/eventDetails_waitingListCap"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="30dp">
 
                 <ImageView
                     android:id="@+id/eventDetails_usersIcon"
@@ -283,9 +293,9 @@
 
         <ScrollView
             android:layout_width="0dp"
-            android:layout_height="120dp"
+            android:layout_height="140dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/lottery_summary_bg"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -319,7 +329,7 @@
 
         <Button
             android:id="@+id/eventDetails_runLotteryBtn"
-            android:layout_width="320dp"
+            android:layout_width="340dp"
             android:layout_height="0dp"
             android:backgroundTint="@color/buttonBG2"
             android:text="Start Lottery"

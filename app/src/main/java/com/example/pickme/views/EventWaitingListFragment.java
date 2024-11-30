@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,7 +89,8 @@ public class EventWaitingListFragment extends Fragment {
                     waitingListAdapter = new WaitingListAdapter(waitingListEntrants);
                     waitingListRecyclerView.setAdapter(waitingListAdapter);
                 } else {
-                    // Handle error
+                    Log.e("EventWaitingListFragment", "Error getting waiting list entrants: " + task.getException());
+                    Navigation.findNavController(requireView()).navigateUp();
                 }
             }
         });

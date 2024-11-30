@@ -87,22 +87,8 @@ public class EventDetailsFragment extends Fragment {
         view.findViewById(R.id.eventDetails_qrBtn).setOnClickListener(v -> navigateToQRCodeView());
         view.findViewById(R.id.eventDetails_editBtn).setOnClickListener(v -> navigateToEditEvent());
         view.findViewById(R.id.eventDetails_sendNotifBtn).setOnClickListener(v -> navigateToCreateNotif());
-        view.findViewById(R.id.eventDetails_deleteBtn).setOnClickListener(v -> {
-            if (event != null) {
-                eventRepository.deleteEvent(event.getEventId(), deleteTask -> {
-                    if (deleteTask.isSuccessful()) {
-                        if (isAdded() && getView() != null) {
-                            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
-                            Toast.makeText(getContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        if (isAdded() && getView() != null) {
-                            Toast.makeText(getContext(), "Failed to delete event: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
+        view.findViewById(R.id.eventDetails_moreInfoLink).setOnClickListener(v -> navigateToWaitlistInfo());
+        view.findViewById(R.id.eventDetails_deleteBtn).setOnClickListener(v -> deleteEvent());
     }
 
     /**
@@ -145,6 +131,7 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_sendNotifBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_runLotteryBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_joinWaitlistBtn, !isOrganizer);
+        setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
 
         configWaitlistBtn();
     }
@@ -246,6 +233,26 @@ public class EventDetailsFragment extends Fragment {
     }
 
     /**
+     * Deletes the event.
+     */
+    private void deleteEvent() {
+        if (event != null) {
+            eventRepository.deleteEvent(event.getEventId(), deleteTask -> {
+                if (deleteTask.isSuccessful()) {
+                    if (isAdded() && getView() != null) {
+                        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
+                        Toast.makeText(getContext(), "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    if (isAdded() && getView() != null) {
+                        Toast.makeText(getContext(), "Failed to delete event: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    }
+
+    /**
      * Navigates to the QR code view.
      */
     private void navigateToQRCodeView() {
@@ -275,5 +282,14 @@ public class EventDetailsFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", event);
         Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+    }
+
+    /**
+     * Navigates to the waitlist info view.
+     */
+    private void navigateToWaitlistInfo() {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("event", event);
+        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
     }
 }
