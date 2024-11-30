@@ -51,7 +51,7 @@
         android:paddingBottom="5dp"
         android:text="Image Catalog"
         android:textAlignment="center"
-        android:textColor="@color/buttonDefault"
+        android:textColor="@color/buttonBG1"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

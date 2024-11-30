@@ -25,8 +25,7 @@ import com.example.pickme.repositories.ImageRepository;
 
 public class AdminGalleryFragment extends Fragment {
 
-    private ImageView backButton;
-    private ImageRepository ir = new ImageRepository();
+    private final ImageRepository ir = ImageRepository.getInstance();
     private GridView gallery;
 
     @Override
@@ -40,7 +39,7 @@ public class AdminGalleryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        backButton = view.findViewById(R.id.imageCatalogBack);
+        ImageView backButton = view.findViewById(R.id.imageCatalogBack);
         backButton.setOnClickListener(v -> Navigation
                 .findNavController(view)
                 .navigate(R.id.action_adminGalleryFragment_to_adminToolsFragment));

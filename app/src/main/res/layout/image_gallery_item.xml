@@ -16,7 +16,7 @@
         android:id="@+id/gallery_deleteButton"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        app:tint="@color/highlight1"
+        app:tint="@color/red1"
         android:src="@drawable/ic_close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
