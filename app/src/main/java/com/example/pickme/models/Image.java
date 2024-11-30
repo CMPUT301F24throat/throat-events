@@ -60,12 +60,19 @@ public class Image {
         this.ir = ImageRepository.getInstance();
         this.uploaderId = userId;
         this.imageAssociation = imageAssociation;
-        this.imageType = userId.equals(imageAssociation) ?
-                ImageType.PROFILE_PICTURE :
-                ImageType.EVENT_POSTER;
+
+        if (userId == null || imageAssociation == null) {
+            // Handle null values - set default image type
+            this.imageType = ImageType.EVENT_POSTER; // Default to EVENT_POSTER
+        } else {
+            // Only call equals() if neither userId nor imageAssociation is null
+            this.imageType = userId.equals(imageAssociation) ? ImageType.PROFILE_PICTURE : ImageType.EVENT_POSTER;
+        }
+
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
     }
+
 
     public Image(@NonNull String userId, @NonNull String imageAssociation, ImageRepository ir) {
         this.ir = ir;
