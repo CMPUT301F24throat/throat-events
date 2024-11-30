@@ -28,6 +28,8 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
+import com.example.pickme.repositories.QrRepository;
+import com.example.pickme.repositories.UserRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -41,7 +43,11 @@ public class EventCreationFragment extends Fragment {
     private Uri selectedImageUri;
     private Event event;
 
-    private FacilityRepository facilityRepository = new FacilityRepository();
+    private FacilityRepository facilityRepository;
+    private EventRepository eventRepository;
+    private UserRepository userRepository;
+    private QrRepository qrRepository;
+
     private String organizerId;
 
     private EditText eventTitleEdit, descriptionEdit, eventDateEdit, startTimeEdit, endTimeEdit, locationEdit, maxWinnersEdit, maxEntrantsEdit;
@@ -60,6 +66,11 @@ public class EventCreationFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        facilityRepository = FacilityRepository.getInstance();
+        eventRepository = EventRepository.getInstance();
+        userRepository = UserRepository.getInstance();
+        qrRepository = QrRepository.getInstance();
 
         organizerId = User.getInstance().getDeviceId();
 
@@ -116,7 +127,9 @@ public class EventCreationFragment extends Fragment {
             }
         }
         // Set the current eventDateEdit and time in the UI
-        setCurrentDateTime();
+        if (event == null) {
+            setCurrentDateTime();
+        }
     }
 
     /**
@@ -150,11 +163,12 @@ public class EventCreationFragment extends Fragment {
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy", java.util.Locale.getDefault());
         String currentDate = dateFormat.format(calendar.getTime());
         eventDateEdit.setText(currentDate);
 
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", java.util.Locale.getDefault());
         String currentTime = timeFormat.format(calendar.getTime());
         startTimeEdit.setText(currentTime);
 
@@ -212,6 +226,12 @@ public class EventCreationFragment extends Fragment {
         if (!maxWinnersEdit.getText().toString().isEmpty()) {
             try {
                 maxWinners = Integer.parseInt(maxWinnersEdit.getText().toString());
+
+                if (maxWinners < 1) {
+                    Toast.makeText(requireActivity(), "Max winners must be greater than 0", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
             } catch (NumberFormatException e) {
                 Toast.makeText(requireActivity(), "Please enter a valid number for max winners", Toast.LENGTH_SHORT).show();
                 return;
@@ -225,6 +245,17 @@ public class EventCreationFragment extends Fragment {
         if (!maxEntrantsEdit.getText().toString().isEmpty()) {
             try {
                 maxEntrants = Integer.parseInt(maxEntrantsEdit.getText().toString());
+
+                if (maxEntrants < 1) {
+                    Toast.makeText(requireActivity(), "Max entrants must be greater than 0", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (maxEntrants < maxWinners) {
+                    Toast.makeText(requireActivity(), "Max entrants must be greater than or equal to max winners", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
             } catch (NumberFormatException e) {
                 Toast.makeText(requireActivity(), "Please enter a valid number for max entrants", Toast.LENGTH_SHORT).show();
                 return;
@@ -258,8 +289,6 @@ public class EventCreationFragment extends Fragment {
                             null    // set to null here, will be initialized in EventRepository
                     );
 
-
-                    EventRepository eventRepository = EventRepository.getInstance();
                     eventRepository.addEvent(newEvent, selectedImageUri, task1 -> {
                         if (task1.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Created Successfully!", Toast.LENGTH_SHORT).show();
@@ -269,18 +298,14 @@ public class EventCreationFragment extends Fragment {
                         }
                     });
                 } else {
-                    // Update the existing event
                     event.setEventTitle(eventTitle);
                     event.setEventDescription(eventDescription);
                     event.setEventDate(dateTime);
                     event.setEventLocation(eventLocation);
                     event.setMaxWinners(maxWinners);
-                    if (maxEntrants != null) {
-                        event.setMaxEntrants(maxEntrants);
-                    }
+                    event.setMaxEntrants(maxEntrants);
                     event.setGeoLocationRequired(isGeolocationRequired);
 
-                    EventRepository eventRepository = EventRepository.getInstance();
                     eventRepository.updateEvent(event, selectedImageUri, task1 -> {
                         if (task1.isSuccessful()) {
                             Toast.makeText(requireActivity(), "Event Updated Successfully!", Toast.LENGTH_SHORT).show();
@@ -299,8 +324,6 @@ public class EventCreationFragment extends Fragment {
      * @param event the event to be deleted.
      */
     private void deleteEvent(Event event) {
-        EventRepository eventRepository = EventRepository.getInstance();
-
         eventRepository.deleteEvent(event.getEventId(), task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(requireActivity(), "Event deleted Successfully!", Toast.LENGTH_SHORT).show();

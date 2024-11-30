@@ -95,6 +95,10 @@
         <action
             android:id="@+id/action_eventDetailsFragment_to_lotteryOverviewFragment"
             app:destination="@id/lotteryOverviewFragment" />
+
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_myEventsFragment"
+            app:destination="@id/myEventsFragment" />
     </fragment>
 
     <fragment
