@@ -74,7 +74,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     }
 
     private void checkUserFacility(String userDeviceId) {
-        facilityRepository.getFacilityByOwnerId(userDeviceId, task -> {
+        facilityRepository.getFacilityByOwnerDeviceId(userDeviceId, task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot querySnapshot = task.getResult();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
