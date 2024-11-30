@@ -342,7 +342,7 @@ public class Event implements Serializable {
      *
      * @return hasLotteryExecuted
      */
-    public boolean hasLotteryExecuted() {
+    public Boolean hasLotteryExecuted() {
         return hasLotteryExecuted;
     }
 

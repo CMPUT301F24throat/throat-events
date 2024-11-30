@@ -1,6 +1,5 @@
 package com.example.pickme.repositories;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.example.pickme.models.Event;
@@ -54,6 +53,8 @@ public class EventRepository {
         this.db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
         this.eventsRef = db.collection("events");
+
+        addSnapshotListener();
     }
 
     /**
@@ -302,7 +303,7 @@ public class EventRepository {
         });
     }
 
-    public void addSnapshotListener(Context context){
+    public void addSnapshotListener(){
         //dont want to add multiple listeners
         if(listening)
             return;
@@ -376,11 +377,13 @@ public class EventRepository {
 
     public void attachList(ArrayList<Event> events, Runnable onUpdate){
         this.listToUpdate = events;
+        this.eventToUpdate = null;
         this.onUpdate = onUpdate;
     }
 
     public void attachEvent(Event event, Runnable onUpdate){
         this.eventToUpdate = event;
+        this.listToUpdate = null;
         this.onUpdate = onUpdate;
     }
 }

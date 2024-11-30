@@ -106,6 +106,11 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
                     eventList.addAll(events);
                     eventAdapter.notifyDataSetChanged();
 
+                    eventRepository.attachList(eventList, () -> {
+                        eventList.removeIf(event -> event.getEventId() == null);
+                        eventAdapter.notifyDataSetChanged();
+                    });
+
                     // Show or hide the no events text based on the event list size
                     View noEventsText = requireView().findViewById(R.id.noEventsText);
                     noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
