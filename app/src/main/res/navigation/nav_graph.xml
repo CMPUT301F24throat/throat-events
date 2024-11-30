@@ -32,7 +32,7 @@
         android:id="@+id/userProfileEditFragment"
         android:name="com.example.pickme.views.UserProfileEditFragment"
         android:label="Edit Profile"
-        tools:layout="@layout/user_profile__edit">
+        tools:layout="@layout/user_profile_edit">
         <action
             android:id="@+id/action_userProfileEditFragment_to_userProfileFragment"
             app:destination="@id/userProfileFragment" />
