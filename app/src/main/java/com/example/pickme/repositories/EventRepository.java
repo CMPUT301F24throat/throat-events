@@ -35,6 +35,7 @@ public class EventRepository {
 
     private ArrayList<Event> listToUpdate;
     private Event eventToUpdate;
+    private Runnable onUpdate;
     private boolean listening = false;
 
     private static EventRepository instance;
@@ -302,6 +303,7 @@ public class EventRepository {
     }
 
     public void addSnapshotListener(Context context){
+        //dont want to add multiple listeners
         if(listening)
             return;
 
@@ -343,6 +345,7 @@ public class EventRepository {
                                 continue;
 
                             e.update(event);
+                            break;
                         }
                     }
 
@@ -360,20 +363,25 @@ public class EventRepository {
                                 continue;
 
                             e.setEventId(null);
+                            break;
                         }
                     }
                 }
             }
+            if(onUpdate != null)
+                onUpdate.run();
         });
 
     }
 
-    public void attachList(ArrayList<Event> events){
+    public void attachList(ArrayList<Event> events, Runnable onUpdate){
         this.listToUpdate = events;
+        this.onUpdate = onUpdate;
     }
 
-    public void attachEvent(Event event){
+    public void attachEvent(Event event, Runnable onUpdate){
         this.eventToUpdate = event;
+        this.onUpdate = onUpdate;
     }
 }
 /*
