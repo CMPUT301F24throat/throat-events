@@ -15,7 +15,7 @@ import com.example.pickme.R;
 
 public class AdminToolsFragment extends Fragment {
 
-    private Button adminImageCatalogButton;
+    private Button adminGalleryButton;
 
     @Nullable
     @Override
@@ -27,9 +27,10 @@ public class AdminToolsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
 
-        adminImageCatalogButton = view.findViewById(R.id.adminImageCatalogButton);
-        adminImageCatalogButton.setOnClickListener(v -> Navigation
+        adminGalleryButton = view.findViewById(R.id.adminGalleryButton);
+        adminGalleryButton.setOnClickListener(v -> Navigation
                 .findNavController(view)
-                .navigate(R.id.action_adminToolsFragment_to_adminImageCatalogFragment));
+                .navigate(R.id.action_adminToolsFragment_to_adminGalleryFragment));
+
     }
 }
