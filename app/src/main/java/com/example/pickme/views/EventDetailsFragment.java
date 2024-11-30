@@ -56,7 +56,7 @@ public class EventDetailsFragment extends Fragment {
             EventRepository.getInstance().attachEvent(event, () -> {
                 if (event.getEventId() == null){
                     Toast.makeText(getContext(), "Sorry, Event was deleted", Toast.LENGTH_SHORT);
-                    Navigation.findNavController(requireView()).navigate(R.id.action_global_homeFragment);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
                 }
                 else
                     displayEventDetails(view);

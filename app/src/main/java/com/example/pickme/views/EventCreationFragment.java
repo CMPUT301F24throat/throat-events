@@ -163,11 +163,12 @@ public class EventCreationFragment extends Fragment {
     private void setCurrentDateTime() {
         Calendar calendar = Calendar.getInstance();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy", java.util.Locale.getDefault());
         String currentDate = dateFormat.format(calendar.getTime());
         eventDateEdit.setText(currentDate);
 
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", java.util.Locale.getDefault());
         String currentTime = timeFormat.format(calendar.getTime());
         startTimeEdit.setText(currentTime);
 
@@ -250,8 +251,8 @@ public class EventCreationFragment extends Fragment {
                     return;
                 }
 
-                if (maxEntrants > maxWinners) {
-                    Toast.makeText(requireActivity(), "Max entrants must be less than or equal to max winners", Toast.LENGTH_SHORT).show();
+                if (maxEntrants < maxWinners) {
+                    Toast.makeText(requireActivity(), "Max entrants must be greater than or equal to max winners", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
