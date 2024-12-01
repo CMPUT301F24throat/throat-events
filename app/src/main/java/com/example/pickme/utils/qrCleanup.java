@@ -13,7 +13,7 @@ public class qrCleanup {
      * Checks all QR codes and removes those associated with deleted events.
      */
     public static void cleanUpQRCodes() {
-        QrRepository qrRepository = new QrRepository();
+        QrRepository qrRepository = QrRepository.getInstance();
         EventRepository eventRepository = EventRepository.getInstance();
 
         qrRepository.getAllQRs().addOnCompleteListener(task -> {

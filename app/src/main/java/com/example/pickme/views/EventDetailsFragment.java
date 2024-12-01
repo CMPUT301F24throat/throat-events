@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,6 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
-import com.example.pickme.utils.GeoLocationUtils;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
@@ -38,7 +38,8 @@ public class EventDetailsFragment extends Fragment {
     private WaitingListUtils waitingListUtils;
     private LotteryUtils lotteryUtils;
 
-    GeoPoint currentUserLocation = null;
+    private boolean alreadyIn = false;
+    private WaitingListEntrant entrant;
 
     /**
      * Inflates the layout for this fragment.
@@ -78,8 +79,10 @@ public class EventDetailsFragment extends Fragment {
                     Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
                 }
-                else
+                else{
+                    configureView(view, currentUser);
                     displayEventDetails(view);
+                }
             });
         } else {
             Navigation.findNavController(requireView()).navigateUp();
@@ -143,65 +146,141 @@ public class EventDetailsFragment extends Fragment {
      * Configures the waitlist button based on the event and waiting list status.
      */
     private void configWaitlistBtn() {
-        if (waitingListUtils != null && event != null) {
-            View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
-            waitingListUtils.getEntrantsCountByStatus(event.getEventId(), EntrantStatus.WAITING, task -> {
-                int waitingEntrantsCount = 0;
-                if (task.isSuccessful() && task.getResult() != null) {
-                    waitingEntrantsCount = task.getResult();
-                }
+        if(waitingListUtils == null || event == null)
+            return;
+        Log.i("EVENT", "in config");
 
-                if (event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()) {
-                    ((TextView) waitlistBtn).setText("Waitlist is full - try again later");
-                    waitlistBtn.setEnabled(false);
-                    waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
-                    ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
-                } else if (event.hasEventPassed()) {
-                    ((TextView) waitlistBtn).setText("This event has already passed");
-                    waitlistBtn.setEnabled(false);
-                    waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
-                    ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
-                } else {
-                    waitlistBtn.setOnClickListener(v -> {
+        View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
 
-                        if (event.isGeoLocationRequired()) {
-                            GeoLocationUtils geoLocationUtils = new GeoLocationUtils();
+        int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
 
-                            // Check if location permissions are granted
-                            if (!geoLocationUtils.areLocationPermissionsGranted(requireActivity())) {
-                                geoLocationUtils.requestLocationPermission(requireActivity());
-                            } else if (!geoLocationUtils.isLocationEnabled(requireActivity())) {
-                                Toast.makeText(requireActivity(), "Please enable location services", Toast.LENGTH_SHORT).show();
-                            } else {
-                                // Fetch current location
-                                geoLocationUtils.fetchCurrentLocation(requireActivity(), new GeoLocationUtils.OnLocationFetchedListener() {
-                                    @Override
-                                    public void onLocationFetched(double latitude, double longitude) {
-                                        // Save the fetched location to GeoPoint
-                                        currentUserLocation = new GeoPoint(latitude, longitude);
-                                        waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
-                                            if (addTask.isSuccessful()) {
-                                                Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
-                                            } else {
-                                                Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        }else{
-                            waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
-                                if (addTask.isSuccessful()) {
-                                    Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    });
-                }
-            });
+        String buttonText = "";
+        boolean enableButton = false;
+
+        EntrantStatus status;
+        alreadyIn = false;
+        for(WaitingListEntrant entrant : event.getWaitingList()){
+            if(entrant.getEntrantId().equals(User.getInstance().getDeviceId())){
+                this.alreadyIn = true;
+                this.entrant = entrant;
+                status = entrant.getStatus();
+                Log.i("EVENT", "Status: " + status.toString());
+                break;
+            }
         }
+
+        if(event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()){
+            buttonText = "Waitlist is full - try again later";
+            enableButton = false;
+        }
+        else if(event.hasEventPassed()){
+            buttonText = "This event has already passed";
+            enableButton = false;
+        }
+        else if(alreadyIn){
+            switch (this.entrant.getStatus()){
+                case WAITING:
+                    buttonText = "Leave Waitlist";
+                    enableButton = true;
+                    break;
+
+                case SELECTED:
+                    buttonText = "Accept";
+                    enableButton = true;
+                    //TODO: need more buttons and stuff for accept/decline
+                    break;
+
+                case REJECTED:
+                    buttonText = "Join Waitlist";
+                    enableButton = true;
+                    break;
+
+                case ACCEPTED:
+                    buttonText = "Already Accepted";
+                    enableButton = false;
+                    break;
+
+                case CANCELLED:
+                    buttonText = "Already Cancelled";
+                    enableButton = false;
+                    break;
+
+                case ALL:
+                    buttonText = "Error";
+                    enableButton = false;
+                    break;
+            }
+        }
+        else{
+            buttonText = "Join Waitlist";
+            enableButton = true;
+        }
+
+        ((TextView) waitlistBtn).setText(buttonText);
+        waitlistBtn.setEnabled(enableButton);
+        if(!enableButton){
+            waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+            ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+        }
+
+        waitlistBtn.setOnClickListener(v -> {
+            GeoPoint currentUserLocation = null;
+            if (event.isGeoLocationRequired()) {
+                // TODO: Implement geolocation
+            }
+
+            waitlistLogic();
+        });
+
+    }
+
+    private void waitlistLogic(){
+        if(!alreadyIn){
+            WaitingListEntrant waitingListEntrant = new WaitingListEntrant(currentUser.getDeviceId(), null, EntrantStatus.WAITING);
+            event.getWaitingList().add(waitingListEntrant);
+            currentUser.getEventIDs().add(event.getEventId());
+            EventRepository.getInstance().updateEvent(event, null, task -> {
+                Log.i("EVENT", "Added user to waitlist");
+                Toast.makeText(requireContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
+            });
+            return;
+        }
+
+        String logText = "";
+        String toastText = "";
+        switch (entrant.getStatus()){
+            case WAITING:
+                event.getWaitingList().remove(entrant);
+                currentUser.getEventIDs().remove(event.getEventId());
+                logText = "Removed user from waitlist";
+                toastText = "You successfully left the waitlist";
+                break;
+
+            case SELECTED:
+                entrant.setStatus(EntrantStatus.ACCEPTED);
+                logText = "User accepted event";
+                toastText = "You successfully accepted the invitation";
+                break;
+
+            case REJECTED:
+                entrant.setStatus(EntrantStatus.WAITING);
+                logText = "User rejoined waitlist after rejection";
+                toastText = "You successfully rejoined the waitlist";
+                break;
+        }
+
+        String finalLogText = logText;
+        String finalToastText = toastText;
+        EventRepository.getInstance().updateEvent(event, null, task -> {
+            if(task.isSuccessful()){
+                Log.i("EVENT", finalLogText);
+                Toast.makeText(requireContext(), finalToastText, Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Log.i("EVENT", "Waitlist button failed, attempt: " + finalLogText);
+                Toast.makeText(requireContext(), "Sorry, something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -297,7 +376,7 @@ public class EventDetailsFragment extends Fragment {
      */
     private void navigateToCreateNotif() {
         Bundle bundle = new Bundle();
-        bundle.putString("EventID", event.getEventId());
+        bundle.putSerializable("Event", event);
         Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
     }
 
