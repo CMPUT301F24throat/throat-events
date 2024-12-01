@@ -16,11 +16,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
+import com.example.pickme.models.QR;
+import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.QrRepository;
 import com.example.pickme.utils.QRCodeGenerator;
@@ -39,6 +42,7 @@ import java.io.File;
 public class QRCodeViewFragment extends Fragment {
 
     private static final String ARG_EVENT_ID = "eventID";
+    private static final String TAG = "QRCodeViewFragment";
 
     private String eventID;
 
@@ -46,6 +50,7 @@ public class QRCodeViewFragment extends Fragment {
     private ImageView qrCodeImageView;
 
     private EventRepository eventRepository;
+    private QrRepository qrRepository;
     private QRCodeGenerator qrCodeGenerator;
 
     /**
@@ -80,9 +85,12 @@ public class QRCodeViewFragment extends Fragment {
             eventID = getArguments().getString(ARG_EVENT_ID);
         }
 
-        // Initialize repositories and QR code generator
+        // Initialize repositories using singleton pattern
         eventRepository = EventRepository.getInstance();
-        qrCodeGenerator = new QRCodeGenerator(new QrRepository());
+        qrRepository = QrRepository.getInstance();
+
+        // Pass the singleton QRRepository instance to QRCodeGenerator
+        qrCodeGenerator = new QRCodeGenerator(qrRepository);
     }
 
     @Nullable
@@ -91,68 +99,115 @@ public class QRCodeViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.qr_display_activity, container, false);
 
-        // Set up view references for event title and QR code image
+        // Set up view references
         eventTitleTextView = view.findViewById(R.id.eventTitle);
         qrCodeImageView = view.findViewById(R.id.qrCodeImage);
 
-        // Set up the back button to perform the default back action
         ImageButton backButton = view.findViewById(R.id.myImageButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requireActivity().getOnBackPressedDispatcher().onBackPressed();
-            }
-        });
+        backButton.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
 
-        // Set up the share button to share the QR code
-        view.findViewById(R.id.shareButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareQRCode();
-            }
-        });
+        view.findViewById(R.id.shareButton).setOnClickListener(v -> shareQRCode());
 
-        // Load event details and QR code for display
+        // Set up the delete button
+        AppCompatButton deleteButton = view.findViewById(R.id.qrDeleteButton);
+
+        // Retrieve and log the User instance
+        User user = User.getInstance();
+        if (user != null) {
+            Log.d(TAG, "User instance: " + user.toString());
+
+            if (user.isAdmin()) {
+                deleteButton.setVisibility(View.VISIBLE);
+                Log.d(TAG, "Delete button made visible.");
+            } else {
+                deleteButton.setVisibility(View.GONE);
+                Log.d(TAG, "Delete button hidden for non-admin user.");
+            }
+        } else {
+            Log.e(TAG, "User instance is null. Cannot determine admin status.");
+            deleteButton.setVisibility(View.GONE);
+        }
+
+        // Define the delete action
+        deleteButton.setOnClickListener(v -> deleteAndRegenerateQRCode());
+
+        // Load event details and QR code
         loadEventDetails();
         return view;
     }
 
-    /**
-     * Loads event details using EventRepository and updates the event title TextView.
-     * If the event title is fetched successfully, calls displayQRCode() to generate and display the QR code.
-     */
+    private void deleteAndRegenerateQRCode() {
+        String qrPath = "/events/" + eventID;
+
+        qrRepository.deleteQRByAssociation(qrPath)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "QR code removed successfully", Toast.LENGTH_SHORT).show();
+                    regenerateQRCode();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to remove QR code: ", e);
+                    Toast.makeText(getContext(), "Failed to remove old QR code, generating a new one", Toast.LENGTH_SHORT).show();
+                    regenerateQRCode();
+                });
+    }
+
+    private void regenerateQRCode() {
+        String newEncodedPath = "/events/" + eventID;
+
+        qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
+            @Override
+            public void onQRCodeReady(String filePath) {
+                if (filePath != null) {
+                    File qrCodeFile = new File(filePath);
+                    if (qrCodeFile.exists() && qrCodeFile.delete()) {
+                        Log.d(TAG, "Old QR code file deleted successfully.");
+                    } else {
+                        Log.d(TAG, "No old QR code file to delete or failed to delete.");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e(TAG, "Error clearing old QR code file: " + errorMessage);
+            }
+        });
+
+        QR qr = new QR(newEncodedPath);
+
+        qrRepository.createQR(qr)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "QR code regenerated successfully", Toast.LENGTH_SHORT).show();
+                    displayQRCode();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to regenerate QR code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to regenerate QR code: ", e);
+                });
+    }
+
     private void loadEventDetails() {
-        // Fetch event details from Firestore based on eventID
         eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
             @Override
             public void onComplete(@NonNull Task<Event> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
                     Event event = task.getResult();
-                    // Retrieve "eventTitle" from the Event object
                     String eventTitle = event.getEventTitle();
                     if (eventTitle != null) {
-                        // Update the event title TextView
                         eventTitleTextView.setText(eventTitle);
                     } else {
-                        Log.e("QRCodeViewFragment", "Event title not found in document.");
+                        Log.e(TAG, "Event title not found in document.");
                         Toast.makeText(getContext(), "Event title not found", Toast.LENGTH_SHORT).show();
                     }
-
-                    // Generate and display the QR code
                     displayQRCode();
                 } else {
-                    Log.e("QRCodeViewFragment", "Failed to load event details: " + task.getException());
+                    Log.e(TAG, "Failed to load event details: ", task.getException());
                     Toast.makeText(getContext(), "Failed to load event details", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    /**
-     * Generates a QR code using QRCodeGenerator for the given eventID.
-     * Checks if a cached QR code exists; if so, it displays the cached image.
-     * Otherwise, generates a new QR code, caches it, and displays it in qrCodeImageView.
-     */
     private void displayQRCode() {
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override
@@ -162,28 +217,27 @@ public class QRCodeViewFragment extends Fragment {
                     if (qrCodeFile.exists()) {
                         Bitmap qrBitmap = BitmapFactory.decodeFile(filePath);
                         qrCodeImageView.setImageBitmap(qrBitmap);
-                        qrCodeImageView.setVisibility(View.VISIBLE); // Make the ImageView visible
+                        qrCodeImageView.setVisibility(View.VISIBLE);
                         qrCodeImageView.setAlpha(0f);
-                        qrCodeImageView.animate().alpha(1f).setDuration(300).start(); // Apply fade-in animation
+                        qrCodeImageView.animate().alpha(1f).setDuration(300).start();
                     } else {
                         Toast.makeText(getContext(), "QR code file not found", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "QR code file not found: " + filePath);
                     }
                 } else {
                     Toast.makeText(getContext(), "Failed to load QR code file path", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to load QR code file path.");
                 }
             }
 
             @Override
             public void onError(String errorMessage) {
                 Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Error displaying QR code: " + errorMessage);
             }
         });
     }
 
-    /**
-     * Shares the QR code currently displayed in the ImageView.
-     * Uses the cached file path provided by QRCodeGenerator to create a shareable intent.
-     */
     private void shareQRCode() {
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override
@@ -197,25 +251,26 @@ public class QRCodeViewFragment extends Fragment {
                                 qrCodeFile
                         );
 
-                        // Create an intent to share the file
                         Intent shareIntent = new Intent(Intent.ACTION_SEND);
                         shareIntent.setType("image/png");
                         shareIntent.putExtra(Intent.EXTRA_STREAM, qrCodeUri);
                         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                        // Launch the share dialog
                         startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
                     } else {
                         Toast.makeText(getContext(), "QR code file not found for sharing", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "QR code file not found for sharing: " + filePath);
                     }
                 } else {
                     Toast.makeText(getContext(), "Failed to retrieve QR code file path", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to retrieve QR code file path.");
                 }
             }
 
             @Override
             public void onError(String errorMessage) {
                 Toast.makeText(getContext(), "Unable to share QR code: " + errorMessage, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Error sharing QR code: " + errorMessage);
             }
         });
     }
