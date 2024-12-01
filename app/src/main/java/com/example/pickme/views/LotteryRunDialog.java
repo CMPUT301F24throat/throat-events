@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class LotteryRunDialog extends DialogFragment {
 
-    private String eventId;
+    private Event event;
     private LotteryUtils lotteryUtils;
     private WaitingListUtils waitingListUtils;
     private EventRepository eventRepository;
@@ -37,14 +37,15 @@ public class LotteryRunDialog extends DialogFragment {
     /**
      * Constructor for LotteryRunDialog.
      *
-     * @param eventId The ID of the event for which the lottery is being run.
+     * @param event The event for which the lottery is being run.
      */
-    public LotteryRunDialog(String eventId) {
-        this.eventId = eventId;
+    public LotteryRunDialog(Event event) {
+        this.event = event;
         this.lotteryUtils = new LotteryUtils();
         this.waitingListUtils = new WaitingListUtils();
         this.eventRepository = EventRepository.getInstance();
     }
+
 
     @NonNull
     @Override
@@ -60,9 +61,10 @@ public class LotteryRunDialog extends DialogFragment {
 
         // Set the start button click listener to run the lottery
         startButton.setOnClickListener(v -> {
-            lotteryUtils.runLottery(eventId, task -> {
+            lotteryUtils.runLottery(event, task -> {
                 if (task.isSuccessful()) {
                     List<String> selectedUserDeviceIds = task.getResult();
+
                     // If lottery was successful, navigate to the winners fragment
                     dialog.dismiss();
                     Bundle bundle = new Bundle();
@@ -86,10 +88,10 @@ public class LotteryRunDialog extends DialogFragment {
      * Static method to show the LotteryRunDialog.
      *
      * @param fragmentManager The FragmentManager to use for showing the dialog.
-     * @param eventId The ID of the event for which the lottery is being run.
+     * @param event The event for which the lottery is being run.
      */
-    public static void showDialog(FragmentManager fragmentManager, String eventId) {
-        LotteryRunDialog dialog = new LotteryRunDialog(eventId);
+    public static void showDialog(FragmentManager fragmentManager, Event event) {
+        LotteryRunDialog dialog = new LotteryRunDialog(event);
         dialog.show(fragmentManager, "LotteryRunDialog");
     }
 
@@ -97,7 +99,7 @@ public class LotteryRunDialog extends DialogFragment {
      * Sets the description text for the dialog.
      */
     private void setDialogDescription() {
-        eventRepository.getEventById(eventId, task -> {
+        eventRepository.getEventById(event.getEventId(), task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 Event event = task.getResult();
                 int numToDraw = lotteryUtils.determineNumToDraw(event);

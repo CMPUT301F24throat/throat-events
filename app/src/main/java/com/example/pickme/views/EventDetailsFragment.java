@@ -22,6 +22,7 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
@@ -35,6 +36,7 @@ public class EventDetailsFragment extends Fragment {
     private Event event;
     private User currentUser;
     private EventRepository eventRepository;
+    private UserRepository userRepository;
     private WaitingListUtils waitingListUtils;
     private LotteryUtils lotteryUtils;
 
@@ -69,6 +71,7 @@ public class EventDetailsFragment extends Fragment {
             currentUser = User.getInstance();
 
             eventRepository = EventRepository.getInstance();
+            userRepository = UserRepository.getInstance();
             waitingListUtils = new WaitingListUtils();
             lotteryUtils = new LotteryUtils();
 
@@ -140,6 +143,7 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
 
         configWaitlistBtn();
+        configLotteryBtn();
     }
 
     /**
@@ -171,11 +175,9 @@ public class EventDetailsFragment extends Fragment {
 
         if(event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()){
             buttonText = "Waitlist is full - try again later";
-            enableButton = false;
         }
         else if(event.hasEventPassed()){
             buttonText = "This event has already passed";
-            enableButton = false;
         }
         else if(alreadyIn){
             switch (this.entrant.getStatus()){
@@ -190,24 +192,21 @@ public class EventDetailsFragment extends Fragment {
                     //TODO: need more buttons and stuff for accept/decline
                     break;
 
-                case REJECTED:
-                    buttonText = "Join Waitlist";
+                case REJECTED:      // User rejected an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus REJECTED
+                    buttonText = "You have rejected this event";
+                    break;
+
+                case ACCEPTED:      // User accepted an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus ACCEPTED
+                    buttonText = "Already accepted event invite";
+                    break;
+
+                case CANCELLED:     // User cancelled their spot; can rejoin waitlist
+                    buttonText = "Rejoin Waitlist";
                     enableButton = true;
-                    break;
-
-                case ACCEPTED:
-                    buttonText = "Already Accepted";
-                    enableButton = false;
-                    break;
-
-                case CANCELLED:
-                    buttonText = "Already Cancelled";
-                    enableButton = false;
                     break;
 
                 case ALL:
                     buttonText = "Error";
-                    enableButton = false;
                     break;
             }
         }
@@ -239,7 +238,7 @@ public class EventDetailsFragment extends Fragment {
             WaitingListEntrant waitingListEntrant = new WaitingListEntrant(currentUser.getDeviceId(), null, EntrantStatus.WAITING);
             event.getWaitingList().add(waitingListEntrant);
             currentUser.getEventIDs().add(event.getEventId());
-            EventRepository.getInstance().updateEvent(event, null, task -> {
+            eventRepository.updateEvent(event, null, task -> {
                 Log.i("EVENT", "Added user to waitlist");
                 Toast.makeText(requireContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
             });
@@ -257,21 +256,22 @@ public class EventDetailsFragment extends Fragment {
                 break;
 
             case SELECTED:
-                entrant.setStatus(EntrantStatus.ACCEPTED);
+                // TODO: perhaps move this so it is under an accept/decline button
+                entrant.setStatus(EntrantStatus.ACCEPTED);  // User stays in waiting list except status is changed to ACCEPTED so not counted as waiting entrant
                 logText = "User accepted event";
                 toastText = "You successfully accepted the invitation";
                 break;
 
-            case REJECTED:
+            case CANCELLED:
                 entrant.setStatus(EntrantStatus.WAITING);
-                logText = "User rejoined waitlist after rejection";
+                logText = "User rejoined waitlist after cancelling spot";
                 toastText = "You successfully rejoined the waitlist";
                 break;
         }
 
         String finalLogText = logText;
         String finalToastText = toastText;
-        EventRepository.getInstance().updateEvent(event, null, task -> {
+        eventRepository.updateEvent(event, null, task -> {
             if(task.isSuccessful()){
                 Log.i("EVENT", finalLogText);
                 Toast.makeText(requireContext(), finalToastText, Toast.LENGTH_SHORT).show();
@@ -291,14 +291,10 @@ public class EventDetailsFragment extends Fragment {
 
         if (!event.hasLotteryExecuted()) {
             // If lottery hasn't been run, set up click listener to open LotteryRunDialog
-            lotteryBtn.setOnClickListener(v -> LotteryRunDialog.showDialog(getParentFragmentManager(), event.getEventId()));
+            lotteryBtn.setOnClickListener(v -> LotteryRunDialog.showDialog(getParentFragmentManager(), event));
         } else {
             // If lottery has been run, set up click listener to navigate to lottery status fragment
-            lotteryBtn.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("event", event);
-                Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);
-            });
+            lotteryBtn.setOnClickListener(v -> navigateToLotteryOverview());
         }
     }
 
@@ -357,6 +353,24 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    private void runLottery() {
+        // Need to check if waitlist is empty and that event is still valid
+        // If it is, open LotteryRunDialog
+
+    }
+
+    /**
+     * Navigates to the lottery overview view.
+     * Enabled once the lottery has been ran.
+     */
+    private void navigateToLotteryOverview() {
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);
+        }
+    }
+
     /**
      * Navigates to the QR code view.
      */
@@ -375,26 +389,32 @@ public class EventDetailsFragment extends Fragment {
      * Navigates to the create notification view.
      */
     private void navigateToCreateNotif() {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("Event", event);
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("Event", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+        }
     }
 
     /**
      * Navigates to the edit event view.
      */
     private void navigateToEditEvent() {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("selectedEvent", event);
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedEvent", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+        }
     }
 
     /**
      * Navigates to the waitlist info view.
      */
     private void navigateToWaitlistInfo() {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("event", event);
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
+        }
     }
 }

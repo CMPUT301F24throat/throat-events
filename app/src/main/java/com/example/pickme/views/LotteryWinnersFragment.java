@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Fragment that displays the list of lottery winners.
+ * A Fragment that displays the list of lottery winners after the lottery is ran.
  */
 public class LotteryWinnersFragment extends Fragment {
 
