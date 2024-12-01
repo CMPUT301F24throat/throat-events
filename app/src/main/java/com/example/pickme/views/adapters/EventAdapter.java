@@ -14,16 +14,17 @@ import com.example.pickme.models.Event;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
-    private List<Event> eventList;
+    private ArrayList<Event> eventList;
     private Context context;
     private OnEventClickListener listener;
 
-    public EventAdapter(List<Event> eventList, Context context, OnEventClickListener listener) {
+    public EventAdapter(ArrayList<Event> eventList, Context context, OnEventClickListener listener) {
         this.eventList = eventList;
         this.context = context;
         this.listener = listener;

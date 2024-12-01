@@ -17,16 +17,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.pickme.R;
+import com.example.pickme.models.Enums.EntrantStatus;
+import com.example.pickme.models.Event;
 import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
+import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.NotificationRepository;
 import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.NotificationHelper;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This fragment handles the create/send screen for notifications
@@ -44,6 +45,7 @@ public class CreateNotificationFragment extends Fragment {
     private Spinner recipientsSpinner;
 
     private User user;
+    private Event event;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
@@ -54,6 +56,15 @@ public class CreateNotificationFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
+
+        if(getArguments() != null)
+            this.event = (Event) getArguments().getSerializable("Event");
+
+        if(event == null){
+            Log.i("NOTIF", "event passed was null");
+            Toast.makeText(getContext(), "Cannot send message right now", Toast.LENGTH_SHORT).show();
+            getActivity().getOnBackPressedDispatcher().onBackPressed(); //return to prev screen
+        }
 
         // get all the views
         backArrow = view.findViewById(R.id.back_arrow);
@@ -66,8 +77,8 @@ public class CreateNotificationFragment extends Fragment {
 
         // populate the spinner with its options
         ArrayList<String> recipientOptions = new ArrayList<>();
-        for(Notification.SendLevel level : Notification.SendLevel.values()){
-            recipientOptions.add(level.toString());
+        for(EntrantStatus status : EntrantStatus.values()){
+            recipientOptions.add(status.toString().charAt(0) + status.toString().substring(1).toLowerCase());
         }
 
         ArrayAdapter<String> recipientsAdapter = new ArrayAdapter<>(getContext(),
@@ -87,10 +98,13 @@ public class CreateNotificationFragment extends Fragment {
                     return;
                 }
 
-                notification.setSentFrom(User.getInstance().getUserId());
-                notification.setLevel(Notification.SendLevel.valueOf((String)recipientsSpinner.getSelectedItem()));
+                notification.setSentFrom(User.getInstance().getDeviceId());
+
+                String selection = (String) recipientsSpinner.getSelectedItem();
+                notification.setLevel(EntrantStatus.valueOf(selection.toUpperCase()));
+
                 notification.setDateTimeNow();
-                notification.setEventID(getArguments().getString("EventID"));
+                notification.setEventID(event.getEventId());
 
                 createSendList(notification, () -> {
 
@@ -121,20 +135,31 @@ public class CreateNotificationFragment extends Fragment {
     private void createSendList(Notification notification, Runnable task){
         UserRepository userRepository = UserRepository.getInstance();
 
-        switch(notification.getLevel()){
-            case All:
-                userRepository.getAllUsers(query -> {
-                    List<DocumentSnapshot> docs = query.getResult().getDocuments();
-                    for(DocumentSnapshot doc : docs){
-                        Log.i("DOC", "DOC ID: " + doc.getId());
-                        notification.getSendTo().add(doc.getId());
-                    }
+        ArrayList<String> IDs = new ArrayList<>();
 
-                    task.run();
-                });
-
-                //TODO: add more cases to send notifs to correct people based on selection
+        for(WaitingListEntrant entrant : event.getWaitingList()){
+            if(notification.getLevel() == EntrantStatus.ALL || notification.getLevel() == entrant.getStatus())
+                notification.getSendTo().add(entrant.getEntrantId());
         }
+
+        task.run();
+
+//        switch(notification.getLevel()){
+//            case ALL:
+//
+//                userRepository.getAllUsers(query -> {
+//                    List<DocumentSnapshot> docs = query.getResult().getDocuments();
+//                    for(DocumentSnapshot doc : docs){
+//                        Log.i("NOTIF", "DOC ID: " + doc.getId());
+//
+//                        notification.getSendTo().add(doc.getId());
+//                    }
+//
+//                    task.run();
+//                });
+//
+//                //TODO: add more cases to send notifs to correct people based on selection
+//        }
     }
 }
 

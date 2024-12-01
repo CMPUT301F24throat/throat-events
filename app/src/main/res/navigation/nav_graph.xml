@@ -248,4 +248,7 @@
             android:id="@+id/action_adminGalleryFragment_to_adminToolsFragment"
             app:destination="@id/adminToolsFragment" />
     </fragment>
+    <action
+        android:id="@+id/action_global_eventDetailsFragment"
+        app:destination="@id/eventDetailsFragment" />
 </navigation>
