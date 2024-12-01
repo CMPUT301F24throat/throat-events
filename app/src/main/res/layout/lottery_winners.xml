@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="18dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="80dp"
         android:fontFamily="@font/inter"
         android:text="Lottery Winners "
         android:textColor="@color/text1"
@@ -46,13 +46,14 @@
         android:fontFamily="@font/inter_medium"
         android:text="Next"
         android:textColorLink="@color/buttonBG1"
+        android:textSize="20sp"
         app:iconTint="@color/text1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/winnerList"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.72" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/winnerList"
@@ -65,8 +66,8 @@
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.102" />
 </androidx.constraintlayout.widget.ConstraintLayout>
