@@ -25,6 +25,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment representing the user's events screen.
+ */
 public class MyEventsFragment extends Fragment implements EventAdapter.OnEventClickListener {
 
     private FacilityRepository facilityRepository;
@@ -33,17 +36,31 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     private EventAdapter eventAdapter;
     private ArrayList<Event> eventList = new ArrayList<>();
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_my_events, container, false);
     }
 
+    /**
+     * Called immediately after onCreateView has returned, but before any saved state has been restored in to the view.
+     *
+     * @param view               The View returned by onCreateView.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        facilityRepository = new FacilityRepository();
+        facilityRepository = FacilityRepository.getInstance();
         eventRepository = EventRepository.getInstance();
         User user = User.getInstance();
 
@@ -73,8 +90,13 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
+    /**
+     * Checks if the user has a facility and loads user events if a facility exists.
+     *
+     * @param userDeviceId The device ID of the user.
+     */
     private void checkUserFacility(String userDeviceId) {
-        facilityRepository.getFacilityByOwnerId(userDeviceId, task -> {
+        facilityRepository.getFacilityByOwnerDeviceId(userDeviceId, task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot querySnapshot = task.getResult();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
@@ -91,12 +113,21 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
-    // Method without includePastEvents parameter, defaulting to false
+    /**
+     * Loads the user events into the RecyclerView.
+     *
+     * @param userDeviceId The device ID of the user.
+     */
     private void loadUserEvents(String userDeviceId) {
         loadUserEvents(userDeviceId, false);
     }
 
-    // Method with includePastEvents parameter
+    /**
+     * Loads the user events into the RecyclerView with an option to include past events.
+     *
+     * @param userDeviceId      The device ID of the user.
+     * @param includePastEvents Whether to include past events.
+     */
     private void loadUserEvents(String userDeviceId, boolean includePastEvents) {
         eventRepository.getEventsByOrganizerId(userDeviceId, includePastEvents, getEventsTask -> {
             if (getEventsTask.isSuccessful()) {
@@ -119,11 +150,19 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
+    /**
+     * Navigates to the facility creation screen.
+     */
     private void navigateToFacilityCreationFragment() {
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.action_myEventsFragment_to_facilityCreationFragment);
     }
 
+    /**
+     * Handles the event click and navigates to the event details screen.
+     *
+     * @param event The event that was clicked.
+     */
     @Override
     public void onEventClick(Event event) {
         Bundle bundle = new Bundle();

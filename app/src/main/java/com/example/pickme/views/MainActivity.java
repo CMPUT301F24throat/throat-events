@@ -122,11 +122,14 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+            Boolean isAdmin = document.getBoolean("admin");
             User user = document.toObject(User.class);
             if (!isUserDeserialized(user)) {
                 handleDeserializationError();
                 return;
             }
+            if(isAdmin != null)
+                user.setIsAdmin(isAdmin);
 
             User.setInstance(user);  // Set the user instance
             // Show the Admin Tools menu item if the user is an admin
@@ -137,14 +140,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Show the loading screen
+    /**
+     * Shows the loading screen.
+     */
     private void showLoadingScreen() {
         if (loadingScreen != null) {
             loadingScreen.setVisibility(View.VISIBLE);
         }
     }
 
-    // Hide the loading screen with a delay
+    /**
+     * Hides the loading screen after a delay.
+     */
     private void hideLoadingScreen() {
         if (loadingScreen != null) {
             // Clean up invalid QR codes
