@@ -61,6 +61,5 @@ public class AdminToolsFragment extends Fragment {
         eventArchiveButton.setOnClickListener(v -> Navigation
                 .findNavController(view)
                 .navigate(R.id.action_adminToolsFragment_to_eventsArchiveFragment));
-
     }
 }
