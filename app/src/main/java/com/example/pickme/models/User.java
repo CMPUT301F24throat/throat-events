@@ -35,7 +35,8 @@ public class User implements Serializable {
     private String contactNumber; // Contact number of user.
     private String profilePictureUrl = defaultProfilePictureUrl; // Customizable user profile picture.
     private boolean isOnline; // Checks if the user is currently online.
-    private ArrayList<UserNotification> userNotifications = new ArrayList<UserNotification>();
+    private ArrayList<UserNotification> userNotifications = new ArrayList<UserNotification>(); //list of user's notifications
+    private ArrayList<String> eventIDs = new ArrayList<>(); //list of events signed up to
 
     // User Preferences & Permissions
     private String deviceId; // Attaches on device to user
@@ -137,6 +138,14 @@ public class User implements Serializable {
 
     public void addUserNotification(UserNotification userNotification){
         this.userNotifications.add(userNotification);
+    }
+
+    public ArrayList<String> getEventIDs() {
+        return eventIDs;
+    }
+
+    public void setEventIDs(ArrayList<String> eventIDs) {
+        this.eventIDs = eventIDs;
     }
 
     //---------- Get/Set User Preferences & Permissions --------------------

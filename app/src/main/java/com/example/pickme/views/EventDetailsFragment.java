@@ -238,6 +238,7 @@ public class EventDetailsFragment extends Fragment {
         if(!alreadyIn){
             WaitingListEntrant waitingListEntrant = new WaitingListEntrant(currentUser.getDeviceId(), null, EntrantStatus.WAITING);
             event.getWaitingList().add(waitingListEntrant);
+            currentUser.getEventIDs().add(event.getEventId());
             EventRepository.getInstance().updateEvent(event, null, task -> {
                 Log.i("EVENT", "Added user to waitlist");
                 Toast.makeText(requireContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
@@ -250,6 +251,7 @@ public class EventDetailsFragment extends Fragment {
         switch (entrant.getStatus()){
             case WAITING:
                 event.getWaitingList().remove(entrant);
+                currentUser.getEventIDs().remove(event.getEventId());
                 logText = "Removed user from waitlist";
                 toastText = "You successfully left the waitlist";
                 break;
