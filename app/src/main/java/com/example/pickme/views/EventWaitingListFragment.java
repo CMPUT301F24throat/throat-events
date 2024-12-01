@@ -16,21 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme.R;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingListEntrant;
-import com.example.pickme.utils.WaitingListUtils;
+import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.views.adapters.WaitingListAdapter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Fragment representing the waiting list for an event.
  */
 public class EventWaitingListFragment extends Fragment {
     private Event event;
-    private WaitingListUtils waitingListUtils;
     private RecyclerView waitingListRecyclerView;
     private WaitingListAdapter waitingListAdapter;
+    private ArrayList<WaitingListEntrant> entrants = new ArrayList<>();
 
     /**
      * Inflates the layout for this fragment.
@@ -62,8 +60,6 @@ public class EventWaitingListFragment extends Fragment {
                 return;
             }
 
-            waitingListUtils = new WaitingListUtils();
-
             waitingListRecyclerView = view.findViewById(R.id.waitingList_list);
             waitingListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -81,18 +77,31 @@ public class EventWaitingListFragment extends Fragment {
      * Loads the waiting list entrants for the event and sets up the RecyclerView adapter.
      */
     private void loadWaitingListEntrants() {
-        waitingListUtils.getWaitingListEntrantsByStatus(event.getEventId(), null, new OnCompleteListener<List<WaitingListEntrant>>() {
-            @Override
-            public void onComplete(@NonNull Task<List<WaitingListEntrant>> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    List<WaitingListEntrant> waitingListEntrants = task.getResult();
-                    waitingListAdapter = new WaitingListAdapter(waitingListEntrants);
-                    waitingListRecyclerView.setAdapter(waitingListAdapter);
-                } else {
-                    Log.e("EventWaitingListFragment", "Error getting waiting list entrants: " + task.getException());
-                    Navigation.findNavController(requireView()).navigateUp();
-                }
-            }
+        entrants = event.getWaitingList();
+
+        for(WaitingListEntrant e : entrants){
+            Log.i("WAITLIST", "ID: " + e.getEntrantId());
+        }
+
+        waitingListAdapter = new WaitingListAdapter(entrants, getContext());
+        waitingListRecyclerView.setAdapter(waitingListAdapter);
+
+        EventRepository.getInstance().attachEvent(event, () -> {
+            waitingListAdapter.notifyDataSetChanged();
         });
+
+//        waitingListUtils.getWaitingListEntrantsByStatus(event.getEventId(), null, new OnCompleteListener<List<WaitingListEntrant>>() {
+//            @Override
+//            public void onComplete(@NonNull Task<List<WaitingListEntrant>> task) {
+//                if (task.isSuccessful() && task.getResult() != null) {
+//                    List<WaitingListEntrant> waitingListEntrants = task.getResult();
+//                    waitingListAdapter = new WaitingListAdapter(waitingListEntrants);
+//                    waitingListRecyclerView.setAdapter(waitingListAdapter);
+//                } else {
+//                    Log.e("EventWaitingListFragment", "Error getting waiting list entrants: " + task.getException());
+//                    Navigation.findNavController(requireView()).navigateUp();
+//                }
+//            }
+//        });
     }
 }

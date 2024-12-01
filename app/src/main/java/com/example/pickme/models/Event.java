@@ -38,7 +38,7 @@ public class Event implements Serializable {
     private boolean geoLocationRequired; // Indicates if geolocation is required
     private Integer maxEntrants;         // Maximum number of entrants [Nullable]
     private ArrayList<WaitingListEntrant> waitingList; // Event waiting list; a list of waiting list entrants
-    private Boolean hasLotteryExecuted;  // Flag to indicate if the lottery has been executed
+    private Boolean hasLotteryExecuted = false;  // Flag to indicate if the lottery has been executed
     private final Timestamp createdAt;              // Creation timestamp
     private Timestamp updatedAt;              // Last updated timestamp
 
@@ -334,7 +334,7 @@ public class Event implements Serializable {
      *
      * @param hasLotteryExecuted Indicates if the lottery has been executed
      */
-    public void setHasLotteryExecuted(boolean hasLotteryExecuted) {
+    public void setHasLotteryExecuted(Boolean hasLotteryExecuted) {
         this.hasLotteryExecuted = hasLotteryExecuted;
         this.updatedAt = Timestamp.now();
     }

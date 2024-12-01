@@ -246,6 +246,7 @@
                     app:layout_constraintHorizontal_bias="0.048"
                     app:layout_constraintStart_toEndOf="@+id/eventDetails_starIcon"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout

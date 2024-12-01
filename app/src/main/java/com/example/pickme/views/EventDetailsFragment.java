@@ -83,8 +83,10 @@ public class EventDetailsFragment extends Fragment {
                     Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
                 }
                 else{
-                    configureView(view, currentUser);
-                    displayEventDetails(view);
+                    if(view != null){
+                        configureView(view, currentUser);
+                        displayEventDetails(view);
+                    }
                 }
             });
         } else {
@@ -108,12 +110,13 @@ public class EventDetailsFragment extends Fragment {
     private void displayEventDetails(View view) {
         if (event != null) {
             int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
+            int winnerEntrantsCount  = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.SELECTED || entrant.getStatus() == EntrantStatus.ACCEPTED).count();
 
             setText(view, R.id.eventDetails_eventTitle, event.getEventTitle() != null ? event.getEventTitle() : " ");
             setText(view, R.id.eventDetails_eventDesc, event.getEventDescription() != null ? event.getEventDescription() : "No description set for the event");
             setText(view, R.id.eventDetails_dateTime, event.getEventDate() != null ? event.getEventDate() : " ");
             setText(view, R.id.eventDetails_location, event.getEventLocation() != null ? event.getEventLocation() : " ");
-            setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() != 0 ? event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners") : " ");
+            setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() != 0 ? winnerEntrantsCount + " / " + event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners") : " ");
             setText(view, R.id.eventDetails_maxEntrants, waitingEntrantsCount + " / " + (event.getMaxEntrants() != null ? event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants") : "No waitlist limit"));
 
             loadImage(view, R.id.eventDetails_poster, event.getPosterImageId());
@@ -142,19 +145,19 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_joinWaitlistBtn, !isOrganizer);
         setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
 
-        configWaitlistBtn();
-        configLotteryBtn();
+        configWaitlistBtn(view);
+        configLotteryBtn(view);
     }
 
     /**
      * Configures the waitlist button based on the event and waiting list status.
      */
-    private void configWaitlistBtn() {
+    private void configWaitlistBtn(View view) {
         if(waitingListUtils == null || event == null)
             return;
         Log.i("EVENT", "in config");
 
-        View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
+        View waitlistBtn = view.findViewById(R.id.eventDetails_joinWaitlistBtn);
 
         int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
 
@@ -286,8 +289,8 @@ public class EventDetailsFragment extends Fragment {
     /**
      * Configures the lottery button based on the event status.
      */
-    private void configLotteryBtn() {
-        View lotteryBtn = requireView().findViewById(R.id.eventDetails_runLotteryBtn);
+    private void configLotteryBtn(View view) {
+        View lotteryBtn = view.findViewById(R.id.eventDetails_runLotteryBtn);
 
         if (!event.hasLotteryExecuted()) {
             // If lottery hasn't been run, set up click listener to open LotteryRunDialog
@@ -417,4 +420,5 @@ public class EventDetailsFragment extends Fragment {
             Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
         }
     }
+
 }

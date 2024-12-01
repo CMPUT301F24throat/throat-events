@@ -99,19 +99,26 @@ public class LotteryRunDialog extends DialogFragment {
      * Sets the description text for the dialog.
      */
     private void setDialogDescription() {
-        eventRepository.getEventById(event.getEventId(), task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                Event event = task.getResult();
-                int numToDraw = lotteryUtils.determineNumToDraw(event);
-                long numWaitingEntrants = event.getWaitingList().stream()
-                        .filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING)
-                        .count();
-                String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
-                description.setText(descriptionText);
-            } else {
-                description.setText("Error fetching event details.");
-            }
-        });
+        int numToDraw = lotteryUtils.determineNumToDraw(event);
+        long numWaitingEntrants = event.getWaitingList().stream()
+                .filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING)
+                .count();
+        String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
+        description.setText(descriptionText);
+
+//        eventRepository.getEventById(event.getEventId(), task -> {
+//            if (task.isSuccessful() && task.getResult() != null) {
+//                Event event = task.getResult();
+//                int numToDraw = lotteryUtils.determineNumToDraw(event);
+//                long numWaitingEntrants = event.getWaitingList().stream()
+//                        .filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING)
+//                        .count();
+//                String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
+//                description.setText(descriptionText);
+//            } else {
+//                description.setText("Error fetching event details.");
+//            }
+//        });
     }
 }
 /*
