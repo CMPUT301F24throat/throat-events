@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.utils.GeoLocationUtils;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
@@ -36,7 +38,10 @@ public class EventDetailsFragment extends Fragment {
     private EventRepository eventRepository;
     private WaitingListUtils waitingListUtils;
     private LotteryUtils lotteryUtils;
-
+    String logText = "";
+    String toastText = "";
+    private boolean alreadyIn;
+    private WaitingListEntrant entrant;
     /**
      * Inflates the layout for this fragment.
      *
@@ -267,9 +272,6 @@ public class EventDetailsFragment extends Fragment {
             });
             return;
         }
-
-        String logText = "";
-        String toastText = "";
 
         switch (entrant.getStatus()) {
             case WAITING:
