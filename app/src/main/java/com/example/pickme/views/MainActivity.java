@@ -122,11 +122,14 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+            Boolean isAdmin = document.getBoolean("admin");
             User user = document.toObject(User.class);
             if (!isUserDeserialized(user)) {
                 handleDeserializationError();
                 return;
             }
+            if(isAdmin != null)
+                user.setIsAdmin(isAdmin);
 
             User.setInstance(user);  // Set the user instance
             // Show the Admin Tools menu item if the user is an admin
