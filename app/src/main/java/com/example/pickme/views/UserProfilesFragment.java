@@ -1,65 +1,150 @@
 package com.example.pickme.views;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.pickme.R;
+import com.example.pickme.databinding.FragmentUserProfilesBinding;
+import com.example.pickme.databinding.LayoutDeleteUserAdminDialogBinding;
+import com.example.pickme.databinding.LayoutUserFacilityDetailsDialogBinding;
+import com.example.pickme.models.Facility;
+import com.example.pickme.models.User;
+import com.example.pickme.repositories.FacilityRepository;
+import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.views.adapters.UserProfilesAdapter;
+import com.google.firebase.firestore.DocumentSnapshot;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UserProfilesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class UserProfilesFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class UserProfilesFragment extends Fragment implements UserProfilesAdapter.OnItemClickListener{
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public UserProfilesFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserProfilesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static UserProfilesFragment newInstance(String param1, String param2) {
-        UserProfilesFragment fragment = new UserProfilesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
+    private FragmentUserProfilesBinding binding;
+    private UserRepository userRepository;
+    private FacilityRepository facilityRepository;
+    private final List<User> usersList = new ArrayList<>();
+    private UserProfilesAdapter userProfilesAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_profiles, container, false);
+        binding = FragmentUserProfilesBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        userRepository = UserRepository.getInstance();
+        facilityRepository = FacilityRepository.getInstance();
+
+        userProfilesAdapter = new UserProfilesAdapter(requireActivity(), usersList, this);
+        binding.recyclerView.setAdapter(userProfilesAdapter);
+
+        loadEvents();
+    }
+
+    private void loadEvents() {
+        usersList.clear();
+        userRepository.getAllUsers(query -> {
+            if (query.isSuccessful()) {
+                List<DocumentSnapshot> docs = query.getResult().getDocuments();
+
+                for (DocumentSnapshot doc : docs) {
+                    // Parse each document to a User object
+                    User user = doc.toObject(User.class);
+                    if (user != null) {
+                        usersList.add(user);
+                        userProfilesAdapter.notifyDataSetChanged();
+                        binding.noEventsText.setVisibility(usersList.isEmpty() ? View.VISIBLE : View.GONE);
+                    }
+                }
+            } else {
+                System.err.println("Failed to fetch users: " + query.getException().getMessage());
+                binding.noEventsText.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void deleteUser(User user, int pos) {
+        // Create a dialog instance
+        Dialog dialog = new Dialog(requireContext());
+
+        // Inflate the custom layout using View Binding
+        LayoutDeleteUserAdminDialogBinding binding = LayoutDeleteUserAdminDialogBinding.inflate(LayoutInflater.from(requireContext()));
+        dialog.setContentView(binding.getRoot());
+
+        // Set up the dialog views
+        binding.firstName.setText(user.getFirstName());
+        binding.lastName.setText(user.getLastName());
+        binding.idNumber.setText(pos);
+        binding.delete.setOnClickListener(view -> {
+            userRepository.deleteUser(user.getDeviceId());
+            usersList.remove(pos);
+            userProfilesAdapter.notifyDataSetChanged();
+            Toast.makeText(requireContext(), "User deleted successfully!", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        binding.cancel.setOnClickListener(view -> dialog.dismiss());
+
+        // Show the dialog
+        dialog.show();
+    }
+
+    private void facilityDetails(User user, int pos) {
+        // Create a dialog instance
+        Dialog dialog = new Dialog(requireContext());
+
+        // Inflate the custom layout using View Binding
+        LayoutUserFacilityDetailsDialogBinding binding = LayoutUserFacilityDetailsDialogBinding.inflate(LayoutInflater.from(requireContext()));
+        dialog.setContentView(binding.getRoot());
+
+        facilityRepository.getFacilityByOwnerId(user.getDeviceId(), query -> {
+            if (query.isSuccessful()) {
+                for (DocumentSnapshot document : query.getResult().getDocuments()) {
+                    Facility facility = document.toObject(Facility.class);
+                    if (facility != null) {
+                        // Set up the dialog views
+                        binding.facilityName.setText(facility.getFacilityName());
+                        binding.location.setText(facility.getLocation());
+                        binding.delete.setOnClickListener(view -> facilityRepository.deleteFacility(facility.getFacilityId(), task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(requireContext(), "Facility deleted successfully!", Toast.LENGTH_SHORT).show();
+                                System.out.println("Facility deleted successfully");
+                                dialog.dismiss();
+                            } else {
+                                dialog.dismiss();
+                                Toast.makeText(requireContext(), "Failed to delete facility: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                System.err.println("Failed to delete facility: " + task.getException().getMessage());
+                            }
+                        }));
+                    }
+                }
+
+            } else {
+                System.err.println("Failed to fetch facilities: " + query.getException().getMessage());
+            }
+        });
+
+        binding.cancel.setOnClickListener(view -> dialog.dismiss());
+        // Show the dialog
+        dialog.show();
+    }
+    @Override
+    public void onDeleteClick(User user, int position) {
+        deleteUser(user, position);
+    }
+
+    @Override
+    public void onFacilityClick(User user, int position) {
+        facilityDetails(user, position);
     }
 }

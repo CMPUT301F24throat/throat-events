@@ -86,6 +86,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.navigation.testing)
 
+    implementation("com.google.android.gms:play-services-location:21.0.1")
     // Google Services
     implementation("com.google.android.gms:play-services-maps:18.0.2")
     implementation("androidx.appcompat:appcompat:1.7.0")

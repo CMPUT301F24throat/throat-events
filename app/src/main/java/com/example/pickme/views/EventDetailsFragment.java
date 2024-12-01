@@ -21,6 +21,7 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.utils.GeoLocationUtils;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
@@ -36,6 +37,8 @@ public class EventDetailsFragment extends Fragment {
     private EventRepository eventRepository;
     private WaitingListUtils waitingListUtils;
     private LotteryUtils lotteryUtils;
+
+    GeoPoint currentUserLocation = null;
 
     /**
      * Inflates the layout for this fragment.
@@ -160,18 +163,41 @@ public class EventDetailsFragment extends Fragment {
                     ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
                 } else {
                     waitlistBtn.setOnClickListener(v -> {
-                        GeoPoint currentUserLocation = null;
-                        if (event.isGeoLocationRequired()) {
-                            // TODO: Implement geolocation
-                        }
 
-                        waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
-                            if (addTask.isSuccessful()) {
-                                Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
+                        if (event.isGeoLocationRequired()) {
+                            GeoLocationUtils geoLocationUtils = new GeoLocationUtils();
+
+                            // Check if location permissions are granted
+                            if (!geoLocationUtils.areLocationPermissionsGranted(requireActivity())) {
+                                geoLocationUtils.requestLocationPermission(requireActivity());
+                            } else if (!geoLocationUtils.isLocationEnabled(requireActivity())) {
+                                Toast.makeText(requireActivity(), "Please enable location services", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                // Fetch current location
+                                geoLocationUtils.fetchCurrentLocation(requireActivity(), new GeoLocationUtils.OnLocationFetchedListener() {
+                                    @Override
+                                    public void onLocationFetched(double latitude, double longitude) {
+                                        // Save the fetched location to GeoPoint
+                                        currentUserLocation = new GeoPoint(latitude, longitude);
+                                        waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
+                                            if (addTask.isSuccessful()) {
+                                                Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                });
                             }
-                        });
+                        }else{
+                            waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
+                                if (addTask.isSuccessful()) {
+                                    Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     });
                 }
             });

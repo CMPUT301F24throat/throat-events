@@ -113,7 +113,7 @@
         app:layout_constraintStart_toEndOf="@id/firstNameTitle"/>
     <TextView
         android:paddingVertical="5dp"
-        android:layout_width="100dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:text="ID"
         android:id="@+id/idTitle"
@@ -183,7 +183,7 @@
         app:layout_constraintTop_toBottomOf="@id/view2"
         android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@id/bottomGuide"
-        tools:listitem="@layout/admin_event_archive_item_view"
+        tools:listitem="@layout/user_profile_item_view"
         tools:itemCount="20"
         android:id="@+id/recyclerView"/>
 
