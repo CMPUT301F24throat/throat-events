@@ -5,6 +5,11 @@ package com.example.pickme.models.Enums;
  */
 public enum EntrantStatus {
     /**
+     * This applies to all entrants, and is only used when organizer is sending a message
+     */
+    ALL,
+
+    /**
      * User has joined the waiting list and is waiting for acceptance.
      */
     WAITING,
