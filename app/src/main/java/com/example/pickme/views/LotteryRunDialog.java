@@ -14,6 +14,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.Navigation;
 
 import com.example.pickme.R;
+import com.example.pickme.models.Enums.EntrantStatus;
+import com.example.pickme.models.Event;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
@@ -30,6 +32,7 @@ public class LotteryRunDialog extends DialogFragment {
     private LotteryUtils lotteryUtils;
     private WaitingListUtils waitingListUtils;
     private EventRepository eventRepository;
+    private TextView description;
 
     /**
      * Constructor for LotteryRunDialog.
@@ -50,11 +53,10 @@ public class LotteryRunDialog extends DialogFragment {
         View view = getLayoutInflater().inflate(R.layout.lottery_run_dialog, null);
         dialog.setContentView(view);
 
-        TextView title = view.findViewById(R.id.dialog_title);
-        TextView description = view.findViewById(R.id.dialog_description);
-        Button startButton = view.findViewById(R.id.start_button);
-        Button cancelButton = view.findViewById(R.id.cancel_button);
-
+        description = view.findViewById(R.id.lotteryRun_description);
+        Button startButton = view.findViewById(R.id.lotteryRun_startBtn);
+        Button cancelButton = view.findViewById(R.id.lotteryRun_cancelBtn);
+        setDialogDescription();
 
         // Set the start button click listener to run the lottery
         startButton.setOnClickListener(v -> {
@@ -89,6 +91,25 @@ public class LotteryRunDialog extends DialogFragment {
     public static void showDialog(FragmentManager fragmentManager, String eventId) {
         LotteryRunDialog dialog = new LotteryRunDialog(eventId);
         dialog.show(fragmentManager, "LotteryRunDialog");
+    }
+
+    /**
+     * Sets the description text for the dialog.
+     */
+    private void setDialogDescription() {
+        eventRepository.getEventById(eventId, task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                Event event = task.getResult();
+                int numToDraw = lotteryUtils.determineNumToDraw(event);
+                long numWaitingEntrants = event.getWaitingList().stream()
+                        .filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING)
+                        .count();
+                String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
+                description.setText(descriptionText);
+            } else {
+                description.setText("Error fetching event details.");
+            }
+        });
     }
 }
 /*

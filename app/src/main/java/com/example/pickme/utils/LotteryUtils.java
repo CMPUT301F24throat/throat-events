@@ -146,7 +146,7 @@ public class LotteryUtils {
      * @param event The event for which the lottery is being run.
      * @return The number of entrants to draw.
      */
-    private int determineNumToDraw(Event event) {
+    public int determineNumToDraw(Event event) {
         int currentNumInvited = 0;
         int targetNumWinners = event.getMaxWinners();
 
