@@ -23,7 +23,6 @@ import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
-import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Objects;
 
@@ -140,43 +139,115 @@ public class EventDetailsFragment extends Fragment {
      * Configures the waitlist button based on the event and waiting list status.
      */
     private void configWaitlistBtn() {
-        if (waitingListUtils != null && event != null) {
-            View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
-            waitingListUtils.getEntrantsCountByStatus(event.getEventId(), EntrantStatus.WAITING, task -> {
-                int waitingEntrantsCount = 0;
-                if (task.isSuccessful() && task.getResult() != null) {
-                    waitingEntrantsCount = task.getResult();
-                }
+        if(waitingListUtils == null || event == null)
+            return;
 
-                if (event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()) {
-                    ((TextView) waitlistBtn).setText("Waitlist is full - try again later");
-                    waitlistBtn.setEnabled(false);
-                    waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
-                    ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
-                } else if (event.hasEventPassed()) {
-                    ((TextView) waitlistBtn).setText("This event has already passed");
-                    waitlistBtn.setEnabled(false);
-                    waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
-                    ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
-                } else {
-                    waitlistBtn.setOnClickListener(v -> {
-                        GeoPoint currentUserLocation = null;
-                        if (event.isGeoLocationRequired()) {
-                            // TODO: Implement geolocation
-                        }
+        View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
 
-                        waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
-                            if (addTask.isSuccessful()) {
-                                Toast.makeText(getContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getContext(), "Failed joining waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                Navigation.findNavController(requireView()).navigate(R.id.action_global_homeFragment);  // If user can't join event waitlist direct them back to home page
-                            }
-                        });
-                    });
-                }
-            });
+        int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
+
+        String buttonText = "";
+        boolean enableButton = false;
+
+        boolean alreadyIn = false;
+        EntrantStatus status = EntrantStatus.ALL;
+        for(WaitingListEntrant entrant : event.getWaitingList()){
+            if(entrant.getEntrantId().equals(User.getInstance().getDeviceId())){
+                alreadyIn = true;
+                status = entrant.getStatus();
+                break;
+            }
         }
+
+        if(event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()){
+            buttonText = "Waitlist is full - try again later";
+            enableButton = false;
+        }
+        else if(event.hasEventPassed()){
+            buttonText = "This event has already passed";
+            enableButton = false;
+        }
+        else if(alreadyIn){
+            switch (status){
+                case WAITING:
+                    buttonText = "Leave Waitlist";
+                    enableButton = true;
+
+                case SELECTED:
+                    buttonText = "Accept";
+                    enableButton = true;
+                    //TODO: need more buttons and stuff for accept/decline
+
+                case REJECTED:
+                    buttonText = "Join Waitlist";
+                    enableButton = true;
+
+                case ACCEPTED:
+                    buttonText = "Already Accepted";
+                    enableButton = false;
+
+                case CANCELLED:
+                    buttonText = "Already Cancelled";
+                    enableButton = false;
+            }
+        }
+        else{
+            buttonText = "Join Waitlist";
+            enableButton = true;
+        }
+
+        ((TextView) waitlistBtn).setText(buttonText);
+        waitlistBtn.setEnabled(enableButton);
+        if(!enableButton){
+            waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+            ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+        }
+
+        //TODO: setup on click listener
+
+//        waitingListUtils.getEntrantsCountByStatus(event.getEventId(), EntrantStatus.WAITING, task -> {
+//            int waitingEntrantsCount = 0;
+//            if (task.isSuccessful() && task.getResult() != null) {
+//                waitingEntrantsCount = task.getResult();
+//            }
+//
+//            if (event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()) {
+//                ((TextView) waitlistBtn).setText("Waitlist is full - try again later");
+//                waitlistBtn.setEnabled(false);
+//                waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+//                ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+//            } else if (event.hasEventPassed()) {
+//                ((TextView) waitlistBtn).setText("This event has already passed");
+//                waitlistBtn.setEnabled(false);
+//                waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
+//                ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
+//            } else {
+//                boolean alreadyIn = false;
+//                for(WaitingListEntrant entrant : event.getWaitingList()){
+//                    if(entrant.getEntrantId().equals(User.getInstance().getDeviceId())){
+//                        alreadyIn = true;
+//                        break;
+//                    }
+//                }
+//
+//                waitlistBtn.setOnClickListener(v -> {
+//                    GeoPoint currentUserLocation = null;
+//                    if (event.isGeoLocationRequired()) {
+//                        // TODO: Implement geolocation
+//                    }
+//
+//                    waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
+//                        if (addTask.isSuccessful()) {
+//                            Toast.makeText(getContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Toast.makeText(getContext(), "Failed joining waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+//                            Navigation.findNavController(requireView()).navigate(R.id.action_global_homeFragment);  // If user can't join event waitlist direct them back to home page
+//                        }
+//                    });
+//                });
+//            }
+//        });
+
     }
 
     /**
