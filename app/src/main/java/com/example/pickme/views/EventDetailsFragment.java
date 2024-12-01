@@ -272,7 +272,7 @@ public class EventDetailsFragment extends Fragment {
      */
     private void navigateToCreateNotif() {
         Bundle bundle = new Bundle();
-        bundle.putString("EventID", event.getEventId());
+        bundle.putSerializable("Event", event);
         Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
     }
 
