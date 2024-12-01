@@ -13,7 +13,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.pickme.R;
-import com.example.pickme.databinding.FragmentMyEventsBinding;
+import com.example.pickme.databinding.EventsMyEventsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
@@ -27,7 +27,7 @@ import java.util.List;
 public class MyEventsFragment extends Fragment implements EventAdapter.OnEventClickListener {
 
     private FacilityRepository facilityRepository;
-    private FragmentMyEventsBinding binding;
+    private EventsMyEventsBinding binding;
     private EventRepository eventRepository;
     private EventAdapter eventAdapter;
     private ArrayList<Event> eventList = new ArrayList<>();
@@ -35,7 +35,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentMyEventsBinding.inflate(getLayoutInflater(), container, false);
+        binding = EventsMyEventsBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 

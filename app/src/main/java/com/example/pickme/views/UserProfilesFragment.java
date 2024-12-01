@@ -2,6 +2,8 @@ package com.example.pickme.views;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.pickme.databinding.FragmentUserProfilesBinding;
 import com.example.pickme.databinding.LayoutDeleteUserAdminDialogBinding;
 import com.example.pickme.databinding.LayoutUserFacilityDetailsDialogBinding;
+import com.example.pickme.databinding.UserAdminProfilesBinding;
 import com.example.pickme.models.Facility;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.FacilityRepository;
@@ -26,7 +28,7 @@ import java.util.List;
 
 public class UserProfilesFragment extends Fragment implements UserProfilesAdapter.OnItemClickListener{
 
-    private FragmentUserProfilesBinding binding;
+    private UserAdminProfilesBinding binding;
     private UserRepository userRepository;
     private FacilityRepository facilityRepository;
     private final List<User> usersList = new ArrayList<>();
@@ -35,7 +37,7 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentUserProfilesBinding.inflate(getLayoutInflater(), container, false);
+        binding = UserAdminProfilesBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
     }
 
@@ -47,7 +49,18 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
 
         userProfilesAdapter = new UserProfilesAdapter(requireActivity(), usersList, this);
         binding.recyclerView.setAdapter(userProfilesAdapter);
+        binding.searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                userProfilesAdapter.filter(s.toString()); // Filter the list based on query
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
         loadEvents();
     }
 

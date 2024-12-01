@@ -1,6 +1,8 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +46,18 @@ public class EventsArchiveFragment extends Fragment {
             Navigation.findNavController(requireView()).navigate(R.id.action_eventsArchiveFragment_to_eventDetailsFragment, bundle);
         });
         binding.recyclerView.setAdapter(eventAdapter);
+        binding.searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                eventAdapter.filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
         loadEvents();
     }
 
