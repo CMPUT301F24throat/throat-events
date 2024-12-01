@@ -279,7 +279,7 @@ public class EventCreationFragment extends Fragment {
         String dateTime = eventDateEdit.getText().toString() + ", " + startTimeEdit.getText().toString() + " - " + endTimeEdit.getText().toString();
         boolean isGeolocationRequired = requireGeolocation.isChecked();
 
-        facilityRepository.getFacilityByOwnerId(organizerId, task -> {
+        facilityRepository.getFacilityByOwnerDeviceId(organizerId, task -> {
             if (task.isSuccessful() && !task.getResult().isEmpty()) {
                 String facilityId = task.getResult().getDocuments().get(0).getId();
 

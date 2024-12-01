@@ -25,6 +25,8 @@ import com.example.pickme.repositories.FacilityRepository;
 public class FacilityCreationFragment extends Fragment {
 
     private FacilityRepository facilityRepository;
+    private User currentUser;
+
     private EditText facilityNameEditText;
     private EditText facilityLocationEditText;
     private Button createFacilityButton;
@@ -53,7 +55,9 @@ public class FacilityCreationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        facilityRepository = new FacilityRepository();
+        facilityRepository = FacilityRepository.getInstance();
+        currentUser = User.getInstance();
+
         facilityNameEditText = view.findViewById(R.id.facilityNameEditText);
         facilityLocationEditText = view.findViewById(R.id.facilityLocationEditText);
         createFacilityButton = view.findViewById(R.id.createFacilityButton);
@@ -69,10 +73,9 @@ public class FacilityCreationFragment extends Fragment {
     private void createFacility() {
         String facilityName = facilityNameEditText.getText().toString().trim();
         String facilityLocation = facilityLocationEditText.getText().toString().trim();
-        User user = User.getInstance();
 
-        if (user != null && !facilityName.isEmpty()) {
-            Facility facility = new Facility(user.getDeviceId(), facilityName, facilityLocation);
+        if (currentUser != null && !facilityName.isEmpty()) {
+            Facility facility = new Facility(currentUser.getDeviceId(), facilityName, facilityLocation);
             facilityRepository.addFacility(facility, task -> {
                 if (task.isSuccessful()) {
                     navigateToMyEventsFragment();

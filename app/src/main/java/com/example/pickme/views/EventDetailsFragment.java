@@ -167,9 +167,10 @@ public class EventDetailsFragment extends Fragment {
 
                         waitingListUtils.addEntrantToWaitingList(event.getEventId(), new WaitingListEntrant(currentUser.getDeviceId(), currentUserLocation, EntrantStatus.WAITING), addTask -> {
                             if (addTask.isSuccessful()) {
-                                Toast.makeText(getContext(), "You have been added to the waitlist", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(getContext(), "Failed to add to waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Failed joining waitlist: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                Navigation.findNavController(requireView()).navigate(R.id.action_global_homeFragment);  // If user can't join event waitlist direct them back to home page
                             }
                         });
                     });
