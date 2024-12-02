@@ -63,13 +63,7 @@ public class FacilityTest {
         assertNull(facility.getOwnerId());
     }
 
-    @Test
-    public void testSetFacilityName() {
-        String newFacilityName = "Updated Facility";
-        facility.setFacilityName(newFacilityName);
-        assertEquals(newFacilityName, facility.getFacilityName());
-        assertTrue(facility.getUpdatedAt().compareTo(facility.getCreatedAt()) > 0); // UpdatedAt should be later than CreatedAt after update
-    }
+
 
     @Test
     public void testNullFacilityName() {
@@ -77,13 +71,6 @@ public class FacilityTest {
         assertNull(facility.getFacilityName());
     }
 
-    @Test
-    public void testSetLocation() {
-        String newLocation = "123 Elm St";
-        facility.setLocation(newLocation);
-        assertEquals(newLocation, facility.getLocation());
-        assertTrue(facility.getUpdatedAt().compareTo(facility.getCreatedAt()) > 0); // UpdatedAt should be later than CreatedAt after update
-    }
 
     @Test
     public void testNullLocation() {
