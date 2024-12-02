@@ -251,11 +251,6 @@ public class EventDetailsFragment extends Fragment {
      * @param location The user's current location, or null if not required.
      */
     // Geolocation
-    /**
-     * Handles the waitlist logic based on the user's status and geolocation.
-     *
-     * @param location The user's current location, or null if not required.
-     */
     private void waitlistLogic(GeoPoint location) {
         if (!alreadyIn) {
             WaitingListEntrant waitingListEntrant = new WaitingListEntrant(
