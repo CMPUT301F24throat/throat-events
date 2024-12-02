@@ -220,7 +220,7 @@ public class EventDetailsFragment extends Fragment {
                 });
 
                 declineBtn.setOnClickListener(v -> {
-                    entrant.setStatus(EntrantStatus.REJECTED);
+                    entrant.setStatus(EntrantStatus.CANCELLED);
                     eventRepository.updateEvent(event, null, task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "You have declined the invitation", Toast.LENGTH_SHORT).show();
@@ -294,11 +294,6 @@ public class EventDetailsFragment extends Fragment {
             switch (this.entrant.getStatus()){
                 case WAITING:
                     buttonText = "Leave Waitlist";
-                    enableButton = true;
-                    break;
-
-                case CANCELLED:     // User cancelled their spot; can rejoin waitlist
-                    buttonText = "Rejoin Waitlist";
                     enableButton = true;
                     break;
 
