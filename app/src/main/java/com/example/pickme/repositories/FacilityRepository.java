@@ -113,4 +113,26 @@ public class FacilityRepository {
                     System.err.println("Query failed: " + e.getMessage());
                 });
     }
+
+    // Get facility by ownerId
+    public void getFacilityByOwnerId(String ownerId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        facilitiesRef.whereEqualTo("ownerId", ownerId)
+                .get()
+                .addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Query failed: " + e.getMessage());
+                });
+    }
+
+    // Delete a facility by its ID
+    public void deleteFacility(String facilityId, OnCompleteListener<Void> onCompleteListener) {
+        facilitiesRef.document(facilityId)
+                .delete()
+                .addOnCompleteListener(onCompleteListener)
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    System.err.println("Delete failed: " + e.getMessage());
+                });
+    }
 }

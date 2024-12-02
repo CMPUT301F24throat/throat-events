@@ -14,10 +14,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
+import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.utils.WaitingListUtils;
 import com.example.pickme.views.adapters.WaitingListAdapter;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -26,11 +32,13 @@ import java.util.List;
 /**
  * Fragment representing the waiting list for an event.
  */
-public class EventWaitingListFragment extends Fragment {
+public class EventWaitingListFragment extends Fragment implements OnMapReadyCallback {
     private Event event;
     private WaitingListUtils waitingListUtils;
     private RecyclerView waitingListRecyclerView;
     private WaitingListAdapter waitingListAdapter;
+    private MapView mapView;
+    private GoogleMap googleMap;
 
     /**
      * Inflates the layout for this fragment.
@@ -66,6 +74,10 @@ public class EventWaitingListFragment extends Fragment {
 
             waitingListRecyclerView = view.findViewById(R.id.waitingList_list);
             waitingListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            // Initialize MapView
+            mapView = view.findViewById(R.id.waitingList_entrantMap);
+            mapView.onCreate(savedInstanceState);
+            mapView.getMapAsync(this);
 
             loadWaitingListEntrants();
         } else {
@@ -81,18 +93,67 @@ public class EventWaitingListFragment extends Fragment {
      * Loads the waiting list entrants for the event and sets up the RecyclerView adapter.
      */
     private void loadWaitingListEntrants() {
-        waitingListUtils.getWaitingListEntrantsByStatus(event.getEventId(), null, new OnCompleteListener<List<WaitingListEntrant>>() {
+        waitingListUtils.getWaitingListEntrantsByStatus(event.getEventId(), EntrantStatus.WAITING, new OnCompleteListener<List<WaitingListEntrant>>() {
             @Override
             public void onComplete(@NonNull Task<List<WaitingListEntrant>> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
                     List<WaitingListEntrant> waitingListEntrants = task.getResult();
                     waitingListAdapter = new WaitingListAdapter(waitingListEntrants);
                     waitingListRecyclerView.setAdapter(waitingListAdapter);
+
+                    // Add markers for each entrant
+                    if (googleMap != null) {
+                        for (WaitingListEntrant entrant : waitingListEntrants) {
+                            if (entrant.getGeoLocation() != null) {
+                                LatLng position = new LatLng(
+                                        entrant.getGeoLocation().getLatitude(),
+                                        entrant.getGeoLocation().getLongitude()
+                                );
+                                googleMap.addMarker(new MarkerOptions().position(position).title(entrant.getEntrantId()));
+                            }
+                        }
+                    }
                 } else {
                     Log.e("EventWaitingListFragment", "Error getting waiting list entrants: " + task.getException());
                     Navigation.findNavController(requireView()).navigateUp();
                 }
             }
         });
+    }
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        this.googleMap = googleMap;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mapView != null) {
+            mapView.onResume();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mapView != null) {
+            mapView.onPause();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mapView != null) {
+            mapView.onDestroy();
+        }
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mapView != null) {
+            mapView.onLowMemory();
+        }
     }
 }
