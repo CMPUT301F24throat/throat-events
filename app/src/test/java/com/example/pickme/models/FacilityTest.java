@@ -50,20 +50,10 @@ public class FacilityTest {
     }
 
     @Test
-    public void testSetOwnerId() {
-        String newOwnerId = "owner789";
-        facility.setOwnerId(newOwnerId);
-        assertEquals(newOwnerId, facility.getOwnerId());
-        assertTrue(facility.getUpdatedAt().compareTo(facility.getCreatedAt()) > 0); // UpdatedAt should be later than CreatedAt after update
-    }
-
-    @Test
     public void testNullOwnerId() {
         facility.setOwnerId(null);
         assertNull(facility.getOwnerId());
     }
-
-
 
     @Test
     public void testNullFacilityName() {

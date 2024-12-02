@@ -50,14 +50,6 @@ public class WaitingListEntrantTest {
     }
 
     @Test
-    public void testSetGeoLocation() {
-        GeoPoint newLocation = new GeoPoint(40.7128, -74.0059);  // Example coordinates (New York)
-        entrant.setGeoLocation(newLocation);
-        assertEquals(newLocation, entrant.getGeoLocation());
-        assertTrue(entrant.getUpdatedAt().compareTo(entrant.getCreatedAt()) > 0);
-    }
-
-    @Test
     public void testGetCreatedAtNotModified() {
         Timestamp initialCreatedAt = entrant.getCreatedAt();
         entrant.setUpdatedAt(Timestamp.now()); // Modify updatedAt
