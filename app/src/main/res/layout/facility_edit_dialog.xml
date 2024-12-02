@@ -75,7 +75,7 @@
             android:id="@+id/facilityEdit_btnSave"
             android:layout_width="wrap_content"
             android:layout_height="52dp"
-            android:backgroundTint="@color/buttonBG2"
+            android:backgroundTint="@color/buttonBG1"
             android:fontFamily="@font/inter"
             android:text="Save"
             android:textStyle="bold"
