@@ -39,6 +39,8 @@ public class UserProfileEditFragment extends Fragment {
     private SwitchCompat editEnableLocation, editEnableNotifications;
     private ImageView editProfilePicture;
     private ImageButton removeProfilePicture;
+    Button saveButton;
+    Button goBackButton;
     private boolean isChanged = false;
     private Image img;
 
@@ -61,8 +63,8 @@ public class UserProfileEditFragment extends Fragment {
         editEnableNotifications = view.findViewById(R.id.editProfileEnableNotifications);
         editProfilePicture = view.findViewById(R.id.editProfilePicture);
         removeProfilePicture = view.findViewById(R.id.removeProfilePicture);
-        Button saveButton = view.findViewById(R.id.editSaveButton);
-        Button goBackButton = view.findViewById(R.id.editProfileGoBackButton);
+        saveButton = view.findViewById(R.id.editSaveButton);
+        goBackButton = view.findViewById(R.id.editProfileGoBackButton);
 
         loadUserData();
 
@@ -146,15 +148,29 @@ public class UserProfileEditFragment extends Fragment {
 
             // Initialize img only if it's null
             if (img == null) {
+                saveButton.setEnabled(false);
+                goBackButton.setEnabled(false);
                 img = new Image(user.getUserId(), user.getUserId()); // Ensure userId is not null here
                 img.download(new ImageQuery() {
                     @Override
                     public void onSuccess(Image image) {
                         img = image;
+                        saveButton.setEnabled(true);
+                        goBackButton.setEnabled(true);
                     }
 
                     @Override
                     public void onEmpty() {
+                        editProfilePicture.setImageBitmap(null);
+                        Toast.makeText(
+                                getContext(),
+                                "Error loading profile picture, please try again",
+                                Toast.LENGTH_SHORT).show();
+                        generateProfilePicture(task -> {
+                            Image i = task.getResult();
+                            user.setProfilePictureUrl(img.getImageUrl());
+                            pushUserToFirebase(user);
+                        });
                     }
                 });
             }
