@@ -112,22 +112,12 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     }
 
     /**
-     * Loads the user events into the RecyclerView.
-     *
-     * @param userDeviceId The device ID of the user.
-     */
-    private void loadUserEvents(String userDeviceId) {
-        loadUserEvents(userDeviceId, false);
-    }
-
-    /**
      * Loads the user events into the RecyclerView with an option to include past events.
      *
      * @param userDeviceId      The device ID of the user.
-     * @param includePastEvents Whether to include past events.
      */
-    private void loadUserEvents(String userDeviceId, boolean includePastEvents) {
-        eventRepository.getEventsByOrganizerId(userDeviceId, includePastEvents, getEventsTask -> {
+    private void loadUserEvents(String userDeviceId) {
+        eventRepository.getEventsByOrganizerId(userDeviceId, false, getEventsTask -> {
             if (getEventsTask.isSuccessful()) {
                 List<Event> events = getEventsTask.getResult();
                 if (events != null) {

@@ -269,18 +269,38 @@ public class EventRepository {
 
     /**
      * Checks if the event date has passed.
+     * An event is considered "passed" if the start date/time is before the current date and time.
      *
      * @param event The event to check.
      * @return true if the event date has passed, false otherwise.
      */
     public boolean hasEventPassed(Event event) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy, h:mm a", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
         try {
-            Date eventDate = dateFormat.parse(event.getEventDate());
-            return eventDate.before(new Date());
+            String[] eventDateTime = event.getEventDate().split(" - ");
+            Date eventStartDate = dateFormat.parse(eventDateTime[0]);
+            Date currentDate = new Date();
+
+            if (eventStartDate.before(currentDate)) {
+                return true;
+            } else if (eventStartDate.after(currentDate)) {
+                return false;
+            } else {
+                // Event is today, compare times
+                String[] eventTimes = eventDateTime[0].split(", ")[1].split(" - ");
+                Date eventStartTime = timeFormat.parse(eventTimes[0]);
+                Date currentTime = timeFormat.parse(timeFormat.format(currentDate));
+
+                if (currentTime != null) {
+                    return currentTime.after(eventStartTime);
+                }
+            }
         } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid event date format.", e);
         }
+
+        return false;
     }
 
     /**
@@ -305,7 +325,9 @@ public class EventRepository {
         });
     }
 
-
+    /**
+     * Adds a listener to the events collection to listen for changes.
+     */
     public void addSnapshotListener(){
         //dont want to add multiple listeners
         if(listening)
