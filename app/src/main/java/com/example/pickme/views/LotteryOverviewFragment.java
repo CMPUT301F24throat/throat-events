@@ -2,34 +2,30 @@ package com.example.pickme.views;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
-import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
-import com.example.pickme.repositories.EventRepository;
-import com.example.pickme.utils.LotteryUtils;
-import com.example.pickme.utils.WaitingListUtils;
+import com.example.pickme.views.adapters.EntrantAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class LotteryOverviewFragment extends Fragment {
 
     private RecyclerView entrantList;
-    private WaitingListUtils waitingListUtils;
-    private LotteryUtils lotteryUtils;
-    private EventRepository eventRepository;
+    private EntrantAdapter entrantAdapter;
     private Event event;
-    private User currentUser;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -39,49 +35,36 @@ public class LotteryOverviewFragment extends Fragment {
             return;
         }
 
-        entrantList = view.findViewById(R.id.lotteryOverview_entrantList);
-        waitingListUtils = new WaitingListUtils();
-        lotteryUtils = new LotteryUtils();
-        eventRepository = EventRepository.getInstance();
-        currentUser = User.getInstance();
         event = (Event) getArguments().getSerializable("event");
 
-        updateLotteryStatsText();  // Update the lottery stats text
-    }
+        entrantList = view.findViewById(R.id.lotteryOverview_entrantList);
+        entrantList.setLayoutManager(new LinearLayoutManager(getContext()));
+        entrantAdapter = new EntrantAdapter(filterEntrants(EntrantStatus.SELECTED));
+        entrantList.setAdapter(entrantAdapter);
 
-    private void filterEntrantList(EntrantStatus status) {
+        Spinner statusSpinner = view.findViewById(R.id.lotteryOverview_dropdown);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.entrant_status_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        statusSpinner.setAdapter(adapter);
 
-    }
-
-    private void updateLotteryStatsText() {
-
-    }
-
-    private void cancelPendingEntrants() {
-        List<WaitingListEntrant> pendingEntrants = event.getWaitingList().stream()
-                .filter(e -> e.getStatus() == EntrantStatus.SELECTED)
-                .collect(Collectors.toList());
-
-        for (WaitingListEntrant entrant : pendingEntrants) {
-            entrant.setStatus(EntrantStatus.CANCELLED);
-        }
-
-        // Need to update event waiting list so that the changes are reflected in the database
-        ArrayList<WaitingListEntrant> updatedWaitingList = new ArrayList<>(event.getWaitingList());
-        for (WaitingListEntrant entrant : pendingEntrants) {
-            int index = updatedWaitingList.indexOf(entrant);
-            if (index != -1) {
-                updatedWaitingList.set(index, entrant);
+        statusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                EntrantStatus selectedStatus = EntrantStatus.values()[position];
+                entrantAdapter.updateEntrants(filterEntrants(selectedStatus));
             }
-        }
-        event.setWaitingList(updatedWaitingList);
 
-        eventRepository.updateEvent(event, null, task -> {
-            if (task.isSuccessful()) {
-                updateLotteryStatsText();
-            } else {
-                Toast.makeText(getContext(), "Failed to cancel pending entrants", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
             }
         });
+    }
+
+    private List<WaitingListEntrant> filterEntrants(EntrantStatus status) {
+        return event.getWaitingList().stream()
+                .filter(e -> e.getStatus() == status)
+                .collect(Collectors.toList());
     }
 }

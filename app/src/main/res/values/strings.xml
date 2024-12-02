@@ -21,4 +21,11 @@
     <string name="admin_tools">Admin Tools</string>
     <string name="image_catalog">Image Catalog</string>
     <string name="delete_this_image">Delete this image?</string>
+    <string-array name="entrant_status_array">
+        <item>Selected</item>
+        <item>Accepted</item>
+        <item>Cancelled</item>
+        <item>Rejected</item>
+        <item>Waiting</item>
+    </string-array>
 </resources>
