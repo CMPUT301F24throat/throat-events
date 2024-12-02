@@ -99,7 +99,7 @@ public class UserRepository {
                 // Creates the User object
 //                String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
 
-                String initials = String.valueOf(firstName.charAt(0));
+                String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
                 Image newImage = new Image(deviceId, deviceId);
                 newImage.generate(initials, task1 -> {
                     if (task1.isSuccessful()) {
