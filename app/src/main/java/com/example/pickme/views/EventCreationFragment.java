@@ -4,6 +4,9 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +49,7 @@ public class EventCreationFragment extends Fragment {
     private String organizerId;
 
     private EditText eventTitleEdit, descriptionEdit, eventDateEdit, startTimeEdit, endTimeEdit, locationEdit, maxWinnersEdit, maxEntrantsEdit;
-    private TextView addImage;
+    private TextView addImage, titleCharCount, descriptionCharCount, locationCharCount;
     private Button upsertEventBtn, deleteEventBtn, backBtn;
     private CheckBox requireGeolocation;
     private ImageView iv;
@@ -82,7 +85,16 @@ public class EventCreationFragment extends Fragment {
         eventRepository = EventRepository.getInstance();
         organizerId = User.getInstance().getDeviceId();
 
-        // Initialize views
+        initializeViews(view);
+    }
+
+    /**
+     * Initializes the views and sets click listeners for UI elements.
+     *
+     * @param view The created view.
+     */
+    private void initializeViews(@NonNull View view) {
+
         eventTitleEdit = view.findViewById(R.id.title);
         descriptionEdit = view.findViewById(R.id.description);
         eventDateEdit = view.findViewById(R.id.date);
@@ -97,8 +109,21 @@ public class EventCreationFragment extends Fragment {
         deleteEventBtn = view.findViewById(R.id.deleteEvent);
         requireGeolocation = view.findViewById(R.id.requireGeolocation);
         iv = view.findViewById(R.id.addImage_preview);
+        titleCharCount = view.findViewById(R.id.eventUpsert_titleCharCount);
+        locationCharCount = view.findViewById(R.id.eventUpsert_locationCharCount);
+        descriptionCharCount = view.findViewById(R.id.eventUpsert_descriptionCharCount);
 
-        // Set click listeners for UI elements
+        setUpClickListeners(view);
+        setupCharacterCounts();
+    }
+
+    /**
+     * Sets up click listeners for UI elements.
+     *
+     * @param view The created view.
+     */
+    private void setUpClickListeners(@NonNull View view) {
+
         addImage.setOnClickListener(listener -> openGallery());
         eventDateEdit.setOnClickListener(listener -> pickDate());
         startTimeEdit.setOnClickListener(listener -> pickTime(true));
@@ -134,6 +159,7 @@ public class EventCreationFragment extends Fragment {
                 upsertEventBtn.setText("Save Changes");
             }
         }
+
         // Set the current eventDateEdit and time in the UI
         if (event == null) {
             setCurrentDateTime();
@@ -187,10 +213,80 @@ public class EventCreationFragment extends Fragment {
     }
 
     /**
+     * Sets up character count for input fields.
+     * Limits event title to 100 characters max, description to 750 characters max, and location to 75 characters max.
+     */
+    private void setupCharacterCounts() {
+        // Set character limits
+        eventTitleEdit.setFilters(new InputFilter[]{new InputFilter.LengthFilter(100)});
+        descriptionEdit.setFilters(new InputFilter[]{new InputFilter.LengthFilter(750)});
+        locationEdit.setFilters(new InputFilter[]{new InputFilter.LengthFilter(75)});
+
+        // Add text change listeners to update character count
+        eventTitleEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                titleCharCount.setText(s.length() + "/100");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        descriptionEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                descriptionCharCount.setText(s.length() + "/750");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        locationEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                locationCharCount.setText(s.length() + "/75");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    /**
      * Validates the input fields to ensure all required fields are filled.
      * @return true if all required fields are filled, false otherwise.
      */
     private boolean validateInputs() {
+        String eventTitle = eventTitleEdit.getText().toString();
+        String eventDescription = descriptionEdit.getText().toString();
+        String eventLocation = locationEdit.getText().toString();
+
+        if (eventTitle.isEmpty() || eventTitle.length() > 100) {
+            Toast.makeText(requireActivity(), "Event title must be between 1 and 100 characters", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (eventDescription.length() > 750) {
+            Toast.makeText(requireActivity(), "Event description must be 750 characters or less", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (eventLocation.isEmpty() || eventLocation.length() > 75) {
+            Toast.makeText(requireActivity(), "Event location must be between 1 and 75 characters", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         return !eventTitleEdit.getText().toString().isEmpty() &&
                 !eventDateEdit.getText().toString().isEmpty() &&
                 !startTimeEdit.getText().toString().isEmpty() &&
