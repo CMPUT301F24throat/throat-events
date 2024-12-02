@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,8 @@ import com.example.pickme.R;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.ImageQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 
 /**
  * Fragment for editing the user's profile.
@@ -82,26 +85,14 @@ public class UserProfileEditFragment extends Fragment {
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                     if (uri != null) {
                         isChanged = true;
+                        img.setImageUrl(uri.toString());
+                        Glide.with(editProfilePicture.getRootView())
+                                .load(uri)
+                                .into(editProfilePicture);
                         Toast.makeText(
                                 this.getContext(),
-                                "Uploading...",
+                                "Profile picture uploaded!",
                                 Toast.LENGTH_SHORT).show();
-                        // uploads the image selected
-                        img.upload(uri, task -> {
-                            if (task.isSuccessful()) {
-                                Image i = task.getResult();
-                                img.setImageUrl(i.getImageUrl());
-                                // preview
-                                Glide.with(editProfilePicture.getRootView())
-                                        .load(img.getImageUrl())
-                                        .into(editProfilePicture);
-                                Toast.makeText(
-                                        this.getContext(),
-                                        "Profile picture uploaded!",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                     }
@@ -123,6 +114,7 @@ public class UserProfileEditFragment extends Fragment {
         // Save the changes
         saveButton.setOnClickListener(v -> {
             if (validateUserChanges()) {
+                saveButton.setEnabled(false);
                 saveUserData();
             }
         });
@@ -155,6 +147,16 @@ public class UserProfileEditFragment extends Fragment {
             // Initialize img only if it's null
             if (img == null) {
                 img = new Image(user.getUserId(), user.getUserId()); // Ensure userId is not null here
+                img.download(new ImageQuery() {
+                    @Override
+                    public void onSuccess(Image image) {
+                        img = image;
+                    }
+
+                    @Override
+                    public void onEmpty() {
+                    }
+                });
             }
 
             // Ensure the imageUrl is not null or empty
@@ -216,6 +218,7 @@ public class UserProfileEditFragment extends Fragment {
         // Save user data here
         User user = User.getInstance();
         if (user != null) {
+            boolean generate = isInitialsChanged(user);
             // Update the user with the input data
             user.setFirstName(editProfileFirstName.getText().toString());
             user.setLastName(editProfileLastName.getText().toString());
@@ -224,21 +227,85 @@ public class UserProfileEditFragment extends Fragment {
             user.setGeoLocationEnabled(editEnableLocation.isChecked());
             user.setNotificationEnabled(editEnableNotifications.isChecked());
 
-            // Update the user's profile picture URL if changed
-            if (img != null && img.getImageUrl() != null) {
-                user.setProfilePictureUrl(img.getImageUrl());
-            }
+            if (img != null) {
+                // Update the user's profile picture URL if changed
+                if (!img.getImageUrl().equals(user.getProfilePictureUrl())) {
+                    // uploads the image selected
+                    Uri uri = Uri.parse(img.getImageUrl());
+                    img = new Image(user.getUserId(), user.getUserId());
+                    img.upload(uri, task -> {
+                                if (task.isSuccessful()) {
+                                    Image i = task.getResult();
+                                    user.setProfilePictureUrl(i.getImageUrl());
+                                    pushUserToFirebase(user);
+                                }
+                            });
 
-            // Update the user in the repository or database
-            UserRepository.getInstance().updateUser(user, task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Profile saved successfully!", Toast.LENGTH_SHORT).show();
-                    navigateToUserProfileFragment();
+                // Update the user's profile picture with new initials if they changed/deleted
+                } else if (generate && img.isGenerated() || editProfilePicture.getTag() == "deleted") {
+                    img = new Image(user.getUserId(), user.getUserId());
+                    generateProfilePicture(task -> {
+                        user.setProfilePictureUrl(img.getImageUrl());
+                        pushUserToFirebase(user);
+                    });
                 } else {
-                    Toast.makeText(getContext(), "Failed to save profile", Toast.LENGTH_SHORT).show();
+                    pushUserToFirebase(user);
                 }
-            });
+            }
         }
+    }
+
+    /**
+     * Checks whether the initials of the user have changed for profile picture generation
+     * @param user The user to check the entered fields against
+     * @return True if the initials have changed, false otherwise
+     */
+    private boolean isInitialsChanged(User user) {
+        String old_in;
+        String new_in;
+        if (!user.getLastName().isEmpty()) {
+            old_in = String.valueOf(user.getFirstName().charAt(0)) + user.getLastName().charAt(0);
+        } else {
+            old_in = String.valueOf(user.getFirstName().charAt(0));
+        }
+
+        if (!editProfileLastName.getText().toString().isEmpty()) {
+            new_in = String.valueOf(editProfileFirstName.getText().toString().trim().charAt(0))
+                    + editProfileLastName.getText().toString().trim().charAt(0);
+        } else {
+            new_in = String.valueOf(editProfileFirstName.getText().toString().trim().charAt(0));
+        }
+
+        return !old_in.equalsIgnoreCase(new_in);
+    }
+
+    /**
+     * Updates the user in firebase
+     * @param user The user to update
+     */
+    private void pushUserToFirebase(User user) {
+        // Update the user in the repository or database
+        UserRepository.getInstance().updateUser(user, task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(getContext(), "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                navigateToUserProfileFragment();
+            } else {
+                Toast.makeText(getContext(), "Failed to save profile", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Helper function to generate profile pictures based on initials
+     * @param listener The onCompleteListener for when the generation task is complete
+     */
+    private void generateProfilePicture(OnCompleteListener<Image> listener) {
+        // Generate a new profile picture using the user's initials (default pfp)
+        String firstName = editProfileFirstName.getText().toString().trim();
+        String lastName = editProfileLastName.getText().toString().trim();
+        String last_initial = !lastName.isEmpty()? String.valueOf(lastName.charAt(0)) : "";
+        String initials = firstName.charAt(0) + last_initial;
+        img.generate(initials, listener);
     }
 
     /**

@@ -157,7 +157,7 @@ public class LotteryUtils {
                     event.getWaitingList().remove(entrant);
             }
 
-            List<WaitingListEntrant> waitingEntrants = new ArrayList<>(checkedEntrants.stream().filter(e -> e.getStatus() == EntrantStatus.WAITING).collect(Collectors.toList()));
+            List<WaitingListEntrant> waitingEntrants = new ArrayList<>(checkedEntrants.stream().filter(e -> e.getStatus() == EntrantStatus.WAITING || e.getStatus() == EntrantStatus.REJECTED).collect(Collectors.toList()));
             Collections.shuffle(waitingEntrants);
 
             List<String> selectedUserDeviceIds = new ArrayList<>();
@@ -172,11 +172,13 @@ public class LotteryUtils {
 
             event.setWaitingList(new ArrayList<>(checkedEntrants)); // Update event's waiting list to reflect entrantStatus changes
             event.setHasLotteryExecuted(true);
+            Log.i("EVENT", "has lottery executed = true");
 
             // don't need to update poster so keep null but we need to update waiting list w/ new entrant status
             EventRepository.getInstance().updateEvent(event, null, task -> {
                 if (task.isSuccessful()) {
                     onCompleteListener.onComplete(Tasks.forResult(selectedUserDeviceIds));
+                    Log.i("EVENT", "event updated after lottery");
                 } else {
                     onCompleteListener.onComplete(Tasks.forException(task.getException()));
                 }
@@ -200,7 +202,7 @@ public class LotteryUtils {
             }
         }
 
-        int numWaitingEntrants = (int) event.getWaitingList().stream().filter(e -> e.getStatus() == EntrantStatus.WAITING).count();
+        int numWaitingEntrants = (int) event.getWaitingList().stream().filter(e -> e.getStatus() == EntrantStatus.WAITING || e.getStatus() == EntrantStatus.REJECTED).count();
         return Math.min(targetNumWinners - currentNumInvited, numWaitingEntrants);
     }
 }

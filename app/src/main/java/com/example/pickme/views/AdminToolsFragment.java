@@ -18,7 +18,7 @@ import com.example.pickme.R;
  */
 public class AdminToolsFragment extends Fragment {
 
-    private Button adminGalleryButton;
+    private Button adminGalleryButton, userProfilesButton, eventArchiveButton;
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -46,10 +46,20 @@ public class AdminToolsFragment extends Fragment {
 
         // Initialize the admin gallery button
         adminGalleryButton = view.findViewById(R.id.adminGalleryButton);
+        userProfilesButton = view.findViewById(R.id.userProfilesButton);
+        eventArchiveButton = view.findViewById(R.id.eventArchiveButton);
 
         // Set click listener to navigate to the admin gallery fragment
         adminGalleryButton.setOnClickListener(v -> Navigation
                 .findNavController(view)
                 .navigate(R.id.action_adminToolsFragment_to_adminGalleryFragment));
+
+        userProfilesButton.setOnClickListener(v -> Navigation
+                .findNavController(view)
+                .navigate(R.id.action_adminToolsFragment_to_adminUserProfilesFragment));
+
+        eventArchiveButton.setOnClickListener(v -> Navigation
+                .findNavController(view)
+                .navigate(R.id.action_adminToolsFragment_to_eventsArchiveFragment));
     }
 }
