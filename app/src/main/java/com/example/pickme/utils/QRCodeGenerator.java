@@ -22,7 +22,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * QRCodeGenerator is a utility class for generating and caching QR codes.
+ * Utility class for generating and caching QR codes.
+ * <p>
+ * This class provides methods to:
+ * - Retrieve QR codes from Firestore or generate them dynamically.
+ * - Cache QR codes locally for reuse to minimize redundant computation.
+ * - Handle QR code generation errors and provide callbacks for results.
+ * <p>
+ * It uses the ZXing library for QR code generation and stores cached images in the app's cache directory.
  */
 public class QRCodeGenerator {
 
@@ -154,3 +161,17 @@ public class QRCodeGenerator {
         void onError(String errorMessage);
     }
 }
+
+/*
+  Code Sources
+  <p>
+  ChatGPT-4o:
+  - Explain how to implement caching of bitmaps in an android app
+  - What are the best Java libraries for creating QR codes?
+  <p>
+  Github:
+  - ZXing ("Zebra Crossing") Library documentation
+  <p>
+  Java Documentation:
+  - Caching in java
+ */

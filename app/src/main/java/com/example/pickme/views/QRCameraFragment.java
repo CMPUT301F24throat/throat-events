@@ -28,6 +28,18 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 /**
  * Fragment for scanning QR codes using the device's camera.
  * Handles camera permissions and QR code scanning functionality.
+ *
+ * This fragment relies on the ZXing library for continuous QR code scanning. It fetches event
+ * details based on the scanned QR code and navigates to the event details screen upon success.
+ *
+ * Dependencies:
+ * - ZXing for barcode scanning.
+ * - EventFetcher for retrieving event details.
+ * - Navigation component for fragment transitions.
+ *
+ * Assumptions:
+ * - The device has a functional camera.
+ * - The QR codes encode event IDs stored in the application's database.
  */
 public class QRCameraFragment extends Fragment {
 
@@ -38,12 +50,13 @@ public class QRCameraFragment extends Fragment {
     private boolean isProcessingScan = false; // Flag to prevent multiple processing
 
     /**
-     * Called to inflate the fragment's view and initialize the QR code scanner.
+     * Inflates the fragment's layout and initializes the QR code scanner.
+     * Checks for camera features and permissions before setting up the scanner.
      *
-     * @param inflater The LayoutInflater object used to inflate views.
-     * @param container The parent view this fragment is attached to.
-     * @param savedInstanceState Saved state data for the fragment.
-     * @return The inflated view for this fragment.
+     * @param inflater The LayoutInflater object used to inflate the fragment's views.
+     * @param container The parent view to which this fragment will be attached.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous state.
+     * @return The root view of the fragment's layout.
      */
     @Nullable
     @Override
@@ -71,6 +84,7 @@ public class QRCameraFragment extends Fragment {
 
     /**
      * Resumes the barcode scanner when the fragment is visible.
+     * Ensures the scanner is ready to process QR codes and resets the scan flag.
      */
     @Override
     public void onResume() {
@@ -83,6 +97,7 @@ public class QRCameraFragment extends Fragment {
 
     /**
      * Pauses the barcode scanner when the fragment is not visible.
+     * This prevents unnecessary camera usage while the fragment is in the background.
      */
     @Override
     public void onPause() {
@@ -94,6 +109,7 @@ public class QRCameraFragment extends Fragment {
 
     /**
      * Configures the barcode scanner to decode QR codes continuously.
+     * Sets a callback to handle scanned results and prevents duplicate processing.
      */
     private void setupScanner() {
         Log.d(TAG, "Setting up scanner...");
@@ -110,9 +126,11 @@ public class QRCameraFragment extends Fragment {
     }
 
     /**
-     * Fetches event details associated with a scanned QR code.
+     * Fetches the details of an event associated with a scanned QR code ID.
+     * The result of the fetch determines the next navigation action.
      *
-     * @param qrID The QR code ID to query event details.
+     * @param qrID The unique identifier extracted from the scanned QR code.
+     *             Used to query the event repository.
      */
     private void fetchEventDetails(String qrID) {
         Log.d(TAG, "Starting fetcher for QR ID: " + qrID);
@@ -138,8 +156,9 @@ public class QRCameraFragment extends Fragment {
 
     /**
      * Navigates to the EventDetailsFragment with the fetched event details.
+     * If navigation fails or the event object is null, displays an error message.
      *
-     * @param event The Event object containing event details.
+     * @param event The Event object containing event details. Must not be null.
      */
     private void navigateToEventDetails(Event event) {
         if (event != null) {
@@ -162,6 +181,7 @@ public class QRCameraFragment extends Fragment {
 
     /**
      * Requests camera permission from the user if not already granted.
+     * Displays a system dialog to prompt the user for permission.
      */
     private void requestCameraPermission() {
         Log.d(TAG, "Requesting camera permission...");
@@ -171,6 +191,7 @@ public class QRCameraFragment extends Fragment {
 
     /**
      * Handles the result of the camera permission request.
+     * If granted, sets up the scanner. Otherwise, shows an error message.
      *
      * @param requestCode The request code passed in requestPermissions.
      * @param permissions The requested permissions.
@@ -190,3 +211,16 @@ public class QRCameraFragment extends Fragment {
         }
     }
 }
+
+/*
+  Code Sources
+  <p>
+  ChatGPT-4o:
+  - Explain how to implement camera permissions in java android applications
+  - Example zxing scanning implementation
+  <p>
+  Github:
+  - ZXing ("Zebra Crossing") Library documentation
+  <p>
+  Java Documentation:
+ */

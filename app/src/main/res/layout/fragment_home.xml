@@ -21,11 +21,11 @@
             style="@style/Widget.AppCompat.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
+            android:layout_marginStart="24dp"
+            android:fontFamily="@font/inter_medium"
             android:text="@string/home"
             android:textColor="@color/text1"
             android:textSize="25sp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -45,6 +45,7 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/homeHomeText"
             app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Inbox Group -->
@@ -62,10 +63,11 @@
             style="@style/Widget.AppCompat.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
+            android:fontFamily="@font/inter"
             android:text="@string/my_inbox"
-            android:textColor="@color/text1"
+            android:textColor="@color/text2"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -73,23 +75,29 @@
         <View
             android:id="@+id/dividerInbox"
             android:layout_width="0dp"
-            android:layout_height="3dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:background="@color/icon"
+            android:layout_height="2dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@color/text3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/homeInboxText" />
 
         <ListView
             android:id="@+id/notifList"
-            android:layout_width="360dp"
-            android:layout_height="230dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:isScrollContainer="false"
+            android:padding="12dp"
             android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.49"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dividerInbox" />
+            app:layout_constraintTop_toBottomOf="@id/dividerInbox"
+            app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/emptyInboxText"
@@ -120,10 +128,11 @@
             style="@style/Widget.AppCompat.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
+            android:fontFamily="@font/inter"
             android:text="@string/events"
-            android:textColor="@color/text1"
+            android:textColor="@color/text2"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -131,10 +140,10 @@
         <View
             android:id="@+id/dividerEvents"
             android:layout_width="0dp"
-            android:layout_height="3dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:background="@color/icon"
+            android:layout_height="2dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@color/text3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/homeEventsText" />
@@ -143,11 +152,11 @@
             android:id="@+id/recyclerViewEvents"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="18dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="18dp"
-            android:layout_marginBottom="80dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="24dp"
+            android:padding="12dp"
+            app:layout_constraintBottom_toTopOf="@+id/divider4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dividerEvents" />
@@ -164,6 +173,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dividerEvents" />
+
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="409dp"
+            android:layout_height="3dp"
+            android:layout_marginBottom="70dp"
+            android:background="@color/navbarBG"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

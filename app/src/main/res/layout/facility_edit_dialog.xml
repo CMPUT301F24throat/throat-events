@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/icon"
     android:backgroundTint="@null"
-    android:padding="16dp">
+    android:padding="28dp">
 
     <TextView
         android:id="@+id/facilityEdit_title"
