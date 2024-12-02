@@ -39,15 +39,14 @@
             style="@style/Widget.AppCompat.TextView"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/inter_medium"
             android:gravity="center"
             android:paddingStart="12dp"
             android:paddingEnd="16dp"
             android:text="User Profiles"
             android:textAllCaps="false"
             android:textColor="@color/text1"
-            android:textSize="25sp"
-            android:textStyle="bold" />
+            android:textSize="25sp" />
 
         <View
             android:id="@+id/divider"

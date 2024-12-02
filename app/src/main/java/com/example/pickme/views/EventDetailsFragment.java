@@ -206,7 +206,7 @@ public class EventDetailsFragment extends Fragment {
                 declineBtn.setVisibility(View.VISIBLE);
 
                 acceptBtn.setOnClickListener(v -> {
-                    entrant.setStatus(EntrantStatus.ACCEPTED);
+                    userEntrant.setStatus(EntrantStatus.ACCEPTED);
                     eventRepository.updateEvent(event, null, task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "You have accepted the invitation", Toast.LENGTH_SHORT).show();
@@ -239,7 +239,7 @@ public class EventDetailsFragment extends Fragment {
                 break;
 
             case REJECTED:
-                lotteryResultText.setText("Sorry! You were not selected to join the event\n You will be notified if a spot opens up and you are selected");
+                lotteryResultText.setText("Sorry! You were not selected to join the event\nYou will be notified if a spot opens up and you are selected");
                 lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
                 view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
 
@@ -386,6 +386,12 @@ public class EventDetailsFragment extends Fragment {
             event.getWaitingList().add(waitingListEntrant);
             currentUser.getEventIDs().add(event.getEventId());
 
+            UserRepository.updateUser(currentUser, task -> {
+                if(task.isSuccessful()){
+                    Log.i("EVENT", "updated user with event ID");
+                }
+            });
+
             EventRepository.getInstance().updateEvent(event, null, task -> {
                 if (task.isSuccessful()) {
                     Log.i("EVENT", "Added user to waitlist");
@@ -418,6 +424,12 @@ public class EventDetailsFragment extends Fragment {
                 toastText = "You successfully rejoined the waitlist";
                 break;
         }
+
+        UserRepository.updateUser(currentUser, task -> {
+            if(task.isSuccessful()){
+                Log.i("EVENT", "updated user with status");
+            }
+        });
 
         EventRepository.getInstance().updateEvent(event, null, task -> {
             if (task.isSuccessful()) {
