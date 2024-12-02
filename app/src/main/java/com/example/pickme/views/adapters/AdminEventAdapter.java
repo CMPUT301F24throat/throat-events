@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.EventViewHolder> {
 
-    private final List<Event> originalEventList;
+    private List<Event> originalEventList;
     private List<Event> filteredEventList;
     private final Context context;
     private final OnItemClickListener onItemClickListener;
@@ -109,11 +109,13 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
     }
 
     /**
-     * Updates the list of events in the adapter and refreshes the displayed data.
+     * Updates the list of users in the adapter and refreshes the displayed data.
+     * This method replaces the current list with the provided one and clears any previous filtering.
      *
-     * @param eventList The new list of events to be displayed in the RecyclerView.
+     * @param eventList The new list of users to be displayed in the RecyclerView.
      */
     public void updateList(List<Event> eventList) {
+        this.originalEventList = new ArrayList<>(eventList);
         filteredEventList.clear();
         filteredEventList.addAll(eventList);
         notifyDataSetChanged();

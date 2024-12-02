@@ -145,15 +145,6 @@
         app:layout_constraintBottom_toTopOf="@id/view2"
         app:layout_constraintStart_toEndOf="@id/idTitle"/>
 
-    <View
-        android:id="@+id/view4"
-        android:layout_width="2dp"
-        android:layout_height="0dp"
-        android:background="@color/dialogBG1"
-        app:layout_constraintTop_toBottomOf="@id/view1"
-        app:layout_constraintBottom_toTopOf="@id/view2"
-        app:layout_constraintStart_toEndOf="@id/eventTitle"/>
-
     <TextView
         android:id="@+id/idTitle"
         android:layout_width="50dp"

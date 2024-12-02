@@ -43,7 +43,7 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
     }
 
     /**
-     * Interface to handle item click events such as deleting and viewing facility details.
+     * Interface that handles item click deleting and viewing facility events.
      */
     public interface OnItemClickListener {
         /**
