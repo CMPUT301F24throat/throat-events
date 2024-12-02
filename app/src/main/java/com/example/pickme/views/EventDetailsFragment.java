@@ -159,13 +159,16 @@ public class EventDetailsFragment extends Fragment {
                 .orElse(null);
 
             if (userEntrant != null) {
-            // User is an entrant on waiting list
+                // User is an entrant on waiting list
                 Log.i("EVENT", "userEntrant != null");
                 view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
                 configResponseBtns(view, userEntrant);
             }
-            else{
+            else {
+                // User is not an entrant on waiting list and event has already ran lottery
+                Log.i("EVENT", "userEntrant = null");
                 TextView lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
+                lotteryResultText.setVisibility(View.VISIBLE);
                 lotteryResultText.setText("Sorry, the lottery has already been run for this event.");
                 lotteryResultText.setBackgroundResource(R.drawable.cancelled_entrant_bg);
             }
