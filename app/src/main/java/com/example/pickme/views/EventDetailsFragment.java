@@ -358,6 +358,7 @@ public class EventDetailsFragment extends Fragment {
                     // Perform waitlist logic with location
                     waitlistLogic(currentUserLocation);
                 });
+                dialogue.dismiss();
             }
         });
 
