@@ -151,42 +151,6 @@ public class LotteryUtils {
                 }
             });
         });
-
-        // first check that all entrants still exist
-//        event.getWaitingList()
-//                .forEach(entrant -> UserRepository.getInstance().checkUserExists(entrant.getEntrantId(), task -> {
-//                    if (task.isSuccessful() && task.getResult()) {
-//                        checkedEntrants.add(entrant);
-//                    } else {
-//                        // User no longer exists, remove from waiting list
-//                        event.getWaitingList().remove(entrant);
-//                    }
-//                }));
-//
-//        List<WaitingListEntrant> waitingEntrants = new ArrayList<>(checkedEntrants.stream().filter(e -> e.getStatus() == EntrantStatus.WAITING).collect(Collectors.toList()));
-//        Collections.shuffle(waitingEntrants);
-//
-//        List<String> selectedUserDeviceIds = new ArrayList<>();
-//        for (int i = 0; i < Math.min(numToDraw, waitingEntrants.size()); i++) {
-//            selectedUserDeviceIds.add(waitingEntrants.get(i).getEntrantId());
-//            checkedEntrants.get(checkedEntrants.indexOf(waitingEntrants.get(i))).setStatus(EntrantStatus.SELECTED);     // Update entrant status to selected in checked entrants
-//        }
-//
-//        for(int i = Math.min(numToDraw, waitingEntrants.size()); i < waitingEntrants.size(); i++){
-//            checkedEntrants.get(checkedEntrants.indexOf(waitingEntrants.get(i))).setStatus(EntrantStatus.REJECTED);
-//        }
-//
-//        event.setWaitingList(new ArrayList<>(checkedEntrants)); // Update event's waiting list to reflect entrantStatus changes
-//        event.setHasLotteryExecuted(true);
-//
-//        // don't need to update poster so keep null but we need to update waiting list w/ new entrant statys
-//        EventRepository.getInstance().updateEvent(event, null, task -> {
-//            if (task.isSuccessful()) {
-//                onCompleteListener.onComplete(Tasks.forResult(selectedUserDeviceIds));
-//            } else {
-//                onCompleteListener.onComplete(Tasks.forException(task.getException()));
-//            }
-//        });
     }
 
     /**
