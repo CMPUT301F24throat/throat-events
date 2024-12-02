@@ -51,7 +51,6 @@ public class AdminEventsArchiveFragment extends Fragment {
 
     /**
      * Called after the fragment's view has been created. Initializes repositories,
-     * sets up the event adapter, and handles UI interactions like refreshing the list and searching.
      *
      * @param view The root view of the fragment.
      * @param savedInstanceState The saved instance state from the last session.
@@ -67,6 +66,7 @@ public class AdminEventsArchiveFragment extends Fragment {
         refreshButton.setOnClickListener(v ->  {
             eventList.clear();
             eventAdapter.updateList(eventList);
+            binding.searchBar.setText("");
             binding.noEventsText.setVisibility(View.GONE);
             loadEvents();
         });

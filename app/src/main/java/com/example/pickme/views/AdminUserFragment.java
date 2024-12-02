@@ -77,6 +77,7 @@ public class AdminUserFragment extends Fragment implements UserProfilesAdapter.O
         refreshButton.setOnClickListener(v ->  {
             usersList.clear();
             userProfilesAdapter.updateList(usersList);
+            binding.searchBar.setText("");
             binding.noUsersText.setVisibility(View.GONE);
             loadUserData();
         });

@@ -42,7 +42,6 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
         this.onItemClickListener = onItemClickListener;
     }
 
-
     /**
      * Interface for handling click events on event items.
      */
@@ -95,7 +94,6 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
         TextView eventTitleTextView;
         TextView eventCountTextView;
         ImageView viewDetails;
-
 
         /**
          * Constructor to initialize the views in the ViewHolder.
