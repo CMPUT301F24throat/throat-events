@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.GeoLocationUtils;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
@@ -36,12 +38,15 @@ public class EventDetailsFragment extends Fragment {
     private Event event;
     private User currentUser;
     private EventRepository eventRepository;
+    private UserRepository userRepository;
     private WaitingListUtils waitingListUtils;
+
+    private boolean alreadyIn = false;
     private LotteryUtils lotteryUtils;
     String logText = "";
     String toastText = "";
-    private boolean alreadyIn;
     private WaitingListEntrant entrant;
+
     /**
      * Inflates the layout for this fragment.
      *
@@ -70,6 +75,7 @@ public class EventDetailsFragment extends Fragment {
             currentUser = User.getInstance();
 
             eventRepository = EventRepository.getInstance();
+            userRepository = UserRepository.getInstance();
             waitingListUtils = new WaitingListUtils();
             lotteryUtils = new LotteryUtils();
 
@@ -80,8 +86,10 @@ public class EventDetailsFragment extends Fragment {
                     Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
                 }
-                else
+                else{
+                    configureView(view, currentUser);
                     displayEventDetails(view);
+                }
             });
         } else {
             Navigation.findNavController(requireView()).navigateUp();
@@ -103,13 +111,14 @@ public class EventDetailsFragment extends Fragment {
      */
     private void displayEventDetails(View view) {
         if (event != null) {
-            int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
+            int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING || entrant.getStatus() == EntrantStatus.REJECTED).count();
+            int winnerEntrantsCount  = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.SELECTED || entrant.getStatus() == EntrantStatus.ACCEPTED).count();
 
             setText(view, R.id.eventDetails_eventTitle, event.getEventTitle() != null ? event.getEventTitle() : " ");
             setText(view, R.id.eventDetails_eventDesc, event.getEventDescription() != null ? event.getEventDescription() : "No description set for the event");
             setText(view, R.id.eventDetails_dateTime, event.getEventDate() != null ? event.getEventDate() : " ");
             setText(view, R.id.eventDetails_location, event.getEventLocation() != null ? event.getEventLocation() : " ");
-            setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() != 0 ? event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners") : " ");
+            setText(view, R.id.eventDetails_maxWinners, event.getMaxWinners() != 0 ? winnerEntrantsCount + " / " + event.getMaxWinners() + (event.getMaxWinners() == 1 ? " Winner" : " Winners") : " ");
             setText(view, R.id.eventDetails_maxEntrants, waitingEntrantsCount + " / " + (event.getMaxEntrants() != null ? event.getMaxEntrants() + (event.getMaxEntrants() == 1 ? " Entrant" : " Entrants") : "No waitlist limit"));
 
             loadImage(view, R.id.eventDetails_poster, event.getPosterImageId());
@@ -135,72 +144,165 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
         setVisibility(view, R.id.eventDetails_sendNotifBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_runLotteryBtn, isOrganizer);
-        setVisibility(view, R.id.eventDetails_joinWaitlistBtn, !isOrganizer);
-        setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
 
-        configWaitlistBtn();
+        // Default of accept/decline buttons and lotteryResult is gone
+        view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
+        view.findViewById(R.id.eventDetails_acceptInviteBtn).setVisibility(View.GONE);
+        view.findViewById(R.id.eventDetails_declineInviteBtn).setVisibility(View.GONE);
+        view.findViewById(R.id.eventDetails_selectedText).setVisibility(View.GONE);
+
+        Log.i("EVENT", "hasLotteryExecuted: " + event.getHasLotteryExecuted().toString());
+
+        // Waitlist button and response buttons display
+        if (!event.getHasLotteryExecuted() && !isOrganizer) {
+            view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.VISIBLE);
+            configWaitlistBtn(view);
+        } else if (!isOrganizer) {
+            // need to check if the current user is an entrant of the waiting list
+            WaitingListEntrant userEntrant = event.getWaitingList().stream()
+                .filter(entrant -> entrant.getEntrantId().equals(currentUser.getDeviceId()))
+                .findFirst()
+                .orElse(null);
+
+            if (userEntrant != null) {
+                // User is an entrant on waiting list
+                Log.i("EVENT", "userEntrant != null");
+                view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
+                configResponseBtns(view, userEntrant);
+            }
+            else {
+                // User is not an entrant on waiting list and event has already ran lottery
+                Log.i("EVENT", "userEntrant = null");
+                TextView lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
+                lotteryResultText.setVisibility(View.VISIBLE);
+                lotteryResultText.setText("Sorry, the lottery has already been run for this event.");
+                lotteryResultText.setBackgroundResource(R.drawable.cancelled_entrant_bg);
+            }
+        }
+
+        configLotteryBtn(view);
+    }
+
+    /**
+     * Configures the response buttons based on the user's entrant status.
+     *
+     * @param view The view to configure.
+     * @param userEntrant The user as a userEntrant.
+     */
+    private void configResponseBtns(View view, WaitingListEntrant userEntrant) {
+        Button acceptBtn = view.findViewById(R.id.eventDetails_acceptInviteBtn);
+        Button declineBtn = view.findViewById(R.id.eventDetails_declineInviteBtn);
+        TextView lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
+
+        Log.i("EVENT", "in config response buttons");
+
+        lotteryResultText.setVisibility(View.VISIBLE);
+
+        switch (userEntrant.getStatus()) {
+            case SELECTED:
+                // User was selected
+                lotteryResultText.setText("You have been selected to join the event!");
+                lotteryResultText.setBackgroundResource(R.drawable.selected_entrant_bg);
+
+                // Only if they're selected, we show the accept/decline buttons
+                acceptBtn.setVisibility(View.VISIBLE);
+                declineBtn.setVisibility(View.VISIBLE);
+
+                acceptBtn.setOnClickListener(v -> {
+                    entrant.setStatus(EntrantStatus.ACCEPTED);
+                    eventRepository.updateEvent(event, null, task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(requireContext(), "You have accepted the invitation", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to accept invitation", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+
+                declineBtn.setOnClickListener(v -> {
+                    entrant.setStatus(EntrantStatus.CANCELLED);
+                    eventRepository.updateEvent(event, null, task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(requireContext(), "You have declined the invitation", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to decline invitation", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+                break;
+
+            case WAITING:
+                lotteryResultText.setText("You are still waiting for a draw for entrants");
+                lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
+                break;
+
+            case CANCELLED:
+                lotteryResultText.setText("You have already rejected the invitation");
+                lotteryResultText.setBackgroundResource(R.drawable.cancelled_entrant_bg);
+                break;
+
+            case REJECTED:
+                lotteryResultText.setText("Sorry! You were not selected to join the event\n You will be notified if a spot opens up and you are selected");
+                lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
+                view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
+
+                break;
+
+            case ACCEPTED:
+                lotteryResultText.setText("You have already accepted the invitation");
+                lotteryResultText.setBackgroundResource(R.drawable.selected_entrant_bg);
+                break;
+        }
     }
 
     /**
      * Configures the waitlist button based on the event and waiting list status.
      */
-    private void configWaitlistBtn() {
-        if (waitingListUtils == null || event == null) return;
+    private void configWaitlistBtn(View view) {
+        if(waitingListUtils == null || event == null)
+            return;
+
         Log.i("EVENT", "in config");
 
-        View waitlistBtn = requireView().findViewById(R.id.eventDetails_joinWaitlistBtn);
-
-        int waitingEntrantsCount = (int) event.getWaitingList().stream()
-                .filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING)
-                .count();
+        View waitlistBtn = view.findViewById(R.id.eventDetails_joinWaitlistBtn);
+        int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
 
         String buttonText = "";
         boolean enableButton = false;
 
+        EntrantStatus status;
         alreadyIn = false;
-        for (WaitingListEntrant entrant : event.getWaitingList()) {
-            if (entrant.getEntrantId().equals(User.getInstance().getDeviceId())) {
+        for(WaitingListEntrant entrant : event.getWaitingList()){
+            if(entrant.getEntrantId().equals(User.getInstance().getDeviceId())){
                 this.alreadyIn = true;
                 this.entrant = entrant;
-                Log.i("EVENT", "Status: " + entrant.getStatus());
+                status = entrant.getStatus();
+                Log.i("EVENT", "Status: " + status.toString());
                 break;
             }
         }
 
-        if (event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()) {
+        if(event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()){
             buttonText = "Waitlist is full - try again later";
             enableButton = false;
-        } else if (event.hasEventPassed()) {
+        }
+        else if(event.hasEventPassed()){
             buttonText = "This event has already passed";
             enableButton = false;
-        } else if (alreadyIn) {
-            switch (this.entrant.getStatus()) {
+        }
+        else if(alreadyIn && !event.getHasLotteryExecuted()){
+            switch (this.entrant.getStatus()){
                 case WAITING:
                     buttonText = "Leave Waitlist";
                     enableButton = true;
                     break;
-                case SELECTED:
-                    buttonText = "Accept";
-                    enableButton = true;
-                    break;
-                case REJECTED:
-                    buttonText = "Join Waitlist";
-                    enableButton = true;
-                    break;
-                case ACCEPTED:
-                    buttonText = "Already Accepted";
-                    enableButton = false;
-                    break;
-                case CANCELLED:
-                    buttonText = "Already Cancelled";
-                    enableButton = false;
-                    break;
+
                 case ALL:
-                    buttonText = "Error";
-                    enableButton = false;
+                    buttonText = " ";
                     break;
             }
-        } else {
+        }
+        else{
             buttonText = "Join Waitlist";
             enableButton = true;
         }
@@ -288,7 +390,7 @@ public class EventDetailsFragment extends Fragment {
                 toastText = "You successfully accepted the invitation";
                 break;
 
-            case REJECTED:
+            case CANCELLED:
                 entrant.setStatus(EntrantStatus.WAITING);
                 logText = "User rejoined waitlist after rejection";
                 toastText = "You successfully rejoined the waitlist";
@@ -319,19 +421,22 @@ public class EventDetailsFragment extends Fragment {
     /**
      * Configures the lottery button based on the event status.
      */
-    private void configLotteryBtn() {
-        View lotteryBtn = requireView().findViewById(R.id.eventDetails_runLotteryBtn);
+    private void configLotteryBtn(View view) {
+        Button lotteryBtn = view.findViewById(R.id.eventDetails_runLotteryBtn);
 
-        if (!event.hasLotteryExecuted()) {
+        if (!event.getHasLotteryExecuted()) {
             // If lottery hasn't been run, set up click listener to open LotteryRunDialog
-            lotteryBtn.setOnClickListener(v -> LotteryRunDialog.showDialog(getParentFragmentManager(), event.getEventId()));
+            lotteryBtn.setOnClickListener(v -> {
+                if (event.getWaitingList().isEmpty()) {
+                    Toast.makeText(getContext(), "Waitinglist is empty - lottery cannot run", Toast.LENGTH_LONG).show();
+                } else {
+                    LotteryRunDialog.showDialog(getParentFragmentManager(), event);
+                }
+            });
         } else {
             // If lottery has been run, set up click listener to navigate to lottery status fragment
-            lotteryBtn.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("event", event);
-                Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);
-            });
+            lotteryBtn.setText("See Lottery Overview");
+            lotteryBtn.setOnClickListener(v -> navigateToLotteryOverview());
         }
     }
 
@@ -391,6 +496,18 @@ public class EventDetailsFragment extends Fragment {
     }
 
     /**
+     * Navigates to the lottery overview view.
+     * Enabled once the lottery has been ran.
+     */
+    private void navigateToLotteryOverview() {
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);
+        }
+    }
+
+    /**
      * Navigates to the QR code view.
      */
     private void navigateToQRCodeView() {
@@ -408,26 +525,32 @@ public class EventDetailsFragment extends Fragment {
      * Navigates to the create notification view.
      */
     private void navigateToCreateNotif() {
-        Bundle bundle = new Bundle();
-        bundle.putString("EventID", event.getEventId());
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("Event", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_createNotif, bundle);
+        }
     }
 
     /**
      * Navigates to the edit event view.
      */
     private void navigateToEditEvent() {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("selectedEvent", event);
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedEvent", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_editEventFragment, bundle);
+        }
     }
 
     /**
      * Navigates to the waitlist info view.
      */
     private void navigateToWaitlistInfo() {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("event", event);
-        Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
+        if (event != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
+        }
     }
 }

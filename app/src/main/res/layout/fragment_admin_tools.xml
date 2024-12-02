@@ -41,10 +41,9 @@
         android:id="@+id/adminGalleryButton"
         android:layout_width="300dp"
         android:layout_height="55dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/text2"
         android:fontFamily="sans-serif"
-        android:layout_marginTop="32dp"
         android:paddingStart="5dp"
         android:paddingTop="5dp"
         android:paddingEnd="5dp"
@@ -57,17 +56,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adminToolsSubheaderText"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/userProfilesButton" />
 
     <Button
         android:id="@+id/eventArchiveButton"
         android:layout_width="300dp"
         android:layout_height="55dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginTop="40dp"
         android:backgroundTint="@color/text2"
         android:fontFamily="sans-serif"
-        android:layout_marginTop="32dp"
         android:paddingStart="5dp"
         android:paddingTop="5dp"
         android:paddingEnd="5dp"
@@ -78,19 +75,17 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adminGalleryButton"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/adminToolsSubheaderText" />
 
     <Button
         android:id="@+id/userProfilesButton"
         android:layout_width="300dp"
         android:layout_height="55dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/text2"
         android:fontFamily="sans-serif"
-        android:layout_marginTop="32dp"
         android:paddingStart="5dp"
         android:paddingTop="5dp"
         android:paddingEnd="5dp"
@@ -101,10 +96,9 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventArchiveButton"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/eventArchiveButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

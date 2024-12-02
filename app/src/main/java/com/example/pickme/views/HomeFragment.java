@@ -104,7 +104,6 @@ public class HomeFragment extends Fragment {
         CircleImageView homeProfileButton = view.findViewById(R.id.homeProfileButton);
 
         eventsAdapter = new EventAdapter(eventsList, requireContext(), event -> {
-            // TODO: Handle events item click
             Bundle args = new Bundle();
             args.putSerializable("selectedEvent", event); // Pass the Event object as a Serializable
             NavController navController = Navigation.findNavController(requireView());
@@ -238,6 +237,8 @@ public class HomeFragment extends Fragment {
                 eventsAdapter.notifyDataSetChanged();
 
                 Log.i("EVENT", "event added to home view, id: " + eventID);
+                if(event.getHasLotteryExecuted() == null)
+                    Log.i("EVENT", "has lottery passed is null");
             });
         }
 

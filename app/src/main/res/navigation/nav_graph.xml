@@ -156,23 +156,6 @@
             app:destination="@id/facilityCreationFragment" />
     </fragment>
 
-    <!-- Admin Tools Page -->
-    <fragment
-        android:id="@+id/adminToolsFragment"
-        android:name="com.example.pickme.views.AdminToolsFragment"
-        android:label="Admin Tools"
-        tools:layout="@layout/fragment_admin_tools" >
-        <action
-            android:id="@+id/action_adminToolsFragment_to_adminGalleryFragment"
-            app:destination="@id/adminGalleryFragment" />
-        <action
-            android:id="@+id/action_adminToolsFragment_to_adminUserProfilesFragment"
-            app:destination="@id/adminUserProfilesFragment" />
-        <action
-            android:id="@+id/action_adminToolsFragment_to_eventsArchiveFragment"
-            app:destination="@id/eventsArchiveFragment" />
-    </fragment>
-
     <!-- Create Event -->
     <fragment
         android:id="@+id/eventCreationFragment"
@@ -186,13 +169,6 @@
         android:name="com.example.pickme.views.FacilityCreationFragment"
         android:label="Facility"
         tools:layout="@layout/facility_create" />
-
-    <!-- User Profiles Fragment -->
-    <fragment
-        android:id="@+id/adminUserProfilesFragment"
-        android:name="com.example.pickme.views.UserProfilesFragment"
-        android:label="Admin User Profiles"
-        tools:layout="@layout/user_admin_profiles" />
 
     <!-- View Event QR -->
     <fragment
@@ -236,6 +212,55 @@
             app:destination="@id/eventDetailsFragment" />
     </fragment>
 
+    <!-- Admin Tools Page -->
+    <fragment
+        android:id="@+id/adminToolsFragment"
+        android:name="com.example.pickme.views.AdminToolsFragment"
+        android:label="Admin Tools"
+        tools:layout="@layout/fragment_admin_tools" >
+        <action
+            android:id="@+id/action_adminToolsFragment_to_adminGalleryFragment"
+            app:destination="@id/adminGalleryFragment" />
+        <action
+            android:id="@+id/action_adminToolsFragment_to_adminUserProfilesFragment"
+            app:destination="@id/adminUserProfilesFragment" />
+        <action
+            android:id="@+id/action_adminToolsFragment_to_eventsArchiveFragment"
+            app:destination="@id/adminEventsArchiveFragment" />
+    </fragment>
+
+    <!-- Admin User Profile Fragment -->
+    <fragment
+        android:id="@+id/adminUserProfilesFragment"
+        android:name="com.example.pickme.views.AdminUserFragment"
+        android:label="Admin User Profiles"
+        tools:layout="@layout/fragment_admin_users" />
+        <action
+            android:id="@+id/action_adminUserProfilesFragment_to_adminToolsFragment"
+            app:destination="@id/adminToolsFragment" />
+
+    <!-- Admin Image Gallary Fragment -->
+    <fragment
+        android:id="@+id/adminGalleryFragment"
+        android:name="com.example.pickme.views.AdminGalleryFragment"
+        android:label="AdminGalleryFragment"
+        tools:layout="@layout/fragment_admin_gallery">
+        <action
+            android:id="@+id/action_adminGalleryFragment_to_adminToolsFragment"
+            app:destination="@id/adminToolsFragment" />
+    </fragment>
+
+    <!-- Admin Events Archive Fragment -->
+    <fragment
+        android:id="@+id/adminEventsArchiveFragment"
+        android:name="com.example.pickme.views.AdminEventsArchiveFragment"
+        android:label="events_events_archive"
+        tools:layout="@layout/fragment_admin_events" >
+        <action
+            android:id="@+id/action_eventsArchiveFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
+
     <!-- Global actions -->
     <action
         android:id="@+id/action_global_homeFragment"
@@ -258,24 +283,7 @@
     <action
         android:id="@+id/action_global_adminToolsFragment"
         app:destination="@id/adminToolsFragment" />
-    <fragment
-        android:id="@+id/adminGalleryFragment"
-        android:name="com.example.pickme.views.AdminGalleryFragment"
-        android:label="AdminGalleryFragment"
-        tools:layout="@layout/image_admin_gallery">
-        <action
-            android:id="@+id/action_adminGalleryFragment_to_adminToolsFragment"
-            app:destination="@id/adminToolsFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/eventsArchiveFragment"
-        android:name="com.example.pickme.views.EventsArchiveFragment"
-        android:label="events_events_archive"
-        tools:layout="@layout/events_events_archive" >
-        <action
-            android:id="@+id/action_eventsArchiveFragment_to_eventDetailsFragment"
-            app:destination="@id/eventDetailsFragment" />
-    </fragment>
+
     <action
         android:id="@+id/action_global_eventDetailsFragment"
         app:destination="@id/eventDetailsFragment" />
