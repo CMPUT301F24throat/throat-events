@@ -10,7 +10,6 @@ import com.example.pickme.repositories.UserRepository;
  * Responsibilities:
  * - Models an administrator in the users collection as an extension of user.
  **/
-
 public class Admin extends User {
 
     public Admin(UserRepository userRepository, String userId, String firstName, String lastName, String emailAddress, String contactNumber, String profilePictureUrl, boolean isAdmin, String deviceId, boolean notificationEnabled, boolean geoLocationEnabled, boolean isOnline) {

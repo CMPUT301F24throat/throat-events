@@ -18,21 +18,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapter class for displaying user profiles in a RecyclerView.
+ * Adapter class for displaying a list of user profiles in a RecyclerView.
+ * Allows interaction with each item through click listeners.
  */
 public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapter.EventViewHolder> {
 
-    private final List<User> usersList;
-    private List<User> filteredList; // For search filtering
+    private List<User> usersList;
+    private List<User> filteredList;
     private final Context context;
     private final OnItemClickListener onItemClickListener;
 
     /**
-     * Constructor for UserProfilesAdapter.
+     * Constructor to initialize the adapter with a list of users and click listener.
      *
-     * @param context the context in which the adapter is used
-     * @param usersList the list of users to display
-     * @param onItemClickListener the listener for item click events
+     * @param context The context for inflating the views.
+     * @param usersList The list of users to display.
+     * @param onItemClickListener Listener for item click events.
      */
     public UserProfilesAdapter(Context context, List<User> usersList, OnItemClickListener onItemClickListener) {
         this.context = context;
@@ -42,19 +43,31 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
     }
 
     /**
-     * Interface for handling item click events.
+     * Interface to handle item click events such as deleting and viewing facility details.
      */
     public interface OnItemClickListener {
+        /**
+         * Called when the delete button is clicked for a user.
+         *
+         * @param user The user being deleted.
+         * @param position The position of the user in the list.
+         */
         void onDeleteClick(User user, int position);
+        /**
+         * Called when the facility details button is clicked for a user.
+         *
+         * @param user The user whose facility details are being viewed.
+         * @param position The position of the user in the list.
+         */
         void onFacilityClick(User user, int position);
     }
 
     /**
-     * Called when the RecyclerView needs a new ViewHolder.
+     * Creates a new ViewHolder for user profile items.
      *
-     * @param parent the parent ViewGroup
-     * @param viewType the view type of the new View
-     * @return a new EventViewHolder instance
+     * @param parent The parent ViewGroup into which the new view will be added.
+     * @param viewType The view type for the new view.
+     * @return A new EventViewHolder object.
      */
     @NonNull
     @Override
@@ -64,85 +77,89 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
     }
 
     /**
-     * Called to bind data to the ViewHolder.
+     * Binds the data to the ViewHolder for a specific position in the filtered list.
      *
-     * @param holder the ViewHolder to bind data to
-     * @param position the position of the item in the data set
+     * @param holder The ViewHolder to bind data to.
+     * @param position The position of the item within the filtered list.
      */
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         User user = filteredList.get(position);
-        holder.firstNameTitle.setText(user.getFirstName());
-        holder.lastNameTitle.setText(user.getLastName());
-        holder.idTitle.setText(String.valueOf(position + 1));
-        holder.delete.setOnClickListener(v -> onItemClickListener.onDeleteClick(user, position));
+        holder.idTitle.setText(user.getDeviceId());
+        holder.fullNameTitle.setText(user.fullName(user.getFirstName(), user.getLastName()));
+        holder.deleteButton.setOnClickListener(v -> onItemClickListener.onDeleteClick(user, position));
         holder.facilityDetails.setOnClickListener(v -> onItemClickListener.onFacilityClick(user, position));
     }
 
     /**
-     * Returns the total number of items in the list.
+     * Returns the total number of items in the filtered list.
      *
-     * @return the total number of items
+     * @return The size of the filtered list.
      */
     @Override
     public int getItemCount() {
         return filteredList.size();
     }
 
+
     /**
-     * ViewHolder class to hold references to the views for each item in the RecyclerView.
+     * ViewHolder class for holding references to views in the user profile item layout.
      */
     public static class EventViewHolder extends RecyclerView.ViewHolder {
-        TextView lastNameTitle;
-        TextView firstNameTitle;
+        TextView fullNameTitle;
         TextView idTitle;
-        ImageView delete;
+        ImageView deleteButton;
         ImageView facilityDetails;
 
         /**
-         * Constructor for EventViewHolder.
+         * Constructor for initializing the view references for the item.
          *
-         * @param itemView the view of the item
+         * @param itemView The root view for the user profile item layout.
          */
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
-            firstNameTitle = itemView.findViewById(R.id.firstNameTitle);
-            lastNameTitle = itemView.findViewById(R.id.lastNameTitle);
+            fullNameTitle = itemView.findViewById(R.id.fullNameTitle);
             idTitle = itemView.findViewById(R.id.idTitle);
             facilityDetails = itemView.findViewById(R.id.facilityDetails);
-            delete = itemView.findViewById(R.id.delete);
+            deleteButton = itemView.findViewById(R.id.deleteIcon);
         }
     }
 
     /**
-     * Updates the list of users and notifies the adapter of data changes.
+     * Updates the list of users in the adapter and refreshes the displayed data.
+     * This method replaces the current list with the provided one and clears any previous filtering.
      *
-     * @param arrayList the new list of users
+     * @param arrayList The new list of users to be displayed in the RecyclerView.
      */
     public void updateList(List<User> arrayList) {
+        this.usersList = new ArrayList<>(arrayList);
         filteredList.clear();
-        filteredList = arrayList;
+        filteredList.addAll(arrayList);
         notifyDataSetChanged();
     }
 
     /**
-     * Filters the list of users based on a query.
+     * Filters the list of users based on a search query and updates the displayed list.
      *
-     * @param query the query to filter the list
+     * @param query The search query to filter the users by.
      */
     public void filter(String query) {
         if (TextUtils.isEmpty(query)) {
             filteredList = new ArrayList<>(usersList); // Reset to full list if query is empty
         } else {
             List<User> filtered = new ArrayList<>();
+            query = query.toLowerCase();  // Convert query to lowercase for case-insensitive comparison
+
             for (User user : usersList) {
-                if (user.getFirstName().toLowerCase().contains(query.toLowerCase()) ||
-                        user.getLastName().toLowerCase().contains(query.toLowerCase())) {
+                if (user.getFirstName().toLowerCase().contains(query)
+                        || user.getLastName().toLowerCase().contains(query)
+                        || (user.getFirstName().toLowerCase() + " " + user.getLastName().toLowerCase()).contains(query)) {
                     filtered.add(user);
                 }
             }
             filteredList = filtered;
         }
-        notifyDataSetChanged(); // Notify RecyclerView about data changes
+        notifyDataSetChanged();
     }
+
 }

@@ -167,7 +167,9 @@ public class User implements Serializable {
         return isAdmin;
     }
 
-    public void setIsAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
 
     public boolean isNotificationEnabled() {
         return notificationEnabled;

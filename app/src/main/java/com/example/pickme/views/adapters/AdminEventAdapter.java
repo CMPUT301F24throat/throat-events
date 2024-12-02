@@ -1,6 +1,7 @@
 package com.example.pickme.views.adapters;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapter class for displaying events in a RecyclerView for admin users.
+ * Adapter class for displaying a list of events in a RecyclerView for administrative purposes.
+ * Provides functionality for displaying event details and handling click events.
  */
 public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.EventViewHolder> {
 
@@ -27,11 +29,11 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
     private final OnItemClickListener onItemClickListener;
 
     /**
-     * Constructor for AdminEventAdapter.
+     * Constructor to initialize the adapter with a list of events and click listener.
      *
-     * @param context The context in which the adapter is used.
+     * @param context The context for inflating the views.
      * @param eventList The list of events to display.
-     * @param onItemClickListener The listener for item click events.
+     * @param onItemClickListener Listener for item click events.
      */
     public AdminEventAdapter(Context context, List<Event> eventList, OnItemClickListener onItemClickListener) {
         this.context = context;
@@ -41,18 +43,18 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
     }
 
     /**
-     * Interface for handling item click events.
+     * Interface for handling click events on event items.
      */
     public interface OnItemClickListener {
         void onItemClick(Event event, int position);
     }
 
     /**
-     * Creates and returns a new EventViewHolder.
+     * Creates and returns a new ViewHolder for event items.
      *
-     * @param parent The parent view group.
-     * @param viewType The view type of the new view.
-     * @return A new EventViewHolder.
+     * @param parent The parent view group where the view holder will be added.
+     * @param viewType The type of view to be created.
+     * @return A new EventViewHolder instance.
      */
     @NonNull
     @Override
@@ -62,10 +64,10 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
     }
 
     /**
-     * Binds the data to the ViewHolder.
+     * Binds the event data to the views in the ViewHolder.
      *
-     * @param holder The ViewHolder to bind data to.
-     * @param position The position of the item in the data set.
+     * @param holder The ViewHolder where the data should be set.
+     * @param position The position of the item within the RecyclerView.
      */
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
@@ -76,9 +78,9 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
     }
 
     /**
-     * Returns the total number of items in the data set.
+     * Returns the total number of items in the filtered list.
      *
-     * @return The total number of items.
+     * @return The size of the filtered event list.
      */
     @Override
     public int getItemCount() {
@@ -86,7 +88,7 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
     }
 
     /**
-     * ViewHolder class for event items.
+     * ViewHolder class for holding the views for each event item.
      */
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView eventTitleTextView;
@@ -94,9 +96,9 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
         ImageView viewDetails;
 
         /**
-         * Constructor for EventViewHolder.
+         * Constructor to initialize the views in the ViewHolder.
          *
-         * @param itemView The view of the item.
+         * @param itemView The item view that holds the event views.
          */
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -107,33 +109,39 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
     }
 
     /**
-     * Updates the list of events and notifies the adapter.
+     * Updates the list of events in the adapter and refreshes the displayed data.
      *
-     * @param arrayList The new list of events.
+     * @param eventList The new list of events to be displayed in the RecyclerView.
      */
-    public void updateList(List<Event> arrayList) {
+    public void updateList(List<Event> eventList) {
         filteredEventList.clear();
-        filteredEventList.addAll(arrayList);
+        filteredEventList.addAll(eventList);
         notifyDataSetChanged();
     }
 
     /**
-     * Filters the list of events based on a query.
+     * Filters the list of users based on a search query and updates the displayed list.
      *
-     * @param query The query to filter events by.
+     * @param query The search query to filter the users by.
      */
     public void filter(String query) {
         query = query.toLowerCase().trim();
-        filteredEventList = new ArrayList<>();
-        if (query.isEmpty()) {
-            filteredEventList.addAll(originalEventList);
+
+        if (TextUtils.isEmpty(query)) {
+            filteredEventList = new ArrayList<>(originalEventList);
         } else {
+            filteredEventList.clear();
+
             for (Event event : originalEventList) {
-                if (event.getEventTitle().toLowerCase().contains(query)) {
+                String eventTitle = event.getEventTitle().toLowerCase();
+                String eventDescription = event.getEventDescription().toLowerCase(); // Assuming this exists
+
+                // Check if the event title or description contains the query
+                if (eventTitle.contains(query) || eventDescription.contains(query)) {
                     filteredEventList.add(event);
                 }
             }
         }
-        notifyDataSetChanged();
+        notifyDataSetChanged();  // Notify the adapter that the data has changed
     }
 }
