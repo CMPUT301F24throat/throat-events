@@ -26,6 +26,9 @@ import com.example.pickme.views.adapters.EntrantAdapter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Fragment that displays an overview of the lottery.
+ */
 public class LotteryOverviewFragment extends Fragment {
 
     private RecyclerView entrantList;
@@ -34,6 +37,12 @@ public class LotteryOverviewFragment extends Fragment {
     private TextView lotteryStatsText;
     private LotteryUtils lotteryUtils;
 
+    /**
+     * Called when the fragment's view has been created.
+     *
+     * @param view The view of the fragment.
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -117,12 +126,21 @@ public class LotteryOverviewFragment extends Fragment {
         });
     }
 
+    /**
+     * Filters the entrants based on their status.
+     *
+     * @param status The status to filter by.
+     * @return A list of entrants with the specified status.
+     */
     private List<WaitingListEntrant> filterEntrants(EntrantStatus status) {
         return event.getWaitingList().stream()
                 .filter(e -> e.getStatus() == status)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Updates the lottery statistics text view with the current statistics.
+     */
     private void updateLotteryStatsText() {
         long p = event.getWaitingList().stream()
                 .filter(e -> e.getStatus() == EntrantStatus.SELECTED || e.getStatus() == EntrantStatus.ACCEPTED || e.getStatus() == EntrantStatus.CANCELLED)
@@ -140,6 +158,15 @@ public class LotteryOverviewFragment extends Fragment {
         String statsText = p + " selected\n" + q + " accepted | " + r + " pending" + s + " declined";
         lotteryStatsText.setText(statsText);
     }
-
-
 }
+
+/*
+ * Code Sources
+ * <p>
+ * Stack Overflow
+ * https://stackoverflow.com/questions/52130338/update-ui-after-getting-data-from-firebase-database
+ * https://stackoverflow.com/questions/16694786/how-to-customize-a-spinner-in-android?noredirect=1&lq=1
+ * <p>
+ * Medium
+ * https://medium.com/vattenfall-tech/android-spinner-customizations-8b4980fb0ee3
+ */
