@@ -16,8 +16,6 @@ import org.mockito.MockitoAnnotations;
  * This test class verifies the behavior, constraints, and validation logic of the User model class,
  * including constructors, updating, and verifying.
  *
- * @version 1.0
- * @author Kenneth Agonoy
  * <p>
  * Responsibilities:
  * - Test that a user is created with the correct attributes.
@@ -36,7 +34,7 @@ public class UserTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         user = new User(mockUserRepository, "randomUserAuthId555", "John", "Doe",
-                "john.doe@example.com", "+1234567890", "custom_profile_url",
+                "john.doe@example.com", "1234567890", "custom_profile_url",
                 false, "randomDeviceId111", true, true, true);
     }
 
@@ -97,12 +95,6 @@ public class UserTest {
     }
 
     @Test
-    public void testIsAndSetAdminStatus() {
-        user.setAdmin(false);
-        assertFalse(user.isAdmin());
-    }
-
-    @Test
     public void testIsAndSetNotificationEnabled() {
         user.setNotificationEnabled(false);
         assertFalse(user.isNotificationEnabled());
@@ -127,17 +119,22 @@ public class UserTest {
         assertTrue("John", User.validateFirstName("John"));
         assertTrue(User.validateLastName("John-Paul"));
         assertFalse(User.validateLastName("John232"));
+        assertFalse(User.validateLastName("John!"));
     }
 
     @Test
     public void testValidateLastName() {
         assertTrue(User.validateFirstName("Dough"));
         assertTrue(User.validateLastName("Dough-Me"));
+        assertFalse(User.validateLastName("John2"));
+        assertFalse(User.validateLastName("Doe!"));
     }
 
     @Test
     public void testValidateEmailAddress() {
         assertTrue(User.validateEmailAddress("valid.email@example.com"));
+        assertTrue(User.validateEmailAddress("kjxke_agonoy@example.net"));
+        assertTrue(User.validateEmailAddress("kjxke22@domain.org"));
         assertFalse(User.validateEmailAddress("invalid-email"));
         assertFalse(User.validateEmailAddress("missingdomain@com"));
         assertFalse(User.validateEmailAddress("missing.symbol.com"));
@@ -146,18 +143,18 @@ public class UserTest {
     @Test
     public void testValidateContactInformation() {
         assertTrue(User.validateContactInformation("+1234567890"));
+        assertTrue(User.validateContactInformation("1234567890"));
+        assertTrue(User.validateContactInformation("780-489-5661"));
         assertFalse(User.validateContactInformation("12345"));
         assertFalse(User.validateContactInformation("invalid-phone"));
     }
 
-    // Test Information Transformations
     @Test
     public void testFullName() {
         String fullName = user.fullName(user.getFirstName(), user.getLastName());
         assertEquals("John Doe", fullName);
     }
 
-    // Test Signup Method
     @Test
     public void testSignup() {
         user.signup("NewFirstName", "NewLastName");

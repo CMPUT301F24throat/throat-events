@@ -19,7 +19,7 @@ import java.util.Random;
 
 /**
  * Represents an image uploaded by the user
- * @author sophiecabungcal, etdong
+ *
  * @version 1.1
  */
 public class Image {
@@ -44,6 +44,8 @@ public class Image {
     // the date/time the image was last updated [non-nullable]
     private Timestamp updatedAt;
 
+    private boolean generated;
+
     // ImageRepository instance for Firebase interaction
     private ImageRepository ir;
 
@@ -57,15 +59,23 @@ public class Image {
      *                         or an event ID for an event poster
      */
     public Image(@NonNull String userId, @NonNull String imageAssociation) {
-        this.ir = new ImageRepository();
+        this.ir = ImageRepository.getInstance();
         this.uploaderId = userId;
         this.imageAssociation = imageAssociation;
-        this.imageType = userId.equals(imageAssociation) ?
-                ImageType.PROFILE_PICTURE :
-                ImageType.EVENT_POSTER;
+
+        if (userId == null || imageAssociation == null) {
+            // Handle null values - set default image type
+            this.imageType = ImageType.EVENT_POSTER; // Default to EVENT_POSTER
+        } else {
+            // Only call equals() if neither userId nor imageAssociation is null
+            this.imageType = userId.equals(imageAssociation) ? ImageType.PROFILE_PICTURE : ImageType.EVENT_POSTER;
+        }
+
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
+        this.generated = false;
     }
+
 
     public Image(@NonNull String userId, @NonNull String imageAssociation, ImageRepository ir) {
         this.ir = ir;
@@ -76,6 +86,7 @@ public class Image {
                 ImageType.EVENT_POSTER;
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
+        this.generated = false;
     }
 
     /**
@@ -133,6 +144,11 @@ public class Image {
     public Timestamp getUpdatedAt() {
         return updatedAt;
     }
+
+    public boolean isGenerated() {
+        return generated;
+    }
+
     //endregion
 
     //region Class methods
@@ -145,16 +161,6 @@ public class Image {
      */
     public void upload(@NonNull Uri imageUri, OnCompleteListener<Image> listener) {
         ir.upload(this, imageUri, listener);
-    }
-
-    /**
-     * Uploads an image with attached image byte data to FirebaseStorage,
-     * then stores the image information to Firestore DB.
-     *
-     * @param data The byte data of the image to be uploaded
-     */
-    public void upload(@NonNull byte[] data, OnCompleteListener<Image> listener) {
-        ir.upload(this, data, listener);
     }
 
     /**
@@ -179,6 +185,7 @@ public class Image {
      * Generates a random image from the uploader ID.
      */
     public void generate(String initials, OnCompleteListener<Image> listener) {
+        this.generated = true;
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(128), rnd.nextInt(128), rnd.nextInt(128));
         Bitmap b=Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);

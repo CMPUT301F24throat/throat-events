@@ -11,53 +11,68 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
+import com.example.pickme.databinding.EventsMyEventsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
 import com.example.pickme.views.adapters.EventAdapter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment representing the user's events screen.
+ */
 public class MyEventsFragment extends Fragment implements EventAdapter.OnEventClickListener {
 
     private FacilityRepository facilityRepository;
+    private EventsMyEventsBinding binding;
     private EventRepository eventRepository;
-    private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
-    private List<Event> eventList = new ArrayList<>();
+    private ArrayList<Event> eventList = new ArrayList<>();
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_my_events, container, false);
+        binding = EventsMyEventsBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
     }
 
+    /**
+     * Called immediately after onCreateView has returned, but before any saved state has been restored in to the view.
+     *
+     * @param view               The View returned by onCreateView.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        facilityRepository = new FacilityRepository();
-        eventRepository = new EventRepository();
+        facilityRepository = FacilityRepository.getInstance();
+        eventRepository = EventRepository.getInstance();
         User user = User.getInstance();
 
-        recyclerView = view.findViewById(R.id.recyclerView);
         eventAdapter = new EventAdapter(eventList, requireActivity(), this);
-        recyclerView.setAdapter(eventAdapter);
+        binding.recyclerView.setAdapter(eventAdapter);
 
         if (user != null) {
             // Check if the user has a facility
-            checkUserFacility(user.getUserId());
+            checkUserFacility(user.getDeviceId());
         }
 
-        FloatingActionButton addEventBtn = view.findViewById(R.id.fab_add_event);
-        addEventBtn.setOnClickListener(v -> {
+        binding.fabAddEvent.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
             navController.navigate(R.id.action_myEventsFragment_to_eventCreationFragment);
         });
@@ -67,19 +82,24 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
             if (result.getBoolean("eventCreated")) {
                 Toast.makeText(requireActivity(), "Event successfully created", Toast.LENGTH_SHORT).show();
                 if (user != null) {
-                    loadUserEvents(user.getUserId());
+                    loadUserEvents(user.getDeviceId());
                 }
             }
         });
     }
 
-    private void checkUserFacility(String userId) {
-        facilityRepository.getFacilityByOwnerId(userId, task -> {
+    /**
+     * Checks if the user has a facility and loads user events if a facility exists.
+     *
+     * @param userDeviceId The device ID of the user.
+     */
+    private void checkUserFacility(String userDeviceId) {
+        facilityRepository.getFacilityByOwnerDeviceId(userDeviceId, task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot querySnapshot = task.getResult();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
                     // Facility exists, proceed to show MyEventsFragment view
-                    loadUserEvents(userId);
+                    loadUserEvents(userDeviceId);
                 } else {
                     // Facility does not exist, navigate to FacilityCreationFragment
                     navigateToFacilityCreationFragment();
@@ -91,28 +111,55 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         });
     }
 
-    private void loadUserEvents(String userId) {
-        boolean includePastEvents = false; // Set this based on your requirement
-        eventRepository.getEventsByOrganizerId(userId, includePastEvents, task -> {
-            if (task.isSuccessful()) {
-                List<Event> events = task.getResult();
+    /**
+     * Loads the user events into the RecyclerView.
+     *
+     * @param userDeviceId The device ID of the user.
+     */
+    private void loadUserEvents(String userDeviceId) {
+        loadUserEvents(userDeviceId, false);
+    }
+
+    /**
+     * Loads the user events into the RecyclerView with an option to include past events.
+     *
+     * @param userDeviceId      The device ID of the user.
+     * @param includePastEvents Whether to include past events.
+     */
+    private void loadUserEvents(String userDeviceId, boolean includePastEvents) {
+        eventRepository.getEventsByOrganizerId(userDeviceId, includePastEvents, getEventsTask -> {
+            if (getEventsTask.isSuccessful()) {
+                List<Event> events = getEventsTask.getResult();
                 if (events != null) {
                     eventList.clear();
                     eventList.addAll(events);
                     eventAdapter.notifyDataSetChanged();
+
+                    eventRepository.attachList(eventList, () -> {
+                        eventList.removeIf(event -> event.getEventId() == null);
+                        eventAdapter.notifyDataSetChanged();
+                    });
+
                     // Show or hide the no events text based on the event list size
-                    View noEventsText = requireView().findViewById(R.id.noEventsText);
-                    noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
+                    binding.noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
                 }
             }
         });
     }
 
+    /**
+     * Navigates to the facility creation screen.
+     */
     private void navigateToFacilityCreationFragment() {
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         navController.navigate(R.id.action_myEventsFragment_to_facilityCreationFragment);
     }
 
+    /**
+     * Handles the event click and navigates to the event details screen.
+     *
+     * @param event The event that was clicked.
+     */
     @Override
     public void onEventClick(Event event) {
         Bundle bundle = new Bundle();
@@ -121,3 +168,11 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         navController.navigate(R.id.action_myEventsFragment_to_eventDetailsFragment, bundle);
     }
 }
+
+/*
+   Coding Sources
+   <p>
+   Stack Overflow
+   - https://stackoverflow.com/questions/60848166/cannot-resolve-method-getparentfragmentmanager
+   - https://stackoverflow.com/questions/77237163/android-how-to-share-result-from-one-fragment-to-another-with-fragment-result-a
+  */

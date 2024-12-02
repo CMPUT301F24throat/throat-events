@@ -1,5 +1,6 @@
 package com.example.pickme.models;
 
+import com.example.pickme.models.Enums.EntrantStatus;
 import com.google.firebase.Timestamp;
 import java.util.ArrayList;
 
@@ -12,7 +13,7 @@ import java.util.ArrayList;
  *     <li>Who it was sent from and when</li>
  *     <li>Who it's going to</li>
  * </ul>
- * @author Omar-Kattan-1
+ *
  * @version 1.1
  */
 public class Notification {
@@ -24,7 +25,7 @@ public class Notification {
 
     private String sentFrom;
     private ArrayList<String> sendTo = new ArrayList<String>();
-    private SendLevel level;
+    private EntrantStatus sendLevel;
 
     private String eventID;
 
@@ -94,12 +95,12 @@ public class Notification {
     }
 
     //---------- Level --------------------
-    public SendLevel getLevel() {
-        return level;
+    public EntrantStatus getLevel() {
+        return sendLevel;
     }
 
-    public void setLevel(SendLevel level) {
-        this.level = level;
+    public void setLevel(EntrantStatus level) {
+        this.sendLevel = level;
     }
 
     //---------- eventID ------------------

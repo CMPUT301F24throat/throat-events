@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -28,6 +31,7 @@ import com.example.pickme.R;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
+import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.NotificationRepository;
 import com.example.pickme.utils.NotificationHelper;
 import com.example.pickme.utils.NotificationList;
@@ -52,7 +56,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerViewEvents;
     private EventAdapter eventsAdapter;
     private List<Event> inboxList = new ArrayList<>();
-    private List<Event> eventsList = new ArrayList<>();
+    private ArrayList<Event> eventsList = new ArrayList<>();
     private View emptyInboxText;
     private View emptyEventsText;
 
@@ -99,10 +103,16 @@ public class HomeFragment extends Fragment {
         emptyEventsText = view.findViewById(R.id.emptyEventsText);
         CircleImageView homeProfileButton = view.findViewById(R.id.homeProfileButton);
 
-        eventsAdapter = new EventAdapter(eventsList, requireActivity(), event -> {
-            // TODO: Handle events item click
+        eventsAdapter = new EventAdapter(eventsList, requireContext(), event -> {
+            Bundle args = new Bundle();
+            args.putSerializable("selectedEvent", event); // Pass the Event object as a Serializable
+            NavController navController = Navigation.findNavController(requireView());
+
+            Log.d("EVENT", "Navigating to EventDetailsFragment with Event: " + event.getEventTitle());
+            navController.navigate(R.id.action_global_eventDetailsFragment, args);
         });
         recyclerViewEvents.setAdapter(eventsAdapter);
+        recyclerViewEvents.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         User user = User.getInstance();
         if (user != null) {
@@ -120,13 +130,13 @@ public class HomeFragment extends Fragment {
             //notification setup
             askNotificationPermission();
             loadInbox();
+            loadMyEvents();
 
         } else {
             // Handle the case where the user is null
             homeProfileButton.setVisibility(View.GONE);
         }
 
-        loadMyEvents();
     }
 
     /**
@@ -166,7 +176,7 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * this method is responsible for loading the user's notifications, and putting it into the
+     * This method is responsible for loading the user's notifications, and putting it into the
      * ListView on the screen
      */
     private void loadInbox() {
@@ -201,14 +211,52 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * This method is responsible for loading the user's events that they're signed up for, and
+     * putting it into the RecyclerView on the screen
+     */
     private void loadMyEvents() {
-        emptyEventsText.setVisibility(View.VISIBLE);
+        User user = User.getInstance();
+
+        int visibility = user.getEventIDs().isEmpty() ? View.VISIBLE : View.GONE;
+        emptyEventsText.setVisibility(visibility);
+
+        eventsList.clear();
+        eventsAdapter.notifyDataSetChanged();
+
+        for(String eventID : user.getEventIDs()){
+            EventRepository.getInstance().getEventById(eventID, task -> {
+                if(!task.isSuccessful()){
+                    return;
+                }
+
+                Event event = task.getResult();
+
+                if(event == null || event.hasEventPassed()){
+                    user.getEventIDs().remove(eventID);
+                    return;
+                }
+
+                eventsList.add(event);
+                eventsAdapter.notifyDataSetChanged();
+
+                Log.i("EVENT", "event added to home view, id: " + eventID);
+                if(event.getHasLotteryExecuted() == null)
+                    Log.i("EVENT", "has lottery passed is null");
+            });
+        }
+
+        EventRepository.getInstance().attachList(eventsList, () -> {
+            eventsList.removeIf(event -> event.getEventId() == null);
+            eventsAdapter.notifyDataSetChanged();
+        });
+
         // TODO: load the events the user is on the waitlist for / upcoming
     }
-
 }
+
 /*
-  Code Sources
+  Coding Sources
   <p>
   StackOverflow:
   - Android Studio: Group elements together

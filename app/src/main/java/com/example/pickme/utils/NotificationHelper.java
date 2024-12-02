@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Manages local notifications
- * @author Omar-Kattan-1
+ *
  * <p>
  * Responsibilities:
  * Create and send notifications to users
@@ -37,11 +37,11 @@ public class NotificationHelper {
     public void sendNotification(Notification notification){
 
         UserNotification userNotification = new UserNotification(notification.getNotificationId());
-        UserRepository userRepository = new UserRepository();
+        UserRepository userRepository = UserRepository.getInstance();
 
         for(String userID : notification.getSendTo()){
 
-            userRepository.getUserByDeviceId(userID, documentSnapshotTask -> {
+            userRepository.getUserDocumentByDeviceId(userID, documentSnapshotTask -> {
                 if(!documentSnapshotTask.isSuccessful() || documentSnapshotTask.getResult() == null){
                     Log.i("NOTIF", "Failed to find user to send notif; userID: " + userID);
                     return;
@@ -91,7 +91,7 @@ public class NotificationHelper {
             NotificationRepository.getInstance().getNotificationById(userNotification.getNotificationID(), documentSnapshot -> {
                 if (documentSnapshot == null) {
                     notificationsToRemove.add(userNotification);
-                    new UserRepository().updateUser(user, task -> {
+                    UserRepository.getInstance().updateUser(user, task -> {
                         Log.i("NOTIF", "Cleaned Notifs; doc was null");
                         future.complete(null);
                     });
@@ -101,17 +101,17 @@ public class NotificationHelper {
                 Notification notification = documentSnapshot.toObject(Notification.class);
                 if (notification == null || notification.getEventID() == null) {
                     notificationsToRemove.add(userNotification);
-                    new UserRepository().updateUser(user, task -> {
+                    UserRepository.getInstance().updateUser(user, task -> {
                         Log.i("NOTIF", "Cleaned Notifs; notif was null");
                         future.complete(null);
                     });
                     return;
                 }
 
-                new EventRepository().getEventById(notification.getEventID(), documentSnapshot1 -> {
+                EventRepository.getInstance().getEventById(notification.getEventID(), documentSnapshot1 -> {
                     if (!documentSnapshot1.isSuccessful() || documentSnapshot1.getResult() == null) {
                         notificationsToRemove.add(userNotification);
-                        new UserRepository().updateUser(user, task -> {
+                        UserRepository.getInstance().updateUser(user, task -> {
                             Log.i("NOTIF", "Cleaned Notifs; no event with that ID");
                             future.complete(null);
                         });
@@ -125,7 +125,7 @@ public class NotificationHelper {
         // Wait for all futures to complete
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
             user.getUserNotifications().removeAll(notificationsToRemove);
-            new UserRepository().updateUser(user, task -> {
+            UserRepository.getInstance().updateUser(user, task -> {
                 Log.i("NOTIF", "Cleaned Notifs");
                 toRun.run();
             });
@@ -135,6 +135,8 @@ public class NotificationHelper {
 }
 
 /*
-  Sources:
-  ChatGPT: how do i make it wait for all my async stuff to finish
- */
+   Coding Sources
+   <p>
+   ChatGPT
+   - "how do i make it wait for all my async stuff to finish?"
+  */

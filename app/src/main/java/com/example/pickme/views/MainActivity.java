@@ -15,6 +15,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.pickme.R;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.qrCleanup;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         loadingScreen = findViewById(R.id.loading_screen); // Find the loading screen view
 
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navigation_my_events) {
                 navController.navigate(R.id.action_global_myEventsFragment);
                 return true;
+            }  else if (itemId == R.id.navigation_admin_tools) {
+                navController.navigate(R.id.action_global_adminToolsFragment);
             }
             return false;
         });
@@ -106,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
      * @param deviceID The device ID to check in Firestore.
      */
     private void checkUserInFirestore(String deviceID) {
-        userRepository.getUserByDeviceId(deviceID, task -> {
+        userRepository.getUserDocumentByDeviceId(deviceID, task -> {
             hideLoadingScreen(); // Hide the loading screen after Firestore operation
             if (!task.isSuccessful() || task.getResult() == null) {
                 handleFirestoreError(task.getException());
@@ -119,13 +122,16 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+            Boolean isAdmin = document.getBoolean("admin");
             User user = document.toObject(User.class);
             if (!isUserDeserialized(user)) {
                 handleDeserializationError();
                 return;
             }
+            if(isAdmin != null)
+                user.setAdmin(isAdmin);
 
-            User.setInstance(user);
+            User.setInstance(user);  // Set the user instance
             // Show the Admin Tools menu item if the user is an admin
             if (user.isAdmin()) {
                 bottomNavigationView.getMenu().findItem(R.id.navigation_admin_tools).setVisible(true);
@@ -134,16 +140,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Show the loading screen
+    /**
+     * Shows the loading screen.
+     */
     private void showLoadingScreen() {
         if (loadingScreen != null) {
             loadingScreen.setVisibility(View.VISIBLE);
         }
     }
 
-    // Hide the loading screen with a delay
+    /**
+     * Hides the loading screen after a delay.
+     */
     private void hideLoadingScreen() {
         if (loadingScreen != null) {
+            // Clean up invalid QR codes
+            qrCleanup.cleanUpQRCodes();
             // Delay for 2 seconds before hiding the loading screen
             new Handler().postDelayed(() -> loadingScreen.setVisibility(View.GONE), 2000);
         }

@@ -66,7 +66,6 @@ public class QRCameraFragment extends Fragment {
         } else {
             setupScanner();
         }
-
         return view;
     }
 
@@ -119,7 +118,7 @@ public class QRCameraFragment extends Fragment {
         Log.d(TAG, "Starting fetcher for QR ID: " + qrID);
 
         // Create an instance of EventFetcher with the EventRepository
-        EventFetcher eventFetcher = new EventFetcher(new EventRepository());
+        EventFetcher eventFetcher = new EventFetcher(EventRepository.getInstance());
 
         eventFetcher.getEventByEventId(qrID, new EventFetcher.EventCallback() {
             @Override

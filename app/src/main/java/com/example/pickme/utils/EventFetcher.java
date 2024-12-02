@@ -38,7 +38,7 @@ public class EventFetcher {
         Log.d(TAG, "Fetching QR document for QR ID: " + qrID);
 
         // Use the repository method to fetch the QR document by QR ID
-        new QrRepository().readQRByID(qrID).addOnCompleteListener(task -> {
+        QrRepository.getInstance().readQRByID(qrID).addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
                 DocumentSnapshot document = task.getResult().getDocuments().get(0);
 

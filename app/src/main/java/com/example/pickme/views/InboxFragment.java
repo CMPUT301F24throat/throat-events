@@ -25,32 +25,59 @@ import com.example.pickme.utils.NotificationList;
 import com.example.pickme.utils.UserNotification;
 import com.example.pickme.views.adapters.NotifRecAdapter;
 
+/**
+ * Fragment representing the inbox view where notifications are displayed.
+ */
 public class InboxFragment extends Fragment {
-
     NotificationRepository notificationRepository = NotificationRepository.getInstance();
 
+    /**
+     * Inflates the fragment's view.
+     *
+     * @param inflater LayoutInflater to inflate the view.
+     * @param container ViewGroup that contains the fragment's UI.
+     * @param savedInstanceState Bundle containing the saved state.
+     * @return The inflated view.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_inbox, container, false);
     }
 
+    /**
+     * Called when the fragment's view has been created.
+     *
+     * @param view The fragment's view.
+     * @param savedInstanceState Bundle containing the saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
 
+        // Get the singleton instance of NotificationList
         NotificationList notifications = NotificationList.getInstance();
 
+        // Set up the RecyclerView with the notification adapter
         NotifRecAdapter notificationAdapter = new NotifRecAdapter(getContext(), notifications);
         RecyclerView recyclerView = view.findViewById(R.id.notifRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(notificationAdapter);
         notificationRepository.attachRecAdapter(notificationAdapter);
 
+        // Attach ItemTouchHelper to handle swipe actions
         ItemTouchHelper itemTouchHelper = getItemTouchHelper(recyclerView, notifications, notificationAdapter);
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
+    /**
+     * Creates and returns an ItemTouchHelper for handling swipe actions on the RecyclerView.
+     *
+     * @param recyclerView The RecyclerView to attach the ItemTouchHelper to.
+     * @param notifications The list of notifications.
+     * @param notificationAdapter The adapter for the notifications.
+     * @return The configured ItemTouchHelper.
+     */
     @NonNull
     private static ItemTouchHelper getItemTouchHelper(RecyclerView recyclerView, NotificationList notifications, NotifRecAdapter notificationAdapter) {
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -67,8 +94,8 @@ public class InboxFragment extends Fragment {
                 Notification notification = notifications.get(position);
                 User user = User.getInstance();
                 if (direction == ItemTouchHelper.LEFT) {
+                    // Handle swipe to the left (delete notification)
                     notifications.remove(notification);
-
                     notificationAdapter.notifyItemRemoved(position);
 
                     for(UserNotification userNotification : user.getUserNotifications()){
@@ -79,8 +106,8 @@ public class InboxFragment extends Fragment {
                     }
 
                 } else if (direction == ItemTouchHelper.RIGHT) {
+                    // Handle swipe to the right (mark notification as read/unread)
                     notification.markRead(!notification.isRead());
-
                     notificationAdapter.notifyItemChanged(position);
 
                     for(UserNotification userNotification : user.getUserNotifications()){
@@ -91,7 +118,8 @@ public class InboxFragment extends Fragment {
                     }
                 }
 
-                new UserRepository().updateUser(user, task -> {});
+                // Update the user in the repository
+                UserRepository.getInstance().updateUser(user, task -> {});
             }
 
             @Override
@@ -105,7 +133,7 @@ public class InboxFragment extends Fragment {
                 Paint paint = new Paint();
                 if (dX > 0) {
                     // Swiping to the right
-                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.highlight2));
+                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.green1));
                     canvas.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom(), paint);
 
                     // Draw a custom icon (optional)
@@ -121,7 +149,7 @@ public class InboxFragment extends Fragment {
                     }
                 } else if (dX < 0) {
                     // Swiping to the left
-                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.highlight1));
+                    paint.setColor(ContextCompat.getColor(recyclerView.getContext(), R.color.red1));
                     canvas.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom(), paint);
 
                     // Draw a delete icon (optional)
@@ -139,13 +167,16 @@ public class InboxFragment extends Fragment {
             }
         };
 
-// Attach the ItemTouchHelper to the RecyclerView
+        // Attach the ItemTouchHelper to the RecyclerView
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         return itemTouchHelper;
     }
 
 }
 
-/* Sources
-ChatGPT: How do I draw something when I swipe a recyclerView
+/*
+  Coding Sources
+  <p>
+  ChatGPT:
+  - How do I draw something when I swipe a recyclerView
  */

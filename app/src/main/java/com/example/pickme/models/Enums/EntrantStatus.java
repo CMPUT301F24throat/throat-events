@@ -5,6 +5,11 @@ package com.example.pickme.models.Enums;
  */
 public enum EntrantStatus {
     /**
+     * This applies to all entrants, and is only used when organizer is sending a message
+     */
+    ALL,
+
+    /**
      * User has joined the waiting list and is waiting for acceptance.
      */
     WAITING,
@@ -15,12 +20,12 @@ public enum EntrantStatus {
     SELECTED,
 
     /**
-     * User was selected to attend the event but rejected from accepting the invite.
+     * User was not selected to attend the event.
      */
     REJECTED,
 
     /**
-     * User's spot in the waiting list was cancelled.
+     * User declined the invitation
      */
     CANCELLED,
 

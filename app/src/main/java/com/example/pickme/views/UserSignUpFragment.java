@@ -19,6 +19,9 @@ import com.example.pickme.R;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
 
+/**
+ * Fragment for user sign-up.
+ */
 public class UserSignUpFragment extends Fragment {
 
     private EditText firstNameEditText, lastNameEditText;
@@ -42,6 +45,9 @@ public class UserSignUpFragment extends Fragment {
         submitButton.setOnClickListener(v -> validateInformation());
     }
 
+    /**
+     * Validates the user input information.
+     */
     private void validateInformation() {
         String firstName = firstNameEditText.getText().toString().trim();
         String lastName = lastNameEditText.getText().toString().trim();
@@ -57,18 +63,36 @@ public class UserSignUpFragment extends Fragment {
         }
 
         String deviceId = getDeviceID();
-        String dummyEmail = "temp@tempmail.com";
-        String dummyContact = "0-000-000-0000";
+        String tempEmail = "User@domain.com";
+        String tempContact = "000-000-0000";
 
-        createUser(firstName, lastName.isEmpty() ? "" : lastName, dummyEmail, dummyContact, deviceId);
+        String finalLastName = lastName;
+        if (lastName.isEmpty()) {
+            finalLastName = "";
+        }
+        createUser(firstName, finalLastName, tempEmail, tempContact, deviceId);
     }
 
+    /**
+     * Retrieves the device ID.
+     *
+     * @return the device ID as a String.
+     */
     private String getDeviceID() {
         return Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
+    /**
+     * Creates a new user with the provided information.
+     *
+     * @param firstName the first name of the user.
+     * @param lastName the last name of the user.
+     * @param email the email address of the user.
+     * @param contact the contact number of the user.
+     * @param deviceId the device ID.
+     */
     private void createUser(String firstName, String lastName, String email, String contact, String deviceId) {
-        UserRepository userRepository = new UserRepository();
+        UserRepository userRepository = UserRepository.getInstance();
         userRepository.addUser(firstName, lastName, email, contact, deviceId, new UserRepository.OnUserCreatedCallback() {
             @Override
             public void onSuccess(User user) {
@@ -86,15 +110,24 @@ public class UserSignUpFragment extends Fragment {
         });
     }
 
+    /**
+     * Clears the text fields.
+     */
     private void clearText() {
         firstNameEditText.setText("");
         lastNameEditText.setText("");
     }
 
+    /**
+     * Navigates to the Home Fragment.
+     */
     private void navigateToHomeFragment() {
-        Navigation.findNavController(getView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
+        Navigation.findNavController(requireView()).navigate(R.id.action_userSignUpFragment_to_homeFragment);
     }
 
+    /**
+     * Shows the bottom navigation.
+     */
     private void showBottomNavigation() {
         MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity != null) {

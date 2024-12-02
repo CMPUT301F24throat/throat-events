@@ -21,6 +21,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * QRCodeGenerator is a utility class for generating and caching QR codes.
+ */
 public class QRCodeGenerator {
 
     private static final int QR_CODE_WIDTH = 500;
@@ -29,6 +32,11 @@ public class QRCodeGenerator {
 
     private final QrRepository qrRepository;
 
+    /**
+     * Constructor for QRCodeGenerator.
+     *
+     * @param qrRepository Repository to access QR data
+     */
     public QRCodeGenerator(QrRepository qrRepository) {
         this.qrRepository = qrRepository;
     }
@@ -128,24 +136,21 @@ public class QRCodeGenerator {
     }
 
     /**
-     * Callback interface for QR code generation and retrieval
+     * Callback interface for QR code generation and retrieval.
      */
     public interface QRCodeCallback {
+        /**
+         * Called when the QR code is ready.
+         *
+         * @param filePath Path to the QR code image file
+         */
         void onQRCodeReady(String filePath);
+
+        /**
+         * Called when there is an error generating or retrieving the QR code.
+         *
+         * @param errorMessage Error message describing the issue
+         */
         void onError(String errorMessage);
     }
 }
-
-/*
-  Code Sources
-  <p>
-  ChatGPT-4o:
-  - Explain how to implement caching of bitmaps in an android app
-  - What are the best Java libraries for creating QR codes?
-  <p>
-  Github:
-  - ZXing ("Zebra Crossing") Library documentation
-  <p>
-  Java Documentation:
-  - Caching in java
- */

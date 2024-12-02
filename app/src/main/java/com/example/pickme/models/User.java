@@ -12,7 +12,6 @@ import java.util.ArrayList;
 /**
  * Class that can represent, validate, and stores a user in the app.
  *
- * @author Kenneth (aesoji)
  * @version 1.2
  *
  * Responsibilities:
@@ -35,7 +34,8 @@ public class User implements Serializable {
     private String contactNumber; // Contact number of user.
     private String profilePictureUrl = defaultProfilePictureUrl; // Customizable user profile picture.
     private boolean isOnline; // Checks if the user is currently online.
-    private ArrayList<UserNotification> userNotifications = new ArrayList<UserNotification>();
+    private ArrayList<UserNotification> userNotifications = new ArrayList<UserNotification>(); //list of user's notifications
+    private ArrayList<String> eventIDs = new ArrayList<>(); //list of events signed up to
 
     // User Preferences & Permissions
     private String deviceId; // Attaches on device to user
@@ -71,11 +71,7 @@ public class User implements Serializable {
 
     //---------- Get/Set User Profile Information --------------------
     public String getUserId() {
-        return userAuthId;
-    }
-
-    public void setUserId(String userId) {
-        this.userAuthId = userId;
+        return deviceId;
     }
 
     public String getFirstName() {
@@ -143,6 +139,14 @@ public class User implements Serializable {
         this.userNotifications.add(userNotification);
     }
 
+    public ArrayList<String> getEventIDs() {
+        return eventIDs;
+    }
+
+    public void setEventIDs(ArrayList<String> eventIDs) {
+        this.eventIDs = eventIDs;
+    }
+
     //---------- Get/Set User Preferences & Permissions --------------------
     public String getDeviceId() {
         return deviceId;
@@ -165,7 +169,6 @@ public class User implements Serializable {
 
     public void setAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
-        this.updatedAt = Timestamp.now();
     }
 
     public boolean isNotificationEnabled() {
@@ -209,13 +212,13 @@ public class User implements Serializable {
     }
 
     public static boolean validateLastName(String lastName) {
-        return lastName != null && lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
+        return lastName.matches("^[A-Za-z]+(-[A-Za-z]+)*$");
     }
 
     public static boolean validateEmailAddress(String emailAddress) {
         String[] validEmailAddressDomains = {".com", ".ca", ".net", ".org", ".kr", ".co", ".uk", "ir", ".ch"};
 
-        if (emailAddress == null || !emailAddress.contains("@")) {
+        if (!emailAddress.contains("@")) {
             return false;
         }
 
@@ -228,7 +231,7 @@ public class User implements Serializable {
     }
 
     public static boolean validateContactInformation(String contactNumber) {
-        return contactNumber != null && contactNumber.matches("\\+?[0-9\\-() ]{7,15}");
+        return contactNumber.matches("\\+?[0-9\\-() ]{7,15}");
     }
 
     //---------- Information Transformations --------------------

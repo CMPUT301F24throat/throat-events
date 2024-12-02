@@ -15,6 +15,15 @@ public class QrRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference qrRef = db.collection("QRs");
 
+    private static QrRepository instance;
+
+    public static QrRepository getInstance() {
+        if (instance == null)
+            instance = new QrRepository();
+
+        return instance;
+    }
+
     /**
      * Creates a new QR document using a QR object.
      *
@@ -48,6 +57,15 @@ public class QrRepository {
     }
 
     /**
+     * Retrieves all QR documents in Firestore.
+     *
+     * @return Task containing all QR documents.
+     */
+    public Task<QuerySnapshot> getAllQRs() {
+        return qrRef.get();
+    }
+
+    /**
      * Reads a QR document by its association.
      *
      * @param qrAssociation Associated entity reference for the QR document
@@ -65,6 +83,35 @@ public class QrRepository {
      */
     public Task<Void> deleteQR(String qrID) {
         return qrRef.document(qrID).delete();
+    }
+
+    /**
+     * Deletes a QR document by its association.
+     *
+     * @param qrAssociation Associated entity reference for the QR document
+     * @return Task for tracking success/failure
+     */
+    public Task<Void> deleteQRByAssociation(String qrAssociation) {
+        return qrRef.whereEqualTo("qrAssociation", qrAssociation).get()
+                .continueWithTask(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        String documentId = task.getResult().getDocuments().get(0).getId();
+                        return qrRef.document(documentId).delete();
+                    } else {
+                        throw new Exception("QR document not found for association: " + qrAssociation);
+                    }
+                });
+    }
+
+    /**
+     * Updates an existing QR document.
+     *
+     * @param qrID ID of the QR document to update
+     * @param qr   The updated QR object
+     * @return Task for tracking success/failure
+     */
+    public Task<Void> updateQR(String qrID, QR qr) {
+        return qrRef.document(qrID).set(qr);
     }
 }
 

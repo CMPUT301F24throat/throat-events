@@ -11,6 +11,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dummy_desc">test description</string>
     <string name="share">Share</string>
+    <string name="deleteRegen">Delete QR and Regenerate</string>
     <string name="events">Events</string>
     <string name="my_inbox">My Inbox</string>
     <string name="home">Home</string>
@@ -18,4 +19,21 @@
     <string name="required_field">* Required Field</string>
     <string name="qr_camera">QR Camera</string>
     <string name="admin_tools">Admin Tools</string>
+    <string name="event_archive">Event Archive</string>
+    <string name="image_catalog">Image Catalog</string>
+    <string name="delete_this_image">Delete this image?</string>
+    <string-array name="entrant_status_array">
+        <item>Selected</item>
+        <item>Accepted</item>
+        <item>Cancelled</item>
+        <item>Rejected</item>
+        <item>Waiting</item>
+    </string-array>
+    <string name="user_profiles">User Profiles</string>
+    <string name="confirm_delete_profile">Confirm Delete Profile</string>
+    <string name="user_facility_details">User Facility Details</string>
+    <string name="facility_name">Facility Name:</string>
+    <string name="location">Location:</string>
+    <string name="report_amp_delete"><![CDATA[REPORT & DELETE]]></string>
+    <string name="exit">EXIT</string>
 </resources>

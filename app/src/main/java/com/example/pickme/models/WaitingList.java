@@ -1,5 +1,10 @@
 package com.example.pickme.models;
 
+import com.example.pickme.models.Enums.EntrantStatus;
+import com.example.pickme.models.Enums.WaitingListStatus;
+
+import java.util.ArrayList;
+
 /**
  * Represents an event's waiting list.
  * This class contains information about the waiting list, including the event ID, maximum entrants, maximum winners, and the current number of entrants.
@@ -17,6 +22,26 @@ public class WaitingList {
     private Integer maxWinners;
     // The number of entrants currently on the waiting list [non-nullable]
     private Integer numEntrants;
+
+    private WaitingListStatus status;
+
+    private ArrayList<WaitingListEntrant> entrants;
+
+    public WaitingList(Event event) {
+        this.eventId = event.getEventId();
+        this.maxEntrants = event.getMaxEntrants();
+        this.maxWinners = event.getMaxWinners();
+        this.entrants = event.getWaitingList();
+        this.numEntrants = (int) this.entrants.stream().filter(e -> e.getStatus() == EntrantStatus.WAITING).count();
+
+        if (event.getHasLotteryExecuted()) {
+            this.status = WaitingListStatus.CLOSED;
+        } else if (this.maxEntrants!= null && this.numEntrants >= this.maxEntrants) {
+            this.status = WaitingListStatus.FULL;
+        } else {
+            this.status = WaitingListStatus.OPEN;
+        }
+    }
 
     /**
      * Gets the unique ID of the event which the waiting list belongs to.
@@ -88,5 +113,21 @@ public class WaitingList {
      */
     public void setNumEntrants(Integer numEntrants) {
         this.numEntrants = numEntrants;
+    }
+
+    public WaitingListStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(WaitingListStatus status) {
+        this.status = status;
+    }
+
+    public ArrayList<WaitingListEntrant> getEntrants() {
+        return entrants;
+    }
+
+    public void setEntrants(ArrayList<WaitingListEntrant> entrants) {
+        this.entrants = entrants;
     }
 }
