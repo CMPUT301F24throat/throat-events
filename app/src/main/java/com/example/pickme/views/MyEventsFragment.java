@@ -11,15 +11,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
+import com.example.pickme.databinding.EventsMyEventsBinding;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.FacilityRepository;
 import com.example.pickme.views.adapters.EventAdapter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -31,8 +30,8 @@ import java.util.List;
 public class MyEventsFragment extends Fragment implements EventAdapter.OnEventClickListener {
 
     private FacilityRepository facilityRepository;
+    private EventsMyEventsBinding binding;
     private EventRepository eventRepository;
-    private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
     private ArrayList<Event> eventList = new ArrayList<>();
 
@@ -47,7 +46,8 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_my_events, container, false);
+        binding = EventsMyEventsBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
     }
 
     /**
@@ -64,17 +64,15 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         eventRepository = EventRepository.getInstance();
         User user = User.getInstance();
 
-        recyclerView = view.findViewById(R.id.recyclerView);
         eventAdapter = new EventAdapter(eventList, requireActivity(), this);
-        recyclerView.setAdapter(eventAdapter);
+        binding.recyclerView.setAdapter(eventAdapter);
 
         if (user != null) {
             // Check if the user has a facility
             checkUserFacility(user.getDeviceId());
         }
 
-        FloatingActionButton addEventBtn = view.findViewById(R.id.fab_add_event);
-        addEventBtn.setOnClickListener(v -> {
+        binding.fabAddEvent.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
             navController.navigate(R.id.action_myEventsFragment_to_eventCreationFragment);
         });
@@ -143,8 +141,7 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
                     });
 
                     // Show or hide the no events text based on the event list size
-                    View noEventsText = requireView().findViewById(R.id.noEventsText);
-                    noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
+                    binding.noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
                 }
             }
         });

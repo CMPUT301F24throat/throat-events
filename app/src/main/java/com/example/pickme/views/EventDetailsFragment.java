@@ -24,6 +24,8 @@ import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.GeoLocationUtils;
+import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -40,6 +42,9 @@ public class EventDetailsFragment extends Fragment {
     private WaitingListUtils waitingListUtils;
 
     private boolean alreadyIn = false;
+    private LotteryUtils lotteryUtils;
+    String logText = "";
+    String toastText = "";
     private WaitingListEntrant entrant;
 
     /**
@@ -72,6 +77,7 @@ public class EventDetailsFragment extends Fragment {
             eventRepository = EventRepository.getInstance();
             userRepository = UserRepository.getInstance();
             waitingListUtils = new WaitingListUtils();
+            lotteryUtils = new LotteryUtils();
 
             configureView(view, currentUser);
             displayEventDetails(view);
@@ -278,9 +284,11 @@ public class EventDetailsFragment extends Fragment {
 
         if(event.getMaxEntrants() != null && waitingEntrantsCount >= event.getMaxEntrants()){
             buttonText = "Waitlist is full - try again later";
+            enableButton = false;
         }
         else if(event.hasEventPassed()){
             buttonText = "This event has already passed";
+            enableButton = false;
         }
         else if(alreadyIn && !event.getHasLotteryExecuted()){
             switch (this.entrant.getStatus()){
@@ -306,39 +314,73 @@ public class EventDetailsFragment extends Fragment {
 
         ((TextView) waitlistBtn).setText(buttonText);
         waitlistBtn.setEnabled(enableButton);
-        if(!enableButton){
+
+        if (!enableButton) {
             waitlistBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.disabledButtonBG));
             ((TextView) waitlistBtn).setTextColor(ContextCompat.getColor(requireContext(), R.color.disabledButtonTxt));
         }
 
+        // Geolocation part //
         waitlistBtn.setOnClickListener(v -> {
-            GeoPoint currentUserLocation = null;
             if (event.isGeoLocationRequired()) {
-                // TODO: Implement geolocation
+                GeoLocationUtils geoLocationUtils = new GeoLocationUtils();
+
+                // Check if location permissions are granted
+                if (!geoLocationUtils.areLocationPermissionsGranted(requireActivity())) {
+                    geoLocationUtils.requestLocationPermission(requireActivity());
+                    return;
+                }
+
+                // Check if location services are enabled
+                if (!geoLocationUtils.isLocationEnabled(requireActivity())) {
+                    Toast.makeText(requireContext(), "Please enable location services", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Fetch the user's current location
+                geoLocationUtils.fetchCurrentLocation(requireActivity(), (latitude, longitude) -> {
+                    GeoPoint currentUserLocation = new GeoPoint(latitude, longitude);
+                    Log.i("EVENT", "User location fetched: " + latitude + ", " + longitude);
+
+                    // Perform waitlist logic with location
+                    waitlistLogic(currentUserLocation);
+                });
+            } else {
+                // Perform waitlist logic without requiring geolocation
+                waitlistLogic(null);
             }
-
-            waitlistLogic();
         });
-
     }
 
-    private void waitlistLogic(){
-        if(!alreadyIn){
-            // If not already in, means they are joining waitlist for the first time
-            WaitingListEntrant waitingListEntrant = new WaitingListEntrant(currentUser.getDeviceId(), null, EntrantStatus.WAITING);
+    /**
+     * Handles the waitlist logic based on the user's status and geolocation.
+     *
+     * @param location The user's current location, or null if not required.
+     */
+    // Geolocation
+    private void waitlistLogic(GeoPoint location) {
+        if (!alreadyIn) {
+            WaitingListEntrant waitingListEntrant = new WaitingListEntrant(
+                    currentUser.getDeviceId(),
+                    location,
+                    EntrantStatus.WAITING
+            );
             event.getWaitingList().add(waitingListEntrant);
             currentUser.getEventIDs().add(event.getEventId());
-            eventRepository.updateEvent(event, null, task -> {
-                Log.i("EVENT", "Added user to waitlist");
-                Toast.makeText(requireContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
+
+            EventRepository.getInstance().updateEvent(event, null, task -> {
+                if (task.isSuccessful()) {
+                    Log.i("EVENT", "Added user to waitlist");
+                    Toast.makeText(requireContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.i("EVENT", "Failed to add user to waitlist");
+                    Toast.makeText(requireContext(), "Failed to join waitlist. Please try again.", Toast.LENGTH_SHORT).show();
+                }
             });
             return;
         }
 
-        // User has joined before
-        String logText = "";
-        String toastText = "";
-        switch (entrant.getStatus()){
+        switch (entrant.getStatus()) {
             case WAITING:
                 event.getWaitingList().remove(entrant);
                 currentUser.getEventIDs().remove(event.getEventId());
@@ -346,23 +388,26 @@ public class EventDetailsFragment extends Fragment {
                 toastText = "You successfully left the waitlist";
                 break;
 
+            case SELECTED:
+                entrant.setStatus(EntrantStatus.ACCEPTED);
+                logText = "User accepted event";
+                toastText = "You successfully accepted the invitation";
+                break;
+
             case CANCELLED:
                 entrant.setStatus(EntrantStatus.WAITING);
-                logText = "User rejoined waitlist after cancelling spot";
+                logText = "User rejoined waitlist after rejection";
                 toastText = "You successfully rejoined the waitlist";
                 break;
         }
 
-        String finalLogText = logText;
-        String finalToastText = toastText;
-        eventRepository.updateEvent(event, null, task -> {
-            if(task.isSuccessful()){
-                Log.i("EVENT", finalLogText);
-                Toast.makeText(requireContext(), finalToastText, Toast.LENGTH_SHORT).show();
-            }
-            else{
-                Log.i("EVENT", "Waitlist button failed, attempt: " + finalLogText);
-                Toast.makeText(requireContext(), "Sorry, something went wrong", Toast.LENGTH_SHORT).show();
+        EventRepository.getInstance().updateEvent(event, null, task -> {
+            if (task.isSuccessful()) {
+                Log.i("EVENT", logText);
+                Toast.makeText(requireContext(), toastText, Toast.LENGTH_SHORT).show();
+            } else {
+                Log.i("EVENT", "Failed to update waitlist: " + logText);
+                Toast.makeText(requireContext(), "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -502,5 +547,4 @@ public class EventDetailsFragment extends Fragment {
             Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_eventWaitingListFragment, bundle);
         }
     }
-
 }

@@ -39,5 +39,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyC4zdZy3mJH1y8NCQjcONn_sRGE5GMbI38" />
     </application>
 </manifest>
