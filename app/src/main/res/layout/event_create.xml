@@ -44,7 +44,8 @@
                 android:layout_width="86dp"
                 android:layout_height="54dp"
                 android:layout_marginTop="4dp"
-                android:backgroundTint="@color/background1"
+                android:background="@null"
+                android:backgroundTint="#00FFFFFF"
                 android:contentDescription="Touch to delete event"
                 android:fontFamily="sans-serif"
                 android:insetTop="0dp"
@@ -53,17 +54,16 @@
                 android:paddingBottom="5dp"
                 android:textAllCaps="false"
                 android:textSize="20sp"
-                android:visibility="gone"
+                android:visibility="invisible"
                 app:icon="@drawable/ic_delete"
                 app:iconPadding="0dp"
                 app:iconSize="40dp"
-                app:iconTint="@color/background1"
+                app:iconTint="@null"
                 app:iconTintMode="add"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.923"
                 app:layout_constraintStart_toEndOf="@+id/back"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="gone" />
+                app:layout_constraintTop_toTopOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Section 2: Title, Date, Time, Address, Max Values -->
@@ -72,6 +72,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/section1">
 
             <EditText
@@ -95,8 +97,8 @@
                 android:layout_marginTop="8dp"
                 android:drawableStart="@drawable/ic_calendar"
                 android:drawablePadding="8dp"
-                android:inputType="date"
                 android:hint="*Date"
+                android:inputType="date"
                 android:textColor="@color/text1"
                 android:textColorHint="@color/text3"
                 android:textSize="14sp"
@@ -128,8 +130,9 @@
                     android:layout_height="48dp"
                     android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_button_fragment"
-                    android:inputType="datetime"
                     android:hint="  *Start Time"
+                    android:inputType="datetime"
+                    android:paddingLeft="3dp"
                     android:textColor="@color/text1"
                     android:textColorHint="@color/text3"
                     android:textSize="14sp"
@@ -157,6 +160,7 @@
                     android:background="@drawable/rounded_button_fragment"
                     android:hint="  *End Time"
                     android:inputType="datetime"
+                    android:paddingLeft="3dp"
                     android:textColor="@color/text1"
                     android:textColorHint="@color/text3"
                     android:textSize="14sp"
@@ -227,7 +231,33 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@id/winners"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/eventUpsert_titleCharCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="38dp"
+                android:fontFamily="@font/inter"
+                android:text="0/100"
+                android:textColor="@color/text3"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
+            <TextView
+                android:id="@+id/eventUpsert_locationCharCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="38dp"
+                android:fontFamily="@font/inter"
+                android:text="0/75"
+                android:textColor="@color/text3"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/address" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Section 3: Description, Add Image, Required Field, Create Button -->
@@ -246,8 +276,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:strokeColor="@null"
-                app:strokeWidth="0dp">
+                app:strokeColor="@color/buttonBG1"
+                app:strokeWidth="1dp">
 
                 <EditText
                     android:id="@+id/description"
@@ -350,6 +380,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/requiredField"
                 app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/eventUpsert_descriptionCharCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="38dp"
+                android:fontFamily="@font/inter"
+                android:text="0/750"
+                android:textColor="@color/text3"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/descCard" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
