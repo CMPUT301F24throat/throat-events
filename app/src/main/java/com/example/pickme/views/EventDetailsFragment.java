@@ -206,7 +206,7 @@ public class EventDetailsFragment extends Fragment {
                 declineBtn.setVisibility(View.VISIBLE);
 
                 acceptBtn.setOnClickListener(v -> {
-                    entrant.setStatus(EntrantStatus.ACCEPTED);
+                    userEntrant.setStatus(EntrantStatus.ACCEPTED);
                     eventRepository.updateEvent(event, null, task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "You have accepted the invitation", Toast.LENGTH_SHORT).show();

@@ -111,14 +111,4 @@ public class Notification {
     public void setEventID(String eventID) {
         this.eventID = eventID;
     }
-
-    /**
-     * represents the group of people a notification will be sent to
-     */
-    public enum SendLevel{
-        All,
-        Selected,
-        Cancelled,
-        Rejected
-    }
 }
