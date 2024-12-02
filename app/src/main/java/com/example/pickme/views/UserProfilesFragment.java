@@ -117,31 +117,16 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
     }
 
     private void facilityDetails(User user, int pos) {
-        // Create a dialog instance
-        Dialog dialog = new Dialog(requireContext());
 
-        // Inflate the custom layout using View Binding
-        LayoutUserFacilityDetailsDialogBinding binding = LayoutUserFacilityDetailsDialogBinding.inflate(LayoutInflater.from(requireContext()));
-        dialog.setContentView(binding.getRoot());
 
         facilityRepository.getFacilityByOwnerId(user.getDeviceId(), query -> {
             if (query.isSuccessful()) {
                 for (DocumentSnapshot document : query.getResult().getDocuments()) {
                     Facility facility = document.toObject(Facility.class);
-                    if (facility != null) {
-                        // Set up the dialog views
-                        binding.facilityName.setText(facility.getFacilityName());
-                        binding.location.setText(facility.getLocation());
-                        binding.delete.setOnClickListener(view -> facilityRepository.deleteFacility(facility.getFacilityId(), task -> {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(requireContext(), "Facility deleted successfully!", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                            } else {
-                                dialog.dismiss();
-                                Toast.makeText(requireContext(), "Failed to delete facility: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                System.err.println("Failed to delete facility: " + task.getException().getMessage());
-                            }
-                        }));
+                    if (facility!=null){
+                        showFacilityDialog(facility);
+                    }else {
+                        Toast.makeText(requireContext(), "Facility not found", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -149,6 +134,31 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
                 System.err.println("Failed to fetch facilities: " + query.getException().getMessage());
             }
         });
+    }
+
+    private void showFacilityDialog(Facility facility){
+        // Create a dialog instance
+        Dialog dialog = new Dialog(requireContext());
+
+        // Inflate the custom layout using View Binding
+        LayoutUserFacilityDetailsDialogBinding binding = LayoutUserFacilityDetailsDialogBinding.inflate(LayoutInflater.from(requireContext()));
+        dialog.setContentView(binding.getRoot());
+
+        if (facility != null) {
+            // Set up the dialog views
+            binding.facilityName.setText(facility.getFacilityName());
+            binding.location.setText(facility.getLocation());
+            binding.delete.setOnClickListener(view -> facilityRepository.deleteFacility(facility.getFacilityId(), task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(requireContext(), "Facility deleted successfully!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    dialog.dismiss();
+                    Toast.makeText(requireContext(), "Failed to delete facility: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    System.err.println("Failed to delete facility: " + task.getException().getMessage());
+                }
+            }));
+        }
 
         binding.cancel.setOnClickListener(view -> dialog.dismiss());
         // Show the dialog
