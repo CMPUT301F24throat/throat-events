@@ -2,6 +2,7 @@ package com.example.pickme.views;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,7 +17,12 @@ import androidx.navigation.Navigation;
 import com.example.pickme.R;
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
+import com.example.pickme.models.Notification;
+import com.example.pickme.models.User;
+import com.example.pickme.models.WaitingListEntrant;
+import com.example.pickme.repositories.NotificationRepository;
 import com.example.pickme.utils.LotteryUtils;
+import com.example.pickme.utils.NotificationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +65,8 @@ public class LotteryRunDialog extends DialogFragment {
                 if (task.isSuccessful()) {
                     List<String> selectedUserDeviceIds = task.getResult();
 
+                    createSendNotifs();
+
                     // If lottery was successful, navigate to the winners fragment
                     dialog.dismiss();
                     Bundle bundle = new Bundle();
@@ -99,6 +107,52 @@ public class LotteryRunDialog extends DialogFragment {
                 .count();
         String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
         description.setText(descriptionText);
+    }
+
+    private void createSendNotifs(){
+        Notification selected = new Notification();
+
+        selected.setEventID(event.getEventId());
+        selected.setSentFrom(User.getInstance().getDeviceId());
+        selected.setDateTimeNow();
+
+        //SELECTED
+        selected.setMessage("Congratulations! You've been selected. Go to event to accept/decline.");
+        selected.setLevel(EntrantStatus.SELECTED);
+
+        for(WaitingListEntrant entrant : event.getWaitingList()){
+            Log.i("NOTIF", "Status: " + entrant.getStatus().toString());
+            if(entrant.getStatus() == EntrantStatus.SELECTED){
+                selected.getSendTo().add(entrant.getEntrantId());
+                Log.i("NOTIF", "Sent to ID: " + entrant.getEntrantId());
+            }
+        }
+
+        NotificationRepository repo = NotificationRepository.getInstance();
+
+        repo.addNotification(selected, task ->{
+            new NotificationHelper().sendNotification(selected);
+        });
+
+        //REJECTED
+        Notification rejected = new Notification();
+
+        rejected.setEventID(event.getEventId());
+        rejected.setSentFrom(User.getInstance().getDeviceId());
+        rejected.setDateTimeNow();
+
+        rejected.setMessage("Sorry, you weren't selected, but you've still got a chance if someone declines!");
+        rejected.setLevel(EntrantStatus.REJECTED);
+
+        rejected.getSendTo().clear();
+        for(WaitingListEntrant entrant : event.getWaitingList()){
+            if(entrant.getStatus() == EntrantStatus.REJECTED)
+                rejected.getSendTo().add(entrant.getEntrantId());
+        }
+
+        repo.addNotification(rejected, task ->{
+            new NotificationHelper().sendNotification(rejected);
+        });
     }
 }
 /*

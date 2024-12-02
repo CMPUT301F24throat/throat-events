@@ -23,7 +23,6 @@ import com.example.pickme.models.Notification;
 import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.NotificationRepository;
-import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.NotificationHelper;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -133,9 +132,6 @@ public class CreateNotificationFragment extends Fragment {
      * @param task the task to run after this process is done
      */
     private void createSendList(Notification notification, Runnable task){
-        UserRepository userRepository = UserRepository.getInstance();
-
-        ArrayList<String> IDs = new ArrayList<>();
 
         for(WaitingListEntrant entrant : event.getWaitingList()){
             if(notification.getLevel() == EntrantStatus.ALL || notification.getLevel() == entrant.getStatus())
@@ -143,23 +139,6 @@ public class CreateNotificationFragment extends Fragment {
         }
 
         task.run();
-
-//        switch(notification.getLevel()){
-//            case ALL:
-//
-//                userRepository.getAllUsers(query -> {
-//                    List<DocumentSnapshot> docs = query.getResult().getDocuments();
-//                    for(DocumentSnapshot doc : docs){
-//                        Log.i("NOTIF", "DOC ID: " + doc.getId());
-//
-//                        notification.getSendTo().add(doc.getId());
-//                    }
-//
-//                    task.run();
-//                });
-//
-//                //TODO: add more cases to send notifs to correct people based on selection
-//        }
     }
 }
 
