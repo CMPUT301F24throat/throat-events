@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.pickme.databinding.LayoutDeleteUserAdminDialogBinding;
 import com.example.pickme.databinding.LayoutUserFacilityDetailsDialogBinding;
@@ -31,7 +33,7 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
     private UserAdminProfilesBinding binding;
     private UserRepository userRepository;
     private FacilityRepository facilityRepository;
-    private final List<User> usersList = new ArrayList<>();
+    private List<User> usersList = new ArrayList<>();
     private UserProfilesAdapter userProfilesAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,6 +49,8 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
         userRepository = UserRepository.getInstance();
         facilityRepository = FacilityRepository.getInstance();
 
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
         userProfilesAdapter = new UserProfilesAdapter(requireActivity(), usersList, this);
         binding.recyclerView.setAdapter(userProfilesAdapter);
         binding.searchBar.addTextChangedListener(new TextWatcher() {
@@ -75,10 +79,10 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
                     User user = doc.toObject(User.class);
                     if (user != null) {
                         usersList.add(user);
-                        userProfilesAdapter.notifyDataSetChanged();
-                        binding.noEventsText.setVisibility(usersList.isEmpty() ? View.VISIBLE : View.GONE);
                     }
                 }
+                userProfilesAdapter.updateList(usersList);
+                binding.noEventsText.setVisibility(usersList.isEmpty() ? View.VISIBLE : View.GONE);
             } else {
                 System.err.println("Failed to fetch users: " + query.getException().getMessage());
                 binding.noEventsText.setVisibility(View.VISIBLE);
@@ -131,7 +135,6 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
                         binding.delete.setOnClickListener(view -> facilityRepository.deleteFacility(facility.getFacilityId(), task -> {
                             if (task.isSuccessful()) {
                                 Toast.makeText(requireContext(), "Facility deleted successfully!", Toast.LENGTH_SHORT).show();
-                                System.out.println("Facility deleted successfully");
                                 dialog.dismiss();
                             } else {
                                 dialog.dismiss();

@@ -68,7 +68,13 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ev
         }
     }
 
+    public void updateList(List<Event> arrayList) {
+        filteredEventList.clear();
+        filteredEventList.addAll(arrayList);
+        notifyDataSetChanged();
+    }
     // Filter method
+
     public void filter(String query) {
         query = query.toLowerCase().trim();
         filteredEventList = new ArrayList<>();

@@ -75,6 +75,13 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
         }
     }
 
+    public void updateList(List<User> arrayList) {
+        filteredList.clear();
+        filteredList = arrayList;
+        notifyDataSetChanged();
+    }
+
+
     // Method to filter the list
     public void filter(String query) {
         if (TextUtils.isEmpty(query)) {

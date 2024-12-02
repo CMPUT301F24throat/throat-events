@@ -159,6 +159,8 @@
         app:layout_constraintEnd_toStartOf="@id/endGuide"
         app:layout_constraintTop_toBottomOf="@id/view2"
         android:layout_marginTop="10dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/bottomGuide"
         tools:listitem="@layout/admin_event_archive_item_view"
         tools:itemCount="20"

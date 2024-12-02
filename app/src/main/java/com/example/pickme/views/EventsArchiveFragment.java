@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.pickme.R;
 import com.example.pickme.databinding.EventsEventsArchiveBinding;
@@ -40,11 +41,13 @@ public class EventsArchiveFragment extends Fragment {
 
         eventRepository = EventRepository.getInstance();
 
+        binding.back.setOnClickListener(listener -> Navigation.findNavController(requireView()).navigateUp());
         eventAdapter = new AdminEventAdapter(requireActivity(), eventList, (event, position) -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("selectedEvent", event);
             Navigation.findNavController(requireView()).navigate(R.id.action_eventsArchiveFragment_to_eventDetailsFragment, bundle);
         });
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
         binding.recyclerView.setAdapter(eventAdapter);
         binding.searchBar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -71,8 +74,10 @@ public class EventsArchiveFragment extends Fragment {
                 if (events != null) {
                     eventList.clear();
                     eventList.addAll(events);
-                    eventAdapter.notifyDataSetChanged();
+                    eventAdapter.updateList(eventList);
                     binding.noEventsText.setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
+                }else{
+                    binding.noEventsText.setVisibility(View.VISIBLE);
                 }
             } else {
                 binding.noEventsText.setVisibility(View.VISIBLE);

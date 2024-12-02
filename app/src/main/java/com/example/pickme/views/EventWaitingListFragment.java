@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme.R;
+import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.utils.WaitingListUtils;
@@ -92,7 +93,7 @@ public class EventWaitingListFragment extends Fragment implements OnMapReadyCall
      * Loads the waiting list entrants for the event and sets up the RecyclerView adapter.
      */
     private void loadWaitingListEntrants() {
-        waitingListUtils.getWaitingListEntrantsByStatus(event.getEventId(), null, new OnCompleteListener<List<WaitingListEntrant>>() {
+        waitingListUtils.getWaitingListEntrantsByStatus(event.getEventId(), EntrantStatus.WAITING, new OnCompleteListener<List<WaitingListEntrant>>() {
             @Override
             public void onComplete(@NonNull Task<List<WaitingListEntrant>> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
