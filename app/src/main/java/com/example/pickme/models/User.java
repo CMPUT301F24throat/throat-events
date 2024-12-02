@@ -72,7 +72,7 @@ public class User implements Serializable {
 
     //---------- Get/Set User Profile Information --------------------
     public String getUserId() {
-        return userAuthId;
+        return deviceId;
     }
 
     public String getFirstName() {
