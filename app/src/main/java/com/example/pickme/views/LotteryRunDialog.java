@@ -105,20 +105,6 @@ public class LotteryRunDialog extends DialogFragment {
                 .count();
         String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
         description.setText(descriptionText);
-
-//        eventRepository.getEventById(event.getEventId(), task -> {
-//            if (task.isSuccessful() && task.getResult() != null) {
-//                Event event = task.getResult();
-//                int numToDraw = lotteryUtils.determineNumToDraw(event);
-//                long numWaitingEntrants = event.getWaitingList().stream()
-//                        .filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING)
-//                        .count();
-//                String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
-//                description.setText(descriptionText);
-//            } else {
-//                description.setText("Error fetching event details.");
-//            }
-//        });
     }
 }
 /*

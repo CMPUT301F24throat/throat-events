@@ -83,10 +83,8 @@ public class EventDetailsFragment extends Fragment {
                     Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_myEventsFragment);
                 }
                 else{
-                    if(view != null){
-                        configureView(view, currentUser);
-                        displayEventDetails(view);
-                    }
+                    configureView(view, currentUser);
+                    displayEventDetails(view);
                 }
             });
         } else {
@@ -182,7 +180,7 @@ public class EventDetailsFragment extends Fragment {
         else if(event.hasEventPassed()){
             buttonText = "This event has already passed";
         }
-        else if(alreadyIn){
+        else if(alreadyIn && !event.hasLotteryExecuted()){
             switch (this.entrant.getStatus()){
                 case WAITING:
                     buttonText = "Leave Waitlist";
@@ -195,11 +193,14 @@ public class EventDetailsFragment extends Fragment {
                     //TODO: need more buttons and stuff for accept/decline
                     break;
 
-                case REJECTED:      // User rejected an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus REJECTED
+                case REJECTED:
+                    // User rejected an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus REJECTED
+                    // Waitlist is closed when lottery runs so can't rejoin anyways
                     buttonText = "You have rejected this event";
                     break;
 
-                case ACCEPTED:      // User accepted an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus ACCEPTED
+                case ACCEPTED:
+                    // User accepted an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus ACCEPTED
                     buttonText = "Already accepted event invite";
                     break;
 
@@ -294,7 +295,13 @@ public class EventDetailsFragment extends Fragment {
 
         if (!event.hasLotteryExecuted()) {
             // If lottery hasn't been run, set up click listener to open LotteryRunDialog
-            lotteryBtn.setOnClickListener(v -> LotteryRunDialog.showDialog(getParentFragmentManager(), event));
+            lotteryBtn.setOnClickListener(v -> {
+                if (event.getWaitingList().isEmpty()) {
+                    Toast.makeText(getContext(), "Waitinglist is empty - lottery cannot run", Toast.LENGTH_LONG).show();
+                } else {
+                    LotteryRunDialog.showDialog(getParentFragmentManager(), event);
+                }
+            });
         } else {
             // If lottery has been run, set up click listener to navigate to lottery status fragment
             lotteryBtn.setOnClickListener(v -> navigateToLotteryOverview());
@@ -354,12 +361,6 @@ public class EventDetailsFragment extends Fragment {
                 }
             });
         }
-    }
-
-    private void runLottery() {
-        // Need to check if waitlist is empty and that event is still valid
-        // If it is, open LotteryRunDialog
-
     }
 
     /**
