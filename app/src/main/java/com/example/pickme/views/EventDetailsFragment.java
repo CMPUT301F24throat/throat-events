@@ -360,6 +360,12 @@ public class EventDetailsFragment extends Fragment {
             event.getWaitingList().add(waitingListEntrant);
             currentUser.getEventIDs().add(event.getEventId());
 
+            UserRepository.updateUser(currentUser, task -> {
+                if(task.isSuccessful()){
+                    Log.i("EVENT", "updated user with event ID");
+                }
+            });
+
             EventRepository.getInstance().updateEvent(event, null, task -> {
                 if (task.isSuccessful()) {
                     Log.i("EVENT", "Added user to waitlist");
@@ -392,6 +398,12 @@ public class EventDetailsFragment extends Fragment {
                 toastText = "You successfully rejoined the waitlist";
                 break;
         }
+
+        UserRepository.updateUser(currentUser, task -> {
+            if(task.isSuccessful()){
+                Log.i("EVENT", "updated user with status");
+            }
+        });
 
         EventRepository.getInstance().updateEvent(event, null, task -> {
             if (task.isSuccessful()) {
