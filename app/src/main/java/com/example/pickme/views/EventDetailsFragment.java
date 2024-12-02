@@ -1,5 +1,6 @@
 package com.example.pickme.views;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.example.pickme.databinding.DialogGeoLocationBinding;
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
@@ -315,6 +317,25 @@ public class EventDetailsFragment extends Fragment {
         // Geolocation part //
         waitlistBtn.setOnClickListener(v -> {
             if (event.isGeoLocationRequired()) {
+                dialogGeoLocation();
+            } else {
+                // Perform waitlist logic without requiring geolocation
+                waitlistLogic(null);
+            }
+        });
+    }
+
+    private void dialogGeoLocation(){
+        // Create a dialogue instance
+        Dialog dialogue = new Dialog(requireContext());
+
+        // Inflate the custom layout using View Binding
+        DialogGeoLocationBinding binding = DialogGeoLocationBinding.inflate(LayoutInflater.from(requireContext()));
+        dialogue.setContentView(binding.getRoot());
+
+        binding.confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 GeoLocationUtils geoLocationUtils = new GeoLocationUtils();
 
                 // Check if location permissions are granted
@@ -337,13 +358,13 @@ public class EventDetailsFragment extends Fragment {
                     // Perform waitlist logic with location
                     waitlistLogic(currentUserLocation);
                 });
-            } else {
-                // Perform waitlist logic without requiring geolocation
-                waitlistLogic(null);
             }
         });
-    }
 
+        binding.cancel.setOnClickListener(view -> dialogue.dismiss());
+
+        dialogue.show();
+    }
     /**
      * Handles the waitlist logic based on the user's status and geolocation.
      *
