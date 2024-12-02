@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,8 @@ import com.example.pickme.R;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.User;
 import com.example.pickme.repositories.UserRepository;
+import com.example.pickme.utils.ImageQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
 
 /**
  * Fragment for editing the user's profile.
@@ -215,6 +218,7 @@ public class UserProfileEditFragment extends Fragment {
         // Save user data here
         User user = User.getInstance();
         if (user != null) {
+            boolean generate = isInitialsChanged(user);
             // Update the user with the input data
             user.setFirstName(editProfileFirstName.getText().toString());
             user.setLastName(editProfileLastName.getText().toString());
@@ -223,21 +227,59 @@ public class UserProfileEditFragment extends Fragment {
             user.setGeoLocationEnabled(editEnableLocation.isChecked());
             user.setNotificationEnabled(editEnableNotifications.isChecked());
 
-            // Update the user's profile picture URL if changed
-            if (img != null && img.getImageUrl() != null) {
-                user.setProfilePictureUrl(img.getImageUrl());
-            }
+            if (img != null) {
+                // Update the user's profile picture URL if changed
+                if (!img.getImageUrl().equals(user.getProfilePictureUrl())) {
+                    // uploads the image selected
+                    Uri uri = Uri.parse(img.getImageUrl());
+                    img = new Image(user.getUserId(), user.getUserId());
+                    img.upload(uri, task -> {
+                                if (task.isSuccessful()) {
+                                    Image i = task.getResult();
+                                    user.setProfilePictureUrl(i.getImageUrl());
+                                    pushUserToFirebase(user);
+                                }
+                            });
 
-            // Update the user in the repository or database
-            UserRepository.getInstance().updateUser(user, task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Profile saved successfully!", Toast.LENGTH_SHORT).show();
-                    navigateToUserProfileFragment();
+                // Update the user's profile picture with new initials if they changed/deleted
+                } else if (generate && img.isGenerated() || editProfilePicture.getTag() == "deleted") {
+                    img = new Image(user.getUserId(), user.getUserId());
+                    generateProfilePicture(task -> {
+                        user.setProfilePictureUrl(img.getImageUrl());
+                        pushUserToFirebase(user);
+                    });
                 } else {
-                    Toast.makeText(getContext(), "Failed to save profile", Toast.LENGTH_SHORT).show();
+                    pushUserToFirebase(user);
                 }
-            });
+            }
         }
+    }
+
+    private boolean isInitialsChanged(User user) {
+        String old_in = String.valueOf(user.getFirstName().charAt(0)) + user.getLastName().charAt(0);
+        String new_in = String.valueOf(editProfileFirstName.getText().toString().trim().charAt(0))
+                + editProfileLastName.getText().toString().trim().charAt(0);
+        return !old_in.equalsIgnoreCase(new_in);
+    }
+
+    private void pushUserToFirebase(User user) {
+        // Update the user in the repository or database
+        UserRepository.getInstance().updateUser(user, task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(getContext(), "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                navigateToUserProfileFragment();
+            } else {
+                Toast.makeText(getContext(), "Failed to save profile", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void generateProfilePicture(OnCompleteListener<Image> listener) {
+        // Generate a new profile picture using the user's initials (default pfp)
+        String firstName = editProfileFirstName.getText().toString().trim();
+        String lastName = editProfileLastName.getText().toString().trim();
+        String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
+        img.generate(initials, listener);
     }
 
     /**
