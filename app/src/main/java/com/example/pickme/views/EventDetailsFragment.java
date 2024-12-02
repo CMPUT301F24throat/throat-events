@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -106,7 +105,7 @@ public class EventDetailsFragment extends Fragment {
      */
     private void displayEventDetails(View view) {
         if (event != null) {
-            int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
+            int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING || entrant.getStatus() == EntrantStatus.REJECTED).count();
             int winnerEntrantsCount  = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.SELECTED || entrant.getStatus() == EntrantStatus.ACCEPTED).count();
 
             setText(view, R.id.eventDetails_eventTitle, event.getEventTitle() != null ? event.getEventTitle() : " ");
@@ -146,8 +145,10 @@ public class EventDetailsFragment extends Fragment {
         view.findViewById(R.id.eventDetails_declineInviteBtn).setVisibility(View.GONE);
         view.findViewById(R.id.eventDetails_selectedText).setVisibility(View.GONE);
 
+        Log.i("EVENT", "hasLotteryExecuted: " + event.getHasLotteryExecuted().toString());
+
         // Waitlist button and response buttons display
-        if (!event.hasLotteryExecuted() && !isOrganizer) {
+        if (!event.getHasLotteryExecuted() && !isOrganizer) {
             view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.VISIBLE);
             configWaitlistBtn(view);
         } else if (!isOrganizer) {
@@ -159,6 +160,7 @@ public class EventDetailsFragment extends Fragment {
 
             if (userEntrant != null) {
             // User is an entrant on waiting list
+                Log.i("EVENT", "userEntrant != null");
                 view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
                 configResponseBtns(view, userEntrant);
             }
@@ -176,7 +178,9 @@ public class EventDetailsFragment extends Fragment {
     private void configResponseBtns(View view, WaitingListEntrant userEntrant) {
         Button acceptBtn = view.findViewById(R.id.eventDetails_acceptInviteBtn);
         Button declineBtn = view.findViewById(R.id.eventDetails_declineInviteBtn);
-        EditText lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
+        TextView lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
+
+        Log.i("EVENT", "in config response buttons");
 
         lotteryResultText.setVisibility(View.VISIBLE);
 
@@ -214,18 +218,20 @@ public class EventDetailsFragment extends Fragment {
                 break;
 
             case WAITING:
-                lotteryResultText.setText("Sorry! You were not selected to join the event\n You will be notified if a spot opens up and you are selected");
+                lotteryResultText.setText("You are still waiting for a draw for entrants");
                 lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
                 break;
 
             case CANCELLED:
-                lotteryResultText.setText("Your spot in the event was cancelled\n Look out for the next one!");
+                lotteryResultText.setText("You have already rejected the invitation");
                 lotteryResultText.setBackgroundResource(R.drawable.cancelled_entrant_bg);
                 break;
 
             case REJECTED:
-                lotteryResultText.setText("You have already rejected the invitation");
+                lotteryResultText.setText("Sorry! You were not selected to join the event\n You will be notified if a spot opens up and you are selected");
                 lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
+                view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
+
                 break;
 
             case ACCEPTED:
@@ -268,7 +274,7 @@ public class EventDetailsFragment extends Fragment {
         else if(event.hasEventPassed()){
             buttonText = "This event has already passed";
         }
-        else if(alreadyIn && !event.hasLotteryExecuted()){
+        else if(alreadyIn && !event.getHasLotteryExecuted()){
             switch (this.entrant.getStatus()){
                 case WAITING:
                     buttonText = "Leave Waitlist";
@@ -359,7 +365,7 @@ public class EventDetailsFragment extends Fragment {
     private void configLotteryBtn(View view) {
         Button lotteryBtn = view.findViewById(R.id.eventDetails_runLotteryBtn);
 
-        if (!event.hasLotteryExecuted()) {
+        if (!event.getHasLotteryExecuted()) {
             // If lottery hasn't been run, set up click listener to open LotteryRunDialog
             lotteryBtn.setOnClickListener(v -> {
                 if (event.getWaitingList().isEmpty()) {

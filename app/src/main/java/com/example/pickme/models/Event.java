@@ -3,6 +3,7 @@ package com.example.pickme.models;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.database.PropertyName;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -334,6 +335,7 @@ public class Event implements Serializable {
      *
      * @param hasLotteryExecuted Indicates if the lottery has been executed
      */
+    @PropertyName("hasLotteryExecuted")
     public void setHasLotteryExecuted(Boolean hasLotteryExecuted) {
         this.hasLotteryExecuted = hasLotteryExecuted;
         this.updatedAt = Timestamp.now();
@@ -344,7 +346,8 @@ public class Event implements Serializable {
      *
      * @return hasLotteryExecuted
      */
-    public Boolean hasLotteryExecuted() {
+    @PropertyName("hasLotteryExecuted")
+    public Boolean getHasLotteryExecuted() {
         return hasLotteryExecuted;
     }
 
@@ -463,7 +466,7 @@ public class Event implements Serializable {
         geoLocationRequired = event.isGeoLocationRequired();
         maxEntrants = event.getMaxEntrants();
         waitingList = new ArrayList<>(event.getWaitingList());
-        hasLotteryExecuted = event.hasLotteryExecuted();
+        hasLotteryExecuted = event.getHasLotteryExecuted();
         updatedAt = Timestamp.now();
     }
 

@@ -298,7 +298,7 @@ public class EventCreationFragment extends Fragment {
                             isGeolocationRequired,
                             maxEntrants,
                             null,  // set to null here, will be initialized in EventRepository
-                            null    // set to null here, will be initialized in EventRepository
+                            false    // set to null here, will be initialized in EventRepository
                     );
 
                     eventRepository.addEvent(newEvent, selectedImageUri, addEventTask -> {
