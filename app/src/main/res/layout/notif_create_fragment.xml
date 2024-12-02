@@ -1,112 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notifCreate_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background1">
 
 
-    <ImageButton
-        android:id="@+id/back_arrow"
+    <TextView
+        android:id="@+id/notifCreate_recipientsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="41dp"
-        android:layout_marginTop="56dp"
-        android:background="@color/background1"
-        android:contentDescription="Back"
-        android:src="@drawable/ic_arrow"
+
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="72dp"
+        android:text="Recipients:"
+
+        android:textColor="@color/text2"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notifCreate_backBtn" />
+
+    <Spinner
+        android:id="@+id/notifCreate_dropdown"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="10dp"
+        android:background="@android:drawable/editbox_background"
+
+        android:backgroundTint="@color/dialogBG1"
+        app:layout_constraintBottom_toBottomOf="@id/notifCreate_recipientsText"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/notifCreate_recipientsText"
+        app:layout_constraintTop_toTopOf="@id/notifCreate_recipientsText" />
+
+    <EditText
+        android:id="@+id/notifCreate_messageBox"
+        android:layout_width="336dp"
+        android:layout_height="100dp"
+
+        android:layout_marginTop="24dp"
+        android:background="@drawable/rounded_edittext_background"
+        android:backgroundTint="@null"
+        android:fontFamily="@font/inter"
+        android:gravity="start|top"
+
+        android:hint="Write your message..."
+        android:inputType="textLongMessage"
+
+        android:padding="15dp"
+        android:textAlignment="gravity"
+        android:textColor="@color/text1"
+        android:textColorHint="@color/text3"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notifCreate_recipientsText" />
+
+    <Button
+        android:id="@+id/notifCreate_sendBtn"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="376dp"
+
+        android:backgroundTint="@color/buttonBG1"
+        android:text="Send"
+        android:textColor="@color/text1"
+
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.478"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/notifCreate_backBtn"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:contentDescription="Touch to go back"
+        android:fontFamily="@font/inter_medium"
+        android:text="Send a Notification"
+        android:textAllCaps="false"
+        android:textColor="@color/text1"
+        android:textSize="20sp"
+        app:icon="@drawable/ic_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/titleText"
+        android:id="@+id/notifCreate_charCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:text="Send a Notification"
-        android:textSize="28sp"
-        android:textColor="@color/text1"
-
-        android:layout_marginStart="10dp"
-        app:layout_constraintBottom_toBottomOf="@id/back_arrow"
-        app:layout_constraintStart_toEndOf="@id/back_arrow"
-        app:layout_constraintTop_toTopOf="@id/back_arrow" />
-
-    <TextView
-        android:id="@+id/recipientsText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:text="Recipients:"
-        android:textSize="16sp"
-        android:textColor="@color/text2"
-
-        app:layout_constraintTop_toBottomOf="@id/back_arrow"
-        app:layout_constraintStart_toStartOf="@id/back_arrow"
-        android:layout_marginTop="30dp"
-        />
-
-    <Spinner
-        android:id="@+id/dropdown_menu"
-        android:layout_width="160dp"
-        android:layout_height="35dp"
-        android:background="@android:drawable/editbox_background"
-        android:backgroundTint="@color/dialogBG1"
-
-        app:layout_constraintBottom_toBottomOf="@id/recipientsText"
-        app:layout_constraintStart_toEndOf="@id/recipientsText"
-        app:layout_constraintTop_toTopOf="@id/recipientsText"
-
-        android:layout_marginStart="10dp"
-        />
-
-    <EditText
-        android:id="@+id/messageBorder"
-        android:layout_width="340dp"
-        android:layout_height="104dp"
-        android:background="@android:drawable/editbox_background"
-
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginEnd="36dp"
+        android:fontFamily="@font/inter"
+        android:text="0/300"
+        android:textColor="@color/text3"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dropdown_menu"
-
-        android:clickable="false"
-        />
-
-    <EditText
-        android:id="@+id/messageEditText"
-        android:layout_width="336dp"
-        android:layout_height="100dp"
-
-        android:background="@android:drawable/editbox_background"
-        android:backgroundTint="@color/background1"
-        android:hint="Write your message..."
-        android:textAlignment="gravity"
-        android:gravity="start|top"
-
-        android:textColorHint="@color/text3"
-        android:textColor="@color/text1"
-
-        app:layout_constraintBottom_toBottomOf="@id/messageBorder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/messageBorder"
-        />
-
-    <Button
-        android:id="@+id/sendButton"
-        android:layout_width="340dp"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/buttonBG1"
-
-        android:text="Send"
-        android:textColor="@color/text1"
-        android:textSize="20dp"
-
-        app:layout_constraintStart_toStartOf="@id/messageBorder"
-        app:layout_constraintEnd_toEndOf="@id/messageBorder"
-        app:layout_constraintTop_toBottomOf="@id/messageBorder"
-        android:layout_marginTop="20dp"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/notifCreate_messageBox" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

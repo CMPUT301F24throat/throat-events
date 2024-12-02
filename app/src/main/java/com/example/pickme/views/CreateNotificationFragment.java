@@ -1,6 +1,9 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,10 +41,10 @@ public class CreateNotificationFragment extends Fragment {
 
     private FirebaseFirestore db;
 
-    private ImageButton backArrow;
-    private Button sendButton;
+    private Button backArrow, sendButton;
     private EditText message;
     private Spinner recipientsSpinner;
+    private TextView messageCharCount;
 
     private User user;
     private Event event;
@@ -80,10 +83,13 @@ public class CreateNotificationFragment extends Fragment {
         }
 
         // get all the views
-        backArrow = view.findViewById(R.id.back_arrow);
-        sendButton = view.findViewById(R.id.sendButton);
-        message = view.findViewById(R.id.messageEditText);
-        recipientsSpinner = view.findViewById(R.id.dropdown_menu);
+        backArrow = view.findViewById(R.id.notifCreate_backBtn);
+        sendButton = view.findViewById(R.id.notifCreate_sendBtn);
+        message = view.findViewById(R.id.notifCreate_messageBox);
+        recipientsSpinner = view.findViewById(R.id.notifCreate_dropdown);
+        messageCharCount = view.findViewById(R.id.notifCreate_charCount);
+
+        setupMsgCharLimit();
 
         // go back a screen when the back arrow is clicked
         backArrow.setOnClickListener( (v) -> getActivity().getOnBackPressedDispatcher().onBackPressed());
@@ -140,6 +146,28 @@ public class CreateNotificationFragment extends Fragment {
     }
 
     /**
+     * Sets up the character limit for the message box and updates the character count
+     */
+    private void setupMsgCharLimit() {
+        // Set character limit for message box
+        message.setFilters(new InputFilter[]{new InputFilter.LengthFilter(300)});
+
+        // Add TextWatcher to update character count
+        message.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                messageCharCount.setText(s.length() + "/300");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    /**
      * Creates the list of people to send the notification to based on the sendLevel of the notification
      *
      * @param notification the notification to update the list of
@@ -156,23 +184,6 @@ public class CreateNotificationFragment extends Fragment {
         }
 
         task.run();
-
-//        switch(notification.getLevel()){
-//            case ALL:
-//
-//                userRepository.getAllUsers(query -> {
-//                    List<DocumentSnapshot> docs = query.getResult().getDocuments();
-//                    for(DocumentSnapshot doc : docs){
-//                        Log.i("NOTIF", "DOC ID: " + doc.getId());
-//
-//                        notification.getSendTo().add(doc.getId());
-//                    }
-//
-//                    task.run();
-//                });
-//
-//                //TODO: add more cases to send notifs to correct people based on selection
-//        }
     }
 }
 
