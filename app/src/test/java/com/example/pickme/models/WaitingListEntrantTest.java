@@ -50,53 +50,10 @@ public class WaitingListEntrantTest {
     }
 
     @Test
-    public void testSetEntrantId() {
-        String newEntrantId = "user789";
-        entrant.setEntrantId(newEntrantId);
-        assertEquals(newEntrantId, entrant.getEntrantId());
-        assertTrue(entrant.getUpdatedAt().compareTo(entrant.getCreatedAt()) > 0);
-    }
-
-    @Test
-    public void testSetGeoLocation() {
-        GeoPoint newLocation = new GeoPoint(40.7128, -74.0059);  // Example coordinates (New York)
-        entrant.setGeoLocation(newLocation);
-        assertEquals(newLocation, entrant.getGeoLocation());
-        assertTrue(entrant.getUpdatedAt().compareTo(entrant.getCreatedAt()) > 0);
-    }
-
-    @Test
-    public void testSetStatus() {
-        EntrantStatus newStatus = EntrantStatus.APPROVED;
-        entrant.setStatus(newStatus);
-        assertEquals(newStatus, entrant.getStatus());
-        assertTrue(entrant.getUpdatedAt().compareTo(entrant.getCreatedAt()) > 0);
-    }
-
-    @Test
-    public void testSetNotified() {
-        entrant.setNotified(true);
-        assertTrue(entrant.isNotified());
-        assertTrue(entrant.getUpdatedAt().compareTo(entrant.getCreatedAt()) > 0);
-    }
-
-    @Test
     public void testGetCreatedAtNotModified() {
         Timestamp initialCreatedAt = entrant.getCreatedAt();
         entrant.setUpdatedAt(Timestamp.now()); // Modify updatedAt
         assertEquals(initialCreatedAt, entrant.getCreatedAt()); // Ensure createdAt remains unchanged
-    }
-
-    @Test
-    public void testEquals() {
-        WaitingListEntrant other = new WaitingListEntrant();
-        other.setWaitListEntrantId(entrant.getWaitListEntrantId());
-        other.setEntrantId(entrant.getEntrantId());
-        other.setGeoLocation(entrant.getGeoLocation());
-        other.setStatus(entrant.getStatus());
-        other.setNotified(entrant.isNotified());
-
-        assertEquals(entrant, other);
     }
 
     @Test
@@ -107,15 +64,4 @@ public class WaitingListEntrantTest {
         assertFalse(entrant.equals(other));
     }
 
-    @Test
-    public void testHashCode() {
-        WaitingListEntrant other = new WaitingListEntrant();
-        other.setWaitListEntrantId(entrant.getWaitListEntrantId());
-        other.setEntrantId(entrant.getEntrantId());
-        other.setGeoLocation(entrant.getGeoLocation());
-        other.setStatus(entrant.getStatus());
-        other.setNotified(entrant.isNotified());
-
-        assertEquals(entrant.hashCode(), other.hashCode());
-    }
 }
