@@ -11,7 +11,6 @@ import com.example.pickme.repositories.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,10 +21,6 @@ import java.util.stream.Collectors;
  * Utility class for running a lottery on an event's waiting list.
  */
 public class LotteryUtils {
-
-    private final WaitingListUtils waitingListUtils = new WaitingListUtils();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final EventRepository eventRepository = EventRepository.getInstance();
 
     /**
      * Runs the lottery for the specified event.
@@ -130,7 +125,7 @@ public class LotteryUtils {
         if (event == null) {
             return false;
         }
-        return event.getOrganizerId().equals(currentUserDeviceId) && !eventRepository.hasEventPassed(event);
+        return event.getOrganizerId().equals(currentUserDeviceId) && !EventRepository.getInstance().hasEventPassed(event);
     }
 
     /**
