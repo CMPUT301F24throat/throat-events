@@ -139,6 +139,7 @@ public class NotificationRepository {
 
             if(query != null){
                 for(DocumentChange change : query.getDocumentChanges()){
+                    Log.i("NOTIF", "doc changed: " + change.getDocument().getId());
                     Notification notification = change.getDocument().toObject(Notification.class);
 
                     if(!notification.getSendTo().contains(user.getDeviceId()))

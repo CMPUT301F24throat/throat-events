@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.navigation.ui.ktx)
     implementation(libs.navigation.dynamic.features.fragment)
     implementation(libs.navigation.compose)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
 
     // Testing Libraries
     testImplementation(libs.junit)

@@ -305,54 +305,6 @@ public class EventRepository {
         });
     }
 
-    /**
-     * Retrieves events within a specific date range.
-     *
-     * @param startDate The start date of the range.
-     * @param endDate The end date of the range.
-     * @param onCompleteListener The listener to notify upon completion.
-     */
-    public void getEventsByDateRange(Date startDate, Date endDate, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereGreaterThanOrEqualTo("eventDate", startDate)
-                .whereLessThanOrEqualTo("eventDate", endDate)
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        List<Event> events = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                            Event event = document.toObject(Event.class);
-                            if (event != null) {
-                                events.add(event);
-                            }
-                        }
-                        onCompleteListener.onComplete(Tasks.forResult(events));
-                    } else {
-                        onCompleteListener.onComplete(Tasks.forException(task.getException()));
-                    }
-                });
-    }
-
-    /**
-     * Retrieves events based on their location.
-     *
-     * @param location The location to filter events by.
-     * @param onCompleteListener The listener to notify upon completion.
-     */
-    public void getEventsByLocation(String location, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("location", location).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                    Event event = document.toObject(Event.class);
-                    if (event != null) {
-                        events.add(event);
-                    }
-                }
-                onCompleteListener.onComplete(Tasks.forResult(events));
-            } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
-            }
-        });
-    }
 
     public void addSnapshotListener(){
         //dont want to add multiple listeners

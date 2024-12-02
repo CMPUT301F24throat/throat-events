@@ -50,16 +50,14 @@ public class AdminToolsFragment extends Fragment {
         eventArchiveButton = view.findViewById(R.id.eventArchiveButton);
 
         // Set click listener to navigate to the admin gallery fragment
-        adminGalleryButton.setOnClickListener(v -> Navigation
-                .findNavController(view)
-                .navigate(R.id.action_adminToolsFragment_to_adminGalleryFragment));
-
-        userProfilesButton.setOnClickListener(v -> Navigation
-                .findNavController(view)
-                .navigate(R.id.action_adminToolsFragment_to_adminUserProfilesFragment));
-
         eventArchiveButton.setOnClickListener(v -> Navigation
                 .findNavController(view)
                 .navigate(R.id.action_adminToolsFragment_to_eventsArchiveFragment));
+        userProfilesButton.setOnClickListener(v -> Navigation
+                .findNavController(view)
+                .navigate(R.id.action_adminToolsFragment_to_adminUserProfilesFragment));
+        adminGalleryButton.setOnClickListener(v -> Navigation
+                .findNavController(view)
+                .navigate(R.id.action_adminToolsFragment_to_adminGalleryFragment));
     }
 }

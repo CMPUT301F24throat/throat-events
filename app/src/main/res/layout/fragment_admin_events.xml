@@ -4,8 +4,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".views.EventsArchiveFragment"
+    tools:context=".views.AdminEventsArchiveFragment"
     android:background="@color/background1">
+
+    <LinearLayout
+        android:id="@+id/imageCatalogHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="40dp"
+        android:paddingBottom="16dp"
+        app:flow_horizontalAlign="center"
+        app:flow_verticalAlign="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageCatalogBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/back"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:src="@drawable/ic_back"
+            app:layout_constraintStart_toEndOf="@id/startGuide"
+            app:layout_constraintTop_toBottomOf="@id/topGuide" />
+
+        <TextView
+            android:id="@+id/imageCatalogHeaderText"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="16dp"
+            android:text="Events Archive"
+            android:textAllCaps="false"
+            android:textColor="@color/text1"
+            android:textSize="25sp" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="80dp"
+            android:layout_height="3dp"
+            android:background="@color/icon" />
+
+        <ImageView
+            android:id="@+id/imageCatalogRefresh"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/back"
+            android:paddingStart="8dp"
+            android:paddingEnd="10dp"
+            android:src="@drawable/ic_refresh"
+            app:layout_constraintStart_toEndOf="@id/startGuide"
+            app:layout_constraintTop_toBottomOf="@id/topGuide"
+            app:tint="@color/text1" />
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
         android:layout_width="wrap_content"
@@ -28,40 +90,12 @@
         app:layout_constraintGuide_percent="0.05"
         android:id="@+id/topGuide"/>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95"
-        android:id="@+id/bottomGuide"/>
-
-    <ImageView
-        android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_back"
-        app:layout_constraintStart_toEndOf="@id/startGuide"
-        app:layout_constraintTop_toBottomOf="@id/topGuide"/>
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:text="@string/event_archive"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/back"
-        app:layout_constraintStart_toEndOf="@id/back"
-        app:layout_constraintTop_toTopOf="@id/back" />
-
     <EditText
         android:id="@+id/searchBar"
         android:layout_width="350dp"
         android:layout_height="48dp"
         android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:background="@drawable/search_bar_bg"
         android:drawableStart="@drawable/ic_search"
         android:drawablePadding="15dp"
@@ -73,7 +107,14 @@
         android:textSize="15sp"
         app:layout_constraintEnd_toStartOf="@id/endGuide"
         app:layout_constraintStart_toEndOf="@id/startGuide"
-        app:layout_constraintTop_toBottomOf="@id/back" />
+        app:layout_constraintTop_toBottomOf="@+id/imageCatalogHeader" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95"
+        android:id="@+id/bottomGuide"/>
 
     <View
         android:id="@+id/view1"
@@ -103,26 +144,18 @@
         app:layout_constraintBottom_toTopOf="@id/view2"
         app:layout_constraintStart_toEndOf="@id/idTitle"/>
 
-    <View
-        android:id="@+id/view4"
-        android:layout_width="2dp"
-        android:layout_height="0dp"
-        android:background="@color/dialogBG1"
-        app:layout_constraintTop_toBottomOf="@id/view1"
-        app:layout_constraintBottom_toTopOf="@id/view2"
-        app:layout_constraintStart_toEndOf="@id/eventTitle"/>
     <TextView
-        android:paddingVertical="5dp"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="ID"
         android:id="@+id/idTitle"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
+        android:paddingStart="5dp"
+        android:text="ID"
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/startGuide"
-        app:layout_constraintTop_toBottomOf="@id/view1"
-        android:paddingStart="5dp"/>
+        app:layout_constraintTop_toBottomOf="@id/view1" />
 
     <TextView
         android:paddingVertical="5dp"

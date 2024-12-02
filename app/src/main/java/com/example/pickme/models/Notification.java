@@ -13,7 +13,7 @@ import java.util.ArrayList;
  *     <li>Who it was sent from and when</li>
  *     <li>Who it's going to</li>
  * </ul>
- * @author Omar-Kattan-1
+ *
  * @version 1.1
  */
 public class Notification {
@@ -110,17 +110,5 @@ public class Notification {
 
     public void setEventID(String eventID) {
         this.eventID = eventID;
-    }
-
-    /**
-     * represents the group of people a notification will be sent to
-     */
-    public enum SendLevel{
-        Specific,
-        Entrants,
-        Users,
-        Organizers,
-        Admins,
-        All
     }
 }

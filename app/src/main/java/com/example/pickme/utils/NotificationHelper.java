@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Manages local notifications
- * @author Omar-Kattan-1
+ *
  * <p>
  * Responsibilities:
  * Create and send notifications to users
@@ -135,6 +135,8 @@ public class NotificationHelper {
 }
 
 /*
-  Sources:
-  ChatGPT: how do i make it wait for all my async stuff to finish
- */
+   Coding Sources
+   <p>
+   ChatGPT
+   - "how do i make it wait for all my async stuff to finish?"
+  */

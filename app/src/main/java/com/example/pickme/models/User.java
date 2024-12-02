@@ -12,7 +12,6 @@ import java.util.ArrayList;
 /**
  * Class that can represent, validate, and stores a user in the app.
  *
- * @author Kenneth (aesoji)
  * @version 1.2
  *
  * Responsibilities:
@@ -72,7 +71,7 @@ public class User implements Serializable {
 
     //---------- Get/Set User Profile Information --------------------
     public String getUserId() {
-        return userAuthId;
+        return deviceId;
     }
 
     public String getFirstName() {
@@ -168,7 +167,9 @@ public class User implements Serializable {
         return isAdmin;
     }
 
-    public void setIsAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
 
     public boolean isNotificationEnabled() {
         return notificationEnabled;

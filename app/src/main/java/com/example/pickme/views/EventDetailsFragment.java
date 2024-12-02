@@ -26,7 +26,6 @@ import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.GeoLocationUtils;
 import com.example.pickme.utils.LotteryUtils;
-import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Objects;
@@ -39,7 +38,6 @@ public class EventDetailsFragment extends Fragment {
     private User currentUser;
     private EventRepository eventRepository;
     private UserRepository userRepository;
-    private WaitingListUtils waitingListUtils;
 
     private boolean alreadyIn = false;
     private LotteryUtils lotteryUtils;
@@ -76,7 +74,6 @@ public class EventDetailsFragment extends Fragment {
 
             eventRepository = EventRepository.getInstance();
             userRepository = UserRepository.getInstance();
-            waitingListUtils = new WaitingListUtils();
             lotteryUtils = new LotteryUtils();
 
             configureView(view, currentUser);
@@ -209,7 +206,7 @@ public class EventDetailsFragment extends Fragment {
                 declineBtn.setVisibility(View.VISIBLE);
 
                 acceptBtn.setOnClickListener(v -> {
-                    entrant.setStatus(EntrantStatus.ACCEPTED);
+                    userEntrant.setStatus(EntrantStatus.ACCEPTED);
                     eventRepository.updateEvent(event, null, task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "You have accepted the invitation", Toast.LENGTH_SHORT).show();
@@ -242,7 +239,7 @@ public class EventDetailsFragment extends Fragment {
                 break;
 
             case REJECTED:
-                lotteryResultText.setText("Sorry! You were not selected to join the event\n You will be notified if a spot opens up and you are selected");
+                lotteryResultText.setText("Sorry! You were not selected to join the event\nYou will be notified if a spot opens up and you are selected");
                 lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
                 view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
 
@@ -259,7 +256,7 @@ public class EventDetailsFragment extends Fragment {
      * Configures the waitlist button based on the event and waiting list status.
      */
     private void configWaitlistBtn(View view) {
-        if(waitingListUtils == null || event == null)
+        if(event == null)
             return;
 
         Log.i("EVENT", "in config");
@@ -490,6 +487,7 @@ public class EventDetailsFragment extends Fragment {
      */
     private void navigateToLotteryOverview() {
         if (event != null) {
+            Log.i("LOTTERY", "navigating to overview");
             Bundle bundle = new Bundle();
             bundle.putSerializable("event", event);
             Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);

@@ -58,7 +58,6 @@ public class QRCodeViewFragment extends Fragment {
      * Required for Fragment instantiation.
      */
     public QRCodeViewFragment() {
-        // Required empty public constructor
     }
 
     /**
@@ -76,6 +75,13 @@ public class QRCodeViewFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Called when the fragment is being created. Initializes the repositories and QR code generator
+     * required for fetching event details and generating QR codes. Retrieves the event ID from
+     * fragment arguments if provided.
+     *
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous state.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +91,6 @@ public class QRCodeViewFragment extends Fragment {
             eventID = getArguments().getString(ARG_EVENT_ID);
         }
 
-        // Initialize repositories using singleton pattern
         eventRepository = EventRepository.getInstance();
         qrRepository = QrRepository.getInstance();
 
@@ -93,6 +98,16 @@ public class QRCodeViewFragment extends Fragment {
         qrCodeGenerator = new QRCodeGenerator(qrRepository);
     }
 
+    /**
+     * Inflates the fragment's layout and initializes the views.
+     * Sets up button click listeners and ensures the correct visibility of admin-only features.
+     * Fetches event details and triggers QR code generation or display.
+     *
+     * @param inflater The LayoutInflater object used to inflate the fragment's views.
+     * @param container The parent view to which this fragment will be attached.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous state.
+     * @return The root view of the fragment's layout.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -136,6 +151,13 @@ public class QRCodeViewFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Deletes the existing QR code associated with the event and regenerates a new one.
+     * Handles success and failure scenarios for both deletion and generation processes.
+     *
+     * This method uses the `QrRepository` to delete the QR code by its association path
+     * and regenerates it upon successful deletion or failure.
+     */
     private void deleteAndRegenerateQRCode() {
         String qrPath = "/events/" + eventID;
 
@@ -151,6 +173,13 @@ public class QRCodeViewFragment extends Fragment {
                 });
     }
 
+    /**
+     * Regenerates a QR code for the current event.
+     * Deletes the old QR code file from the file system (if it exists) and creates a new QR code
+     * in the repository based on the current event ID.
+     *
+     * The QR code generation is handled by the `QRCodeGenerator` utility.
+     */
     private void regenerateQRCode() {
         String newEncodedPath = "/events/" + eventID;
 
@@ -186,6 +215,13 @@ public class QRCodeViewFragment extends Fragment {
                 });
     }
 
+    /**
+     * Fetches the details of the event associated with the provided event ID from the repository.
+     * Updates the event title in the corresponding TextView and triggers the display of the
+     * associated QR code if the event details are successfully retrieved.
+     *
+     * Displays error messages if the event details cannot be loaded or the event title is missing.
+     */
     private void loadEventDetails() {
         eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
             @Override
@@ -208,6 +244,12 @@ public class QRCodeViewFragment extends Fragment {
         });
     }
 
+    /**
+     * Retrieves the QR code image file for the current event using the QRCodeGenerator utility
+     * and displays it in the ImageView. Animates the QR code visibility when loaded successfully.
+     *
+     * Displays appropriate error messages if the QR code file cannot be found or loaded.
+     */
     private void displayQRCode() {
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override
@@ -238,6 +280,16 @@ public class QRCodeViewFragment extends Fragment {
         });
     }
 
+    /**
+     * Shares the QR code associated with the current event.
+     * Retrieves the QR code image file using the QRCodeGenerator utility and shares it
+     * through an intent chooser. Ensures the file URI is shared securely using a FileProvider.
+     *
+     * Displays error messages in the following cases:
+     * - The QR code file cannot be found.
+     * - The QR code file path retrieval fails.
+     * - An error occurs while trying to share the QR code.
+     */
     private void shareQRCode() {
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override
@@ -275,3 +327,17 @@ public class QRCodeViewFragment extends Fragment {
         });
     }
 }
+
+/*
+  Code Sources
+  <p>
+  ChatGPT-4o:
+  - Explain how to implement sharing using androids built in share function
+  <p>
+  Github:
+  <p>
+  Java Documentation:
+  <p>
+  Android Documentation:
+  - Android Sharesheet
+ */

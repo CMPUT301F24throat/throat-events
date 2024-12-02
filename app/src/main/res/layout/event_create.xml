@@ -26,14 +26,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:contentDescription="Touch to go back"
-                android:fontFamily="sans-serif"
+                android:fontFamily="@font/inter_medium"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:text="Create a new event"
                 android:textAllCaps="false"
                 android:textColor="@color/text1"
                 android:textSize="20sp"
-                android:textStyle="bold"
                 app:icon="@drawable/ic_arrow"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +43,8 @@
                 android:layout_width="86dp"
                 android:layout_height="54dp"
                 android:layout_marginTop="4dp"
-                android:backgroundTint="@color/background1"
+                android:background="@null"
+                android:backgroundTint="#00FFFFFF"
                 android:contentDescription="Touch to delete event"
                 android:fontFamily="sans-serif"
                 android:insetTop="0dp"
@@ -53,17 +53,16 @@
                 android:paddingBottom="5dp"
                 android:textAllCaps="false"
                 android:textSize="20sp"
-                android:visibility="gone"
+                android:visibility="invisible"
                 app:icon="@drawable/ic_delete"
                 app:iconPadding="0dp"
                 app:iconSize="40dp"
-                app:iconTint="@color/background1"
+                app:iconTint="@null"
                 app:iconTintMode="add"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.923"
                 app:layout_constraintStart_toEndOf="@+id/back"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="gone" />
+                app:layout_constraintTop_toTopOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Section 2: Title, Date, Time, Address, Max Values -->
@@ -72,12 +71,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/section1">
 
             <EditText
                 android:id="@+id/title"
                 android:layout_width="330dp"
                 android:layout_height="50dp"
+                android:fontFamily="@font/inter"
                 android:hint="*Title"
                 android:inputType="text"
                 android:maxLines="1"
@@ -95,8 +97,9 @@
                 android:layout_marginTop="8dp"
                 android:drawableStart="@drawable/ic_calendar"
                 android:drawablePadding="8dp"
-                android:inputType="date"
+                android:fontFamily="@font/inter"
                 android:hint="*Date"
+                android:inputType="date"
                 android:textColor="@color/text1"
                 android:textColorHint="@color/text3"
                 android:textSize="14sp"
@@ -127,9 +130,11 @@
                     android:layout_width="140dp"
                     android:layout_height="48dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/rounded_button__no_border"
-                    android:inputType="datetime"
+                    android:background="@drawable/rounded_button_fragment"
+                    android:fontFamily="@font/inter"
                     android:hint="  *Start Time"
+                    android:inputType="datetime"
+                    android:paddingLeft="3dp"
                     android:textColor="@color/text1"
                     android:textColorHint="@color/text3"
                     android:textSize="14sp"
@@ -154,9 +159,11 @@
                     android:id="@+id/endTime"
                     android:layout_width="140dp"
                     android:layout_height="48dp"
-                    android:background="@drawable/rounded_button__no_border"
+                    android:background="@drawable/rounded_button_fragment"
+                    android:fontFamily="@font/inter"
                     android:hint="  *End Time"
                     android:inputType="datetime"
+                    android:paddingLeft="3dp"
                     android:textColor="@color/text1"
                     android:textColorHint="@color/text3"
                     android:textSize="14sp"
@@ -173,6 +180,7 @@
                 android:layout_marginTop="8dp"
                 android:drawableStart="@drawable/ic_location"
                 android:drawablePadding="8dp"
+                android:fontFamily="@font/inter"
                 android:hint="*Location"
                 android:textColor="@color/text1"
                 android:textColorHint="@color/text3"
@@ -197,6 +205,7 @@
                     android:digits="0123456789"
                     android:drawableStart="@drawable/ic_winners"
                     android:drawablePadding="8dp"
+                    android:fontFamily="@font/inter"
                     android:hint="*Max Winners"
                     android:inputType="number"
                     android:maxLines="1"
@@ -216,6 +225,7 @@
                     android:digits="0123456789"
                     android:drawableStart="@drawable/ic_entrants"
                     android:drawablePadding="8dp"
+                    android:fontFamily="@font/inter"
                     android:hint="Max Entrants"
                     android:inputType="number"
                     android:maxLines="1"
@@ -227,7 +237,33 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@id/winners"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/eventUpsert_titleCharCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="38dp"
+                android:fontFamily="@font/inter"
+                android:text="0/100"
+                android:textColor="@color/text3"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
+            <TextView
+                android:id="@+id/eventUpsert_locationCharCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="38dp"
+                android:fontFamily="@font/inter"
+                android:text="0/75"
+                android:textColor="@color/text3"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/address" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Section 3: Description, Add Image, Required Field, Create Button -->
@@ -246,14 +282,15 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:strokeColor="@null"
-                app:strokeWidth="0dp">
+                app:strokeColor="@color/buttonBG1"
+                app:strokeWidth="1dp">
 
                 <EditText
                     android:id="@+id/description"
                     android:layout_width="330dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/rounded_edittext_background"
+                    android:fontFamily="@font/inter"
                     android:gravity="top|start"
                     android:hint="Description"
                     android:inputType="textMultiLine"
@@ -292,6 +329,7 @@
                         android:layout_marginStart="4dp"
                         android:background="@drawable/ic_button_bg_main"
                         android:drawablePadding="8dp"
+                        android:fontFamily="@font/inter"
                         android:gravity="center"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="5dp"
@@ -300,12 +338,13 @@
                         android:textColor="@color/text1"
                         android:textSize="14sp" />
                 </LinearLayout>
-                
+
                 <CheckBox
                     android:id="@+id/requireGeolocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
+                    android:fontFamily="@font/inter"
                     android:text="Require Geolocation"
                     android:textColor="@color/text1"
                     android:textSize="14sp" />
@@ -316,11 +355,10 @@
                 android:layout_width="330dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@font/inter_medium"
                 android:text="@string/required_field"
                 android:textColor="@color/text2"
                 android:textSize="14sp"
-                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageGeolocationGroup" />
@@ -333,7 +371,7 @@
                 android:layout_marginBottom="80dp"
                 android:backgroundTint="@color/buttonBG1"
                 android:contentDescription="Touch to create event"
-                android:fontFamily="sans-serif"
+                android:fontFamily="@font/inter_medium"
                 android:paddingStart="5dp"
                 android:paddingTop="5dp"
                 android:paddingEnd="5dp"
@@ -350,6 +388,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/requiredField"
                 app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/eventUpsert_descriptionCharCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="38dp"
+                android:fontFamily="@font/inter"
+                android:text="0/750"
+                android:textColor="@color/text3"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/descCard" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

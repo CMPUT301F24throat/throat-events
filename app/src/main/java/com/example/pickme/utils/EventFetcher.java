@@ -12,22 +12,31 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 /**
- * Utility class to fetch the Event details associated with a given QR ID.
+ * Utility class to fetch the {@link Event} details associated with a given QR ID.
+ * This class interacts with the repositories to retrieve QR and Event information
+ * and provides callbacks for the results.
  */
 public class EventFetcher {
 
     private static final String TAG = "EventFetcher";
     private final EventRepository eventRepository;
 
+    /**
+     * Constructs an instance of EventFetcher with the specified {@link EventRepository}.
+     *
+     * @param eventRepository The repository to fetch event details.
+     */
     public EventFetcher(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
 
     /**
-     * Fetches the Event object associated with the given QR ID.
+     * Fetches the {@link Event} object associated with the given QR ID.
+     * The method first retrieves the QR document to extract the associated event ID
+     * and then fetches the event details using the extracted event ID.
      *
-     * @param qrID     The QR ID to look up in the database
-     * @param callback Callback to handle the result
+     * @param qrID     The QR ID to look up in the database. Must not be null or empty.
+     * @param callback Callback interface to handle the result or error.
      */
     public void getEventByEventId(String qrID, EventCallback callback) {
         if (qrID == null || qrID.isEmpty()) {
@@ -65,10 +74,10 @@ public class EventFetcher {
     }
 
     /**
-     * Fetches the Event object associated with the given event ID.
+     * Fetches the {@link Event} object associated with the given event ID.
      *
-     * @param eventID  The event ID to look up in the database
-     * @param callback Callback to handle the result
+     * @param eventID  The event ID to look up in the database. Must not be null or empty.
+     * @param callback Callback interface to handle the result or error.
      */
     private void fetchEventById(String eventID, EventCallback callback) {
         Log.d(TAG, "Fetching event details for Event ID: " + eventID);
@@ -77,12 +86,6 @@ public class EventFetcher {
             @Override
             public void onComplete(@NonNull Task<Event> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
-//                    DocumentSnapshot document = task.getResult();
-//
-//                    // Log the raw event document data for debugging
-//                    Log.d(TAG, "Raw Event Document: " + document.getData());
-
-                    // Convert Firestore document to Event object
                     Event event = task.getResult();
                     if (event != null) {
                         Log.d(TAG, "Event fetched: " + event.getEventTitle());
@@ -100,11 +103,22 @@ public class EventFetcher {
     }
 
     /**
-     * Callback interface for fetching the Event object.
+     * Callback interface to handle the result or error while fetching the {@link Event}.
      */
     public interface EventCallback {
+
+        /**
+         * Called when the {@link Event} object is successfully fetched.
+         *
+         * @param event The {@link Event} object containing the event details.
+         */
         void onEventFetched(Event event);
 
+        /**
+         * Called when an error occurs during the fetch operation.
+         *
+         * @param errorMessage A message describing the error.
+         */
         void onError(String errorMessage);
     }
 }
