@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -140,11 +142,94 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
         setVisibility(view, R.id.eventDetails_sendNotifBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_runLotteryBtn, isOrganizer);
-        setVisibility(view, R.id.eventDetails_joinWaitlistBtn, !isOrganizer);
         setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
 
-        configWaitlistBtn(view);
+        // Default of accept/decline buttons and lotteryResult is gone
+        view.findViewById(R.id.eventDetails_acceptInviteBtn).setVisibility(View.GONE);
+        view.findViewById(R.id.eventDetails_declineInviteBtn).setVisibility(View.GONE);
+        view.findViewById(R.id.eventDetails_selectedText).setVisibility(View.GONE);
+
+        // Waitlist button and response buttons display
+        if (!event.hasLotteryExecuted() && !isOrganizer) {
+            view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.VISIBLE);
+            configWaitlistBtn(view);
+        } else if (!isOrganizer) {
+            // need to check if the current user is an entrant of the waiting list
+            WaitingListEntrant userEntrant = event.getWaitingList().stream()
+                .filter(entrant -> entrant.getEntrantId().equals(currentUser.getDeviceId()))
+                .findFirst()
+                .orElse(null);
+
+            if (userEntrant != null) {
+            // User is an entrant on waiting list
+                view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
+                configResponseBtns(view, userEntrant);
+            }
+        }
+
         configLotteryBtn(view);
+    }
+
+    private void configResponseBtns(View view, WaitingListEntrant userEntrant) {
+        Button acceptBtn = view.findViewById(R.id.eventDetails_acceptInviteBtn);
+        Button declineBtn = view.findViewById(R.id.eventDetails_declineInviteBtn);
+        EditText lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
+
+        lotteryResultText.setVisibility(View.VISIBLE);
+
+        switch (userEntrant.getStatus()) {
+            case SELECTED:
+                // User was selected
+                lotteryResultText.setText("You have been selected to join the event!");
+                lotteryResultText.setBackgroundResource(R.drawable.selected_entrant_bg);
+
+                // Only if they're selected, we show the accept/decline buttons
+                acceptBtn.setVisibility(View.VISIBLE);
+                declineBtn.setVisibility(View.VISIBLE);
+
+                acceptBtn.setOnClickListener(v -> {
+                    entrant.setStatus(EntrantStatus.ACCEPTED);
+                    eventRepository.updateEvent(event, null, task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(requireContext(), "You have accepted the invitation", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to accept invitation", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+
+                declineBtn.setOnClickListener(v -> {
+                    entrant.setStatus(EntrantStatus.REJECTED);
+                    eventRepository.updateEvent(event, null, task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(requireContext(), "You have declined the invitation", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to decline invitation", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+                break;
+
+            case WAITING:
+                lotteryResultText.setText("Sorry! You were not selected to join the event\n You will be notified if a spot opens up and you are selected");
+                lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
+                break;
+
+            case CANCELLED:
+                lotteryResultText.setText("Your spot in the event was cancelled\n Look out for the next one!");
+                lotteryResultText.setBackgroundResource(R.drawable.cancelled_entrant_bg);
+                break;
+
+            case REJECTED:
+                lotteryResultText.setText("You have already rejected the invitation");
+                lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
+                break;
+
+            case ACCEPTED:
+                lotteryResultText.setText("You have already accepted the invitation");
+                lotteryResultText.setBackgroundResource(R.drawable.selected_entrant_bg);
+                break;
+        }
     }
 
     /**
@@ -153,10 +238,10 @@ public class EventDetailsFragment extends Fragment {
     private void configWaitlistBtn(View view) {
         if(waitingListUtils == null || event == null)
             return;
+
         Log.i("EVENT", "in config");
 
         View waitlistBtn = view.findViewById(R.id.eventDetails_joinWaitlistBtn);
-
         int waitingEntrantsCount = (int) event.getWaitingList().stream().filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING).count();
 
         String buttonText = "";
@@ -187,30 +272,13 @@ public class EventDetailsFragment extends Fragment {
                     enableButton = true;
                     break;
 
-                case SELECTED:
-                    buttonText = "Accept";
-                    enableButton = true;
-                    //TODO: need more buttons and stuff for accept/decline
-                    break;
-
-                case REJECTED:
-                    // User rejected an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus REJECTED
-                    // Waitlist is closed when lottery runs so can't rejoin anyways
-                    buttonText = "You have rejected this event";
-                    break;
-
-                case ACCEPTED:
-                    // User accepted an invitation; cannot rejoin waitlist will remain in waitlist with EntrantStatus ACCEPTED
-                    buttonText = "Already accepted event invite";
-                    break;
-
                 case CANCELLED:     // User cancelled their spot; can rejoin waitlist
                     buttonText = "Rejoin Waitlist";
                     enableButton = true;
                     break;
 
                 case ALL:
-                    buttonText = "Error";
+                    buttonText = " ";
                     break;
             }
         }
@@ -239,6 +307,7 @@ public class EventDetailsFragment extends Fragment {
 
     private void waitlistLogic(){
         if(!alreadyIn){
+            // If not already in, means they are joining waitlist for the first time
             WaitingListEntrant waitingListEntrant = new WaitingListEntrant(currentUser.getDeviceId(), null, EntrantStatus.WAITING);
             event.getWaitingList().add(waitingListEntrant);
             currentUser.getEventIDs().add(event.getEventId());
@@ -249,6 +318,7 @@ public class EventDetailsFragment extends Fragment {
             return;
         }
 
+        // User has joined before
         String logText = "";
         String toastText = "";
         switch (entrant.getStatus()){
@@ -257,13 +327,6 @@ public class EventDetailsFragment extends Fragment {
                 currentUser.getEventIDs().remove(event.getEventId());
                 logText = "Removed user from waitlist";
                 toastText = "You successfully left the waitlist";
-                break;
-
-            case SELECTED:
-                // TODO: perhaps move this so it is under an accept/decline button
-                entrant.setStatus(EntrantStatus.ACCEPTED);  // User stays in waiting list except status is changed to ACCEPTED so not counted as waiting entrant
-                logText = "User accepted event";
-                toastText = "You successfully accepted the invitation";
                 break;
 
             case CANCELLED:
@@ -291,7 +354,7 @@ public class EventDetailsFragment extends Fragment {
      * Configures the lottery button based on the event status.
      */
     private void configLotteryBtn(View view) {
-        View lotteryBtn = view.findViewById(R.id.eventDetails_runLotteryBtn);
+        Button lotteryBtn = view.findViewById(R.id.eventDetails_runLotteryBtn);
 
         if (!event.hasLotteryExecuted()) {
             // If lottery hasn't been run, set up click listener to open LotteryRunDialog
@@ -304,6 +367,7 @@ public class EventDetailsFragment extends Fragment {
             });
         } else {
             // If lottery has been run, set up click listener to navigate to lottery status fragment
+            lotteryBtn.setText("See Lottery Overview");
             lotteryBtn.setOnClickListener(v -> navigateToLotteryOverview());
         }
     }

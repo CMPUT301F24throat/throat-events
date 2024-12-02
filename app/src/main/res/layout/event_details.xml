@@ -137,19 +137,79 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/eventDetails_joinWaitlistBtn"
-            android:layout_width="250dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/eventDetails_userBtnsGroup"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/buttonBG1"
-            android:fontFamily="@font/inter_medium"
-            android:text="Join Waitlist"
-            app:cornerRadius="8dp"
-            app:icon="@drawable/ic_add"
+            android:layout_marginTop="24dp"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/eventDetails_poster" />
+            app:layout_constraintTop_toBottomOf="@+id/eventDetails_poster">
+
+            <Button
+                android:id="@+id/eventDetails_joinWaitlistBtn"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/buttonBG1"
+                android:fontFamily="@font/inter_medium"
+                android:text="Join Waitlist"
+                android:visibility="gone"
+                app:cornerRadius="8dp"
+                app:icon="@drawable/ic_add"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/eventDetails_acceptInviteBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:backgroundTint="@color/buttonBG2"
+                android:fontFamily="@font/inter_medium"
+                android:text="Accept"
+                android:textColor="@color/text2"
+                app:cornerRadius="8dp"
+                app:icon="@drawable/ic_checkmark"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/eventDetails_declineInviteBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="48dp"
+                android:background="@null"
+                android:backgroundTint="#00FFFFFF"
+                android:fontFamily="@font/inter_medium"
+                android:text="Decline"
+                android:textColor="@color/text2"
+                app:cornerRadius="8dp"
+                app:icon="@drawable/ic_close"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:strokeColor="@color/icon"
+                app:strokeWidth="2dp" />
+
+            <TextView
+                android:id="@+id/eventDetails_selectedText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="55dp"
+                android:background="@drawable/selected_entrant_bg"
+                android:padding="8dp"
+                android:text="You have been selected to join the event!"
+                android:textColor="@color/text1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/eventDetailsGroup1"
@@ -159,7 +219,7 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/eventDetails_joinWaitlistBtn">
+            app:layout_constraintTop_toBottomOf="@+id/eventDetails_userBtnsGroup">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/eventDateTimeGroup"

@@ -16,9 +16,7 @@ import androidx.navigation.Navigation;
 import com.example.pickme.R;
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
-import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.utils.LotteryUtils;
-import com.example.pickme.utils.WaitingListUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +28,6 @@ public class LotteryRunDialog extends DialogFragment {
 
     private Event event;
     private LotteryUtils lotteryUtils;
-    private WaitingListUtils waitingListUtils;
-    private EventRepository eventRepository;
     private TextView description;
 
     /**
@@ -42,8 +38,6 @@ public class LotteryRunDialog extends DialogFragment {
     public LotteryRunDialog(Event event) {
         this.event = event;
         this.lotteryUtils = new LotteryUtils();
-        this.waitingListUtils = new WaitingListUtils();
-        this.eventRepository = EventRepository.getInstance();
     }
 
 
