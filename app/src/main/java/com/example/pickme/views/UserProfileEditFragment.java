@@ -82,26 +82,14 @@ public class UserProfileEditFragment extends Fragment {
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                     if (uri != null) {
                         isChanged = true;
+                        img.setImageUrl(uri.toString());
+                        Glide.with(editProfilePicture.getRootView())
+                                .load(uri)
+                                .into(editProfilePicture);
                         Toast.makeText(
                                 this.getContext(),
-                                "Uploading...",
+                                "Profile picture uploaded!",
                                 Toast.LENGTH_SHORT).show();
-                        // uploads the image selected
-                        img.upload(uri, task -> {
-                            if (task.isSuccessful()) {
-                                Image i = task.getResult();
-                                img.setImageUrl(i.getImageUrl());
-                                // preview
-                                Glide.with(editProfilePicture.getRootView())
-                                        .load(img.getImageUrl())
-                                        .into(editProfilePicture);
-                                Toast.makeText(
-                                        this.getContext(),
-                                        "Profile picture uploaded!",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                     }
