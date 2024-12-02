@@ -9,7 +9,6 @@ import java.util.ArrayList;
  * - Singleton pattern since the user only ever has a single list of notifications
  * - automatically sorts the list after every add/remove from newest to oldest
  *
- * @author Omar-Kattan-1
  */
 public class NotificationList extends ArrayList<Notification> {
     private static NotificationList instance;

@@ -17,9 +17,6 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit tests for the Image class.
  * Tests validate uploading, updating, and downloading images
- *
- * @version 1.0
- * @author etdong
  */
 public class ImageTest {
 

@@ -28,7 +28,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 /**
  * Handles interactions with the notifications collection
- * @author sophiecabungcal, Omar-Kattan-1
+ *
  * @version 1.1
  * <b></b>
  * Responsibilities:

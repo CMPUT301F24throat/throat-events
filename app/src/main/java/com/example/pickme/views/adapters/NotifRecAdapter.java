@@ -17,24 +17,35 @@ import com.example.pickme.repositories.EventRepository;
 import java.util.ArrayList;
 
 /**
- * this class is an adapter for Notifications for a RecyclerView used on the Inbox screen
- *
- * @author Omar-Kattan-1
+ * Adapter class for displaying notifications in a RecyclerView on the Inbox screen.
  */
 public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHolder> {
     private Context context;
     private ArrayList<Notification> notifications;
 
+    /**
+     * Constructor for NotifRecAdapter.
+     *
+     * @param context the context in which the adapter is used
+     * @param notifications the list of notifications to display
+     */
     public NotifRecAdapter(Context context, ArrayList<Notification> notifications) {
         this.context = context;
         this.notifications = notifications;
     }
 
-    // ViewHolder class to hold references to the views
+    /**
+     * ViewHolder class to hold references to the views for each item in the RecyclerView.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView eventName;
         public TextView message;
 
+        /**
+         * Constructor for ViewHolder.
+         *
+         * @param view the view of the item
+         */
         public ViewHolder(View view) {
             super(view);
             eventName = view.findViewById(R.id.eventName);
@@ -42,7 +53,13 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
         }
     }
 
-    // Called when RecyclerView needs a new ViewHolder
+    /**
+     * Called when the RecyclerView needs a new ViewHolder.
+     *
+     * @param parent the parent ViewGroup
+     * @param viewType the view type of the new View
+     * @return a new ViewHolder instance
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // Inflate the item layout
@@ -50,7 +67,12 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
         return new ViewHolder(itemView);
     }
 
-    // Called to bind data to the ViewHolder
+    /**
+     * Called to bind data to the ViewHolder.
+     *
+     * @param holder the ViewHolder to bind data to
+     * @param position the position of the item in the data set
+     */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Notification notification = notifications.get(position);
@@ -69,10 +91,13 @@ public class NotifRecAdapter extends RecyclerView.Adapter<NotifRecAdapter.ViewHo
                 getColor(context, R.color.readNotif) : getColor(context, R.color.background3));
     }
 
-    // Returns the total number of items in the list
+    /**
+     * Returns the total number of items in the list.
+     *
+     * @return the total number of items
+     */
     @Override
     public int getItemCount() {
         return notifications.size();
     }
-
 }

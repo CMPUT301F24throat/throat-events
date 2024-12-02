@@ -26,7 +26,6 @@ import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.UserRepository;
 import com.example.pickme.utils.GeoLocationUtils;
 import com.example.pickme.utils.LotteryUtils;
-import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Objects;
@@ -39,7 +38,6 @@ public class EventDetailsFragment extends Fragment {
     private User currentUser;
     private EventRepository eventRepository;
     private UserRepository userRepository;
-    private WaitingListUtils waitingListUtils;
 
     private boolean alreadyIn = false;
     private LotteryUtils lotteryUtils;
@@ -76,7 +74,6 @@ public class EventDetailsFragment extends Fragment {
 
             eventRepository = EventRepository.getInstance();
             userRepository = UserRepository.getInstance();
-            waitingListUtils = new WaitingListUtils();
             lotteryUtils = new LotteryUtils();
 
             configureView(view, currentUser);
@@ -259,7 +256,7 @@ public class EventDetailsFragment extends Fragment {
      * Configures the waitlist button based on the event and waiting list status.
      */
     private void configWaitlistBtn(View view) {
-        if(waitingListUtils == null || event == null)
+        if(event == null)
             return;
 
         Log.i("EVENT", "in config");

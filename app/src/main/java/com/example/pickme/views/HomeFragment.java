@@ -176,7 +176,7 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * this method is responsible for loading the user's notifications, and putting it into the
+     * This method is responsible for loading the user's notifications, and putting it into the
      * ListView on the screen
      */
     private void loadInbox() {
@@ -211,6 +211,10 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * This method is responsible for loading the user's events that they're signed up for, and
+     * putting it into the RecyclerView on the screen
+     */
     private void loadMyEvents() {
         User user = User.getInstance();
 
@@ -249,10 +253,10 @@ public class HomeFragment extends Fragment {
 
         // TODO: load the events the user is on the waitlist for / upcoming
     }
-
 }
+
 /*
-  Code Sources
+  Coding Sources
   <p>
   StackOverflow:
   - Android Studio: Group elements together

@@ -13,7 +13,7 @@ import java.util.ArrayList;
  *     <li>Who it was sent from and when</li>
  *     <li>Who it's going to</li>
  * </ul>
- * @author Omar-Kattan-1
+ *
  * @version 1.1
  */
 public class Notification {
