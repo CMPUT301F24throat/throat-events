@@ -206,7 +206,7 @@ public class EventDetailsFragment extends Fragment {
                 declineBtn.setVisibility(View.VISIBLE);
 
                 acceptBtn.setOnClickListener(v -> {
-                    entrant.setStatus(EntrantStatus.ACCEPTED);
+                    userEntrant.setStatus(EntrantStatus.ACCEPTED);
                     eventRepository.updateEvent(event, null, task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "You have accepted the invitation", Toast.LENGTH_SHORT).show();
@@ -239,7 +239,7 @@ public class EventDetailsFragment extends Fragment {
                 break;
 
             case REJECTED:
-                lotteryResultText.setText("Sorry! You were not selected to join the event\n You will be notified if a spot opens up and you are selected");
+                lotteryResultText.setText("Sorry! You were not selected to join the event\nYou will be notified if a spot opens up and you are selected");
                 lotteryResultText.setBackgroundResource(R.drawable.not_selected_entrant_bg);
                 view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
 
