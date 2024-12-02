@@ -25,7 +25,6 @@ import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.repositories.UserRepository;
-import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.utils.WaitingListUtils;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -40,7 +39,6 @@ public class EventDetailsFragment extends Fragment {
     private EventRepository eventRepository;
     private UserRepository userRepository;
     private WaitingListUtils waitingListUtils;
-    private LotteryUtils lotteryUtils;
 
     private boolean alreadyIn = false;
     private WaitingListEntrant entrant;
@@ -75,7 +73,6 @@ public class EventDetailsFragment extends Fragment {
             eventRepository = EventRepository.getInstance();
             userRepository = UserRepository.getInstance();
             waitingListUtils = new WaitingListUtils();
-            lotteryUtils = new LotteryUtils();
 
             configureView(view, currentUser);
             displayEventDetails(view);
@@ -142,9 +139,9 @@ public class EventDetailsFragment extends Fragment {
         setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
         setVisibility(view, R.id.eventDetails_sendNotifBtn, isOrganizer);
         setVisibility(view, R.id.eventDetails_runLotteryBtn, isOrganizer);
-        setVisibility(view, R.id.eventDetails_moreInfoLink, isOrganizer);
 
         // Default of accept/decline buttons and lotteryResult is gone
+        view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
         view.findViewById(R.id.eventDetails_acceptInviteBtn).setVisibility(View.GONE);
         view.findViewById(R.id.eventDetails_declineInviteBtn).setVisibility(View.GONE);
         view.findViewById(R.id.eventDetails_selectedText).setVisibility(View.GONE);
@@ -170,6 +167,12 @@ public class EventDetailsFragment extends Fragment {
         configLotteryBtn(view);
     }
 
+    /**
+     * Configures the response buttons based on the user's entrant status.
+     *
+     * @param view The view to configure.
+     * @param userEntrant The user as a userEntrant.
+     */
     private void configResponseBtns(View view, WaitingListEntrant userEntrant) {
         Button acceptBtn = view.findViewById(R.id.eventDetails_acceptInviteBtn);
         Button declineBtn = view.findViewById(R.id.eventDetails_declineInviteBtn);
