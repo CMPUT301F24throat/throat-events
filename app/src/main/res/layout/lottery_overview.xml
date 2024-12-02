@@ -2,24 +2,27 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lotteryOverview_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/lotteryOverviewHeaderGroup"
+        android:id="@+id/lotteryOverview_groupHeader"
         android:layout_width="409dp"
-        android:layout_height="132dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/lotteryOverview_groupList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <Button
-            android:id="@+id/lotteryOverviewGoBackButton"
+            android:id="@+id/lotteryOverview_backBtn"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="58dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:contentDescription="Touch to go back"
             android:fontFamily="@font/inter"
             android:text="Back"
@@ -35,7 +38,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/lotteryOverview_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
@@ -47,28 +50,53 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintHorizontal_bias="0.094"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lotteryOverviewGoBackButton" />
+            app:layout_constraintTop_toBottomOf="@+id/lotteryOverview_backBtn" />
+
+        <TextView
+            android:id="@+id/lotteryStatsText"
+            android:layout_width="200dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/lottery_summary_bg"
+            android:fontFamily="@font/inter"
+            android:padding="8dp"
+            android:text="TextView"
+            android:textColor="@color/text2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lotteryOverview_header" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/lotteryOverviewListGroup"
+        android:id="@+id/lotteryOverview_groupList"
         android:layout_width="411dp"
-        android:layout_height="503dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginBottom="2dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/lotteryOverview_groupBtn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lotteryOverviewHeaderGroup">
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Spinner
+            android:id="@+id/lotteryOverview_dropdown"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="212dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edittext_background"
+            app:layout_constraintBottom_toTopOf="@+id/lotteryOverview_entrantList"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView2"
+            android:id="@+id/lotteryOverview_entrantList"
             android:layout_width="363dp"
             android:layout_height="385dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
+            android:layout_marginBottom="32dp"
             android:background="@color/background2"
             android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -77,67 +105,55 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/lotteryStatsText"
-            android:layout_width="200dp"
-            android:layout_height="35dp"
-            android:background="@drawable/lottery_summary_bg"
-            android:fontFamily="@font/inter"
-            android:padding="8dp"
-            android:text="TextView"
-            android:textColor="@color/text2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/filterLotteryListBtn"
-            android:layout_width="wrap_content"
+            android:id="@+id/lotteryOverview_viewText"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/buttonBG1"
-            android:fontFamily="@font/inter_semibold"
-            android:text="Filter List"
-            app:icon="@drawable/filter"
-            app:layout_constraintBottom_toTopOf="@+id/recyclerView2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.911"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lotteryStatsText" />
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/inter"
+            android:text="View:"
+            android:textColor="@color/text2"
+            app:layout_constraintBottom_toTopOf="@+id/lotteryOverview_entrantList"
+            app:layout_constraintEnd_toStartOf="@+id/lotteryOverview_dropdown"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout4"
+        android:id="@+id/lotteryOverview_groupBtn"
         android:layout_width="0dp"
         android:layout_height="93dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="2dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginBottom="40dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lotteryOverviewListGroup">
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/drawReplacementBtn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:backgroundTint="@color/buttonBG2"
             android:fontFamily="@font/inter_medium"
             android:paddingLeft="24dp"
             android:text="Draw Replacements"
             android:textColor="@color/text1"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="8dp" />
 
         <Button
             android:id="@+id/cancelPendingBtn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:backgroundTint="@color/buttonBG2"
             android:fontFamily="@font/inter_medium"
             android:text="Cancel Pending Entrants"
             android:textColor="@color/text1"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="8dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

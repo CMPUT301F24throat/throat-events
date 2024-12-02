@@ -1,6 +1,7 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Fragment that displays the list of lottery winners.
+ * A Fragment that displays the list of lottery winners after the lottery is ran.
  */
 public class LotteryWinnersFragment extends Fragment {
 
@@ -72,7 +72,7 @@ public class LotteryWinnersFragment extends Fragment {
         }
 
         confirmButton.setOnClickListener(v -> {
-            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(R.id.action_lotteryWinnersFragment_to_eventDetailsFragment);
+            getActivity().getOnBackPressedDispatcher().onBackPressed();
         });
     }
 
@@ -88,6 +88,7 @@ public class LotteryWinnersFragment extends Fragment {
                 if (userTask.isSuccessful() && userTask.getResult() != null) {
                     winners.add(userTask.getResult());
                     winnerAdapter.notifyDataSetChanged();
+                    Log.i("LOTTERY", "Added winner to list, id: " + userTask.getResult().getUserId());
                 }
             });
         }

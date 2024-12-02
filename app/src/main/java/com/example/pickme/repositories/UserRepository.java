@@ -97,9 +97,8 @@ public class UserRepository {
                 String userAuthId = Objects.requireNonNull(task.getResult().getUser()).getUid();
 
                 // Creates the User object
-//                String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
-
-                String initials = String.valueOf(firstName.charAt(0));
+                String last_initial = !lastName.isEmpty()? String.valueOf(lastName.charAt(0)) : "";
+                String initials = firstName.charAt(0) + last_initial;
                 Image newImage = new Image(deviceId, deviceId);
                 newImage.generate(initials, task1 -> {
                     if (task1.isSuccessful()) {

@@ -1,7 +1,5 @@
 package com.example.pickme.repositories;
 
-import android.util.Log;
-
 import android.net.Uri;
 import android.util.Log;
 
@@ -9,9 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.pickme.models.Event;
-import com.example.pickme.models.User;
 import com.example.pickme.models.Image;
 import com.example.pickme.models.QR;
+import com.example.pickme.models.User;
 import com.example.pickme.models.WaitingListEntrant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
@@ -341,52 +339,6 @@ public class EventRepository {
      */
     public void getEventsByLocation(String location, OnCompleteListener<List<Event>> onCompleteListener) {
         eventsRef.whereEqualTo("location", location).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                    Event event = document.toObject(Event.class);
-                    if (event != null) {
-                        events.add(event);
-                    }
-                }
-                onCompleteListener.onComplete(Tasks.forResult(events));
-            } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
-            }
-        });
-    }
-
-    /**
-     * Retrieves events based on their status.
-     *
-     * @param status The status to filter events by.
-     * @param onCompleteListener The listener to notify upon completion.
-     */
-    public void getEventsByStatus(String status, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("status", status).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                List<Event> events = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                    Event event = document.toObject(Event.class);
-                    if (event != null) {
-                        events.add(event);
-                    }
-                }
-                onCompleteListener.onComplete(Tasks.forResult(events));
-            } else {
-                onCompleteListener.onComplete(Tasks.forException(task.getException()));
-            }
-        });
-    }
-
-    /**
-     * Retrieves events based on their category.
-     *
-     * @param category The category to filter events by.
-     * @param onCompleteListener The listener to notify upon completion.
-     */
-    public void getEventsByCategory(String category, OnCompleteListener<List<Event>> onCompleteListener) {
-        eventsRef.whereEqualTo("category", category).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<Event> events = new ArrayList<>();
                 for (DocumentSnapshot document : task.getResult().getDocuments()) {

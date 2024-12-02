@@ -14,9 +14,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.Navigation;
 
 import com.example.pickme.R;
-import com.example.pickme.repositories.EventRepository;
+import com.example.pickme.models.Enums.EntrantStatus;
+import com.example.pickme.models.Event;
 import com.example.pickme.utils.LotteryUtils;
-import com.example.pickme.utils.WaitingListUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,22 +26,20 @@ import java.util.List;
  */
 public class LotteryRunDialog extends DialogFragment {
 
-    private String eventId;
+    private Event event;
     private LotteryUtils lotteryUtils;
-    private WaitingListUtils waitingListUtils;
-    private EventRepository eventRepository;
+    private TextView description;
 
     /**
      * Constructor for LotteryRunDialog.
      *
-     * @param eventId The ID of the event for which the lottery is being run.
+     * @param event The event for which the lottery is being run.
      */
-    public LotteryRunDialog(String eventId) {
-        this.eventId = eventId;
+    public LotteryRunDialog(Event event) {
+        this.event = event;
         this.lotteryUtils = new LotteryUtils();
-        this.waitingListUtils = new WaitingListUtils();
-        this.eventRepository = EventRepository.getInstance();
     }
+
 
     @NonNull
     @Override
@@ -50,17 +48,17 @@ public class LotteryRunDialog extends DialogFragment {
         View view = getLayoutInflater().inflate(R.layout.lottery_run_dialog, null);
         dialog.setContentView(view);
 
-        TextView title = view.findViewById(R.id.dialog_title);
-        TextView description = view.findViewById(R.id.dialog_description);
-        Button startButton = view.findViewById(R.id.start_button);
-        Button cancelButton = view.findViewById(R.id.cancel_button);
-
+        description = view.findViewById(R.id.lotteryRun_description);
+        Button startButton = view.findViewById(R.id.lotteryRun_startBtn);
+        Button cancelButton = view.findViewById(R.id.lotteryRun_cancelBtn);
+        setDialogDescription();
 
         // Set the start button click listener to run the lottery
         startButton.setOnClickListener(v -> {
-            lotteryUtils.runLottery(eventId, task -> {
+            lotteryUtils.runLottery(event, task -> {
                 if (task.isSuccessful()) {
                     List<String> selectedUserDeviceIds = task.getResult();
+
                     // If lottery was successful, navigate to the winners fragment
                     dialog.dismiss();
                     Bundle bundle = new Bundle();
@@ -84,11 +82,23 @@ public class LotteryRunDialog extends DialogFragment {
      * Static method to show the LotteryRunDialog.
      *
      * @param fragmentManager The FragmentManager to use for showing the dialog.
-     * @param eventId The ID of the event for which the lottery is being run.
+     * @param event The event for which the lottery is being run.
      */
-    public static void showDialog(FragmentManager fragmentManager, String eventId) {
-        LotteryRunDialog dialog = new LotteryRunDialog(eventId);
+    public static void showDialog(FragmentManager fragmentManager, Event event) {
+        LotteryRunDialog dialog = new LotteryRunDialog(event);
         dialog.show(fragmentManager, "LotteryRunDialog");
+    }
+
+    /**
+     * Sets the description text for the dialog.
+     */
+    private void setDialogDescription() {
+        int numToDraw = lotteryUtils.determineNumToDraw(event);
+        long numWaitingEntrants = event.getWaitingList().stream()
+                .filter(entrant -> entrant.getStatus() == EntrantStatus.WAITING)
+                .count();
+        String descriptionText = "We will draw " + numToDraw + " winners from your waitlist of " + numWaitingEntrants + " entrants.\nProceed?";
+        description.setText(descriptionText);
     }
 }
 /*

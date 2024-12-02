@@ -44,6 +44,8 @@ public class Image {
     // the date/time the image was last updated [non-nullable]
     private Timestamp updatedAt;
 
+    private boolean generated;
+
     // ImageRepository instance for Firebase interaction
     private ImageRepository ir;
 
@@ -71,6 +73,7 @@ public class Image {
 
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
+        this.generated = false;
     }
 
 
@@ -83,6 +86,7 @@ public class Image {
                 ImageType.EVENT_POSTER;
         this.createdAt = Timestamp.now();
         this.updatedAt = Timestamp.now();
+        this.generated = false;
     }
 
     /**
@@ -140,6 +144,11 @@ public class Image {
     public Timestamp getUpdatedAt() {
         return updatedAt;
     }
+
+    public boolean isGenerated() {
+        return generated;
+    }
+
     //endregion
 
     //region Class methods
@@ -176,6 +185,7 @@ public class Image {
      * Generates a random image from the uploader ID.
      */
     public void generate(String initials, OnCompleteListener<Image> listener) {
+        this.generated = true;
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(128), rnd.nextInt(128), rnd.nextInt(128));
         Bitmap b=Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
