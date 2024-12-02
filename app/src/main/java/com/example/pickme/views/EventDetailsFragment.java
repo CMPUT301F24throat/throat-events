@@ -360,7 +360,13 @@ public class EventDetailsFragment extends Fragment {
             }
         });
 
-        binding.cancel.setOnClickListener(view -> dialogue.dismiss());
+        binding.cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogue.dismiss();
+                Navigation.findNavController(requireView()).navigateUp();
+            }
+        });
 
         dialogue.show();
     }
