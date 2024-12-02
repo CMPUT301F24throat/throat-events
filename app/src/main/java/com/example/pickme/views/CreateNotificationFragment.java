@@ -32,7 +32,6 @@ import java.util.ArrayList;
 /**
  * This fragment handles the create/send screen for notifications
  *
- * @author Omar-Kattan-1
  * @version 1.1
  */
 public class CreateNotificationFragment extends Fragment {

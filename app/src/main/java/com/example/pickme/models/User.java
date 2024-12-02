@@ -12,7 +12,6 @@ import java.util.ArrayList;
 /**
  * Class that can represent, validate, and stores a user in the app.
  *
- * @author Kenneth (aesoji)
  * @version 1.2
  *
  * Responsibilities:

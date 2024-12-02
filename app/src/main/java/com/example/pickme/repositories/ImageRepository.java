@@ -29,8 +29,7 @@ import java.util.List;
  * Handles interactions with the images collection <br>
  * Responsibilities:
  * CRUD operations for image data
- * @author sophiecabungcal
- * @author etdong
+ *
  * @version 1.4
  */
 public class ImageRepository {

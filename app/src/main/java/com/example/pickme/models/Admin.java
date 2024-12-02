@@ -5,7 +5,6 @@ import com.example.pickme.repositories.UserRepository;
 /**
  * Class that represents an admin in the app.
  *
- * @author Kenneth (aesoji)
  * @version 1.0
  *
  * Responsibilities:

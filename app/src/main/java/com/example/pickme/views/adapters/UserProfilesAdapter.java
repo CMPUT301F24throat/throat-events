@@ -17,6 +17,9 @@ import com.example.pickme.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter class for displaying user profiles in a RecyclerView.
+ */
 public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapter.EventViewHolder> {
 
     private final List<User> usersList;
@@ -24,6 +27,13 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
     private final Context context;
     private final OnItemClickListener onItemClickListener;
 
+    /**
+     * Constructor for UserProfilesAdapter.
+     *
+     * @param context the context in which the adapter is used
+     * @param usersList the list of users to display
+     * @param onItemClickListener the listener for item click events
+     */
     public UserProfilesAdapter(Context context, List<User> usersList, OnItemClickListener onItemClickListener) {
         this.context = context;
         this.usersList = usersList;
@@ -31,11 +41,21 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
         this.onItemClickListener = onItemClickListener;
     }
 
+    /**
+     * Interface for handling item click events.
+     */
     public interface OnItemClickListener {
         void onDeleteClick(User user, int position);
         void onFacilityClick(User user, int position);
     }
 
+    /**
+     * Called when the RecyclerView needs a new ViewHolder.
+     *
+     * @param parent the parent ViewGroup
+     * @param viewType the view type of the new View
+     * @return a new EventViewHolder instance
+     */
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -43,6 +63,12 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
         return new EventViewHolder(view);
     }
 
+    /**
+     * Called to bind data to the ViewHolder.
+     *
+     * @param holder the ViewHolder to bind data to
+     * @param position the position of the item in the data set
+     */
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         User user = filteredList.get(position);
@@ -53,11 +79,19 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
         holder.facilityDetails.setOnClickListener(v -> onItemClickListener.onFacilityClick(user, position));
     }
 
+    /**
+     * Returns the total number of items in the list.
+     *
+     * @return the total number of items
+     */
     @Override
     public int getItemCount() {
         return filteredList.size();
     }
 
+    /**
+     * ViewHolder class to hold references to the views for each item in the RecyclerView.
+     */
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView lastNameTitle;
         TextView firstNameTitle;
@@ -65,6 +99,11 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
         ImageView delete;
         ImageView facilityDetails;
 
+        /**
+         * Constructor for EventViewHolder.
+         *
+         * @param itemView the view of the item
+         */
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
             firstNameTitle = itemView.findViewById(R.id.firstNameTitle);
@@ -75,14 +114,22 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
         }
     }
 
+    /**
+     * Updates the list of users and notifies the adapter of data changes.
+     *
+     * @param arrayList the new list of users
+     */
     public void updateList(List<User> arrayList) {
         filteredList.clear();
         filteredList = arrayList;
         notifyDataSetChanged();
     }
 
-
-    // Method to filter the list
+    /**
+     * Filters the list of users based on a query.
+     *
+     * @param query the query to filter the list
+     */
     public void filter(String query) {
         if (TextUtils.isEmpty(query)) {
             filteredList = new ArrayList<>(usersList); // Reset to full list if query is empty

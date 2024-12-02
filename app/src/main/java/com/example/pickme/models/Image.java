@@ -19,7 +19,7 @@ import java.util.Random;
 
 /**
  * Represents an image uploaded by the user
- * @author sophiecabungcal, etdong
+ *
  * @version 1.1
  */
 public class Image {

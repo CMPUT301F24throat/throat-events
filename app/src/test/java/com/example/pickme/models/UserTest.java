@@ -16,8 +16,6 @@ import org.mockito.MockitoAnnotations;
  * This test class verifies the behavior, constraints, and validation logic of the User model class,
  * including constructors, updating, and verifying.
  *
- * @version 1.0
- * @author Kenneth Agonoy
  * <p>
  * Responsibilities:
  * - Test that a user is created with the correct attributes.
