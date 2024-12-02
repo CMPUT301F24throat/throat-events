@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.example.pickme.views.adapters.NotifRecAdapter;
  */
 public class InboxFragment extends Fragment {
     NotificationRepository notificationRepository = NotificationRepository.getInstance();
+    private TextView noNotifsText;
 
     /**
      * Inflates the fragment's view.
@@ -57,6 +59,9 @@ public class InboxFragment extends Fragment {
 
         // Get the singleton instance of NotificationList
         NotificationList notifications = NotificationList.getInstance();
+        noNotifsText = view.findViewById(R.id.noNotifsText);
+
+        noNotifsText.setVisibility(notifications.isEmpty() ? View.VISIBLE : View.GONE);
 
         // Set up the RecyclerView with the notification adapter
         NotifRecAdapter notificationAdapter = new NotifRecAdapter(getContext(), notifications);
