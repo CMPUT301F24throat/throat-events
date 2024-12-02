@@ -21,6 +21,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * Utility class for generating and caching QR codes.
+ * <p>
+ * This class provides methods to:
+ * - Retrieve QR codes from Firestore or generate them dynamically.
+ * - Cache QR codes locally for reuse to minimize redundant computation.
+ * - Handle QR code generation errors and provide callbacks for results.
+ * <p>
+ * It uses the ZXing library for QR code generation and stores cached images in the app's cache directory.
+ */
 public class QRCodeGenerator {
 
     private static final int QR_CODE_WIDTH = 500;
