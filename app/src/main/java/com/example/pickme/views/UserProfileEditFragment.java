@@ -144,6 +144,16 @@ public class UserProfileEditFragment extends Fragment {
             // Initialize img only if it's null
             if (img == null) {
                 img = new Image(user.getUserId(), user.getUserId()); // Ensure userId is not null here
+                img.download(new ImageQuery() {
+                    @Override
+                    public void onSuccess(Image image) {
+                        img = image;
+                    }
+
+                    @Override
+                    public void onEmpty() {
+                    }
+                });
             }
 
             // Ensure the imageUrl is not null or empty
