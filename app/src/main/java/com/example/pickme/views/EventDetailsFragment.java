@@ -315,7 +315,17 @@ public class EventDetailsFragment extends Fragment {
         // Geolocation part //
         waitlistBtn.setOnClickListener(v -> {
             if (event.isGeoLocationRequired()) {
-                dialogGeoLocation();
+                if(!currentUser.isGeoLocationEnabled())
+                    dialogGeoLocation();
+                else{
+                    new GeoLocationUtils().fetchCurrentLocation(requireActivity(), (latitude, longitude) -> {
+                        GeoPoint currentUserLocation = new GeoPoint(latitude, longitude);
+                        Log.i("EVENT", "User location fetched: " + latitude + ", " + longitude);
+
+                        // Perform waitlist logic with location
+                        waitlistLogic(currentUserLocation);
+                    });
+                }
             } else {
                 // Perform waitlist logic without requiring geolocation
                 waitlistLogic(null);
@@ -353,6 +363,11 @@ public class EventDetailsFragment extends Fragment {
                     GeoPoint currentUserLocation = new GeoPoint(latitude, longitude);
                     Log.i("EVENT", "User location fetched: " + latitude + ", " + longitude);
 
+                    currentUser.setGeoLocationEnabled(true);
+
+                    UserRepository.updateUser(currentUser, task -> {
+                        Log.i("EVENT", "updated user geolocation");
+                    });
                     // Perform waitlist logic with location
                     waitlistLogic(currentUserLocation);
                 });
