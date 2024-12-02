@@ -116,11 +116,9 @@ public class Notification {
      * represents the group of people a notification will be sent to
      */
     public enum SendLevel{
-        Specific,
-        Entrants,
-        Users,
-        Organizers,
-        Admins,
-        All
+        All,
+        Selected,
+        Cancelled,
+        Rejected
     }
 }

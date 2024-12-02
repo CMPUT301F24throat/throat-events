@@ -487,6 +487,7 @@ public class EventDetailsFragment extends Fragment {
      */
     private void navigateToLotteryOverview() {
         if (event != null) {
+            Log.i("LOTTERY", "navigating to overview");
             Bundle bundle = new Bundle();
             bundle.putSerializable("event", event);
             Navigation.findNavController(requireView()).navigate(R.id.action_eventDetailsFragment_to_lotteryOverviewFragment, bundle);

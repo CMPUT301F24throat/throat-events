@@ -1,7 +1,9 @@
 package com.example.pickme.views;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -23,6 +25,7 @@ import com.example.pickme.repositories.EventRepository;
 import com.example.pickme.utils.LotteryUtils;
 import com.example.pickme.views.adapters.EntrantAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,13 @@ public class LotteryOverviewFragment extends Fragment {
     private Event event;
     private TextView lotteryStatsText;
     private LotteryUtils lotteryUtils;
+
+    private ArrayList<WaitingListEntrant> entrants;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.lottery_overview, container, false);
+    }
 
     /**
      * Called when the fragment's view has been created.
@@ -56,7 +66,8 @@ public class LotteryOverviewFragment extends Fragment {
 
         entrantList = view.findViewById(R.id.lotteryOverview_entrantList);
         entrantList.setLayoutManager(new LinearLayoutManager(getContext()));
-        entrantAdapter = new EntrantAdapter(filterEntrants(EntrantStatus.SELECTED));
+        entrantAdapter = new EntrantAdapter(entrants);
+        entrantAdapter.updateEntrants(filterEntrants(EntrantStatus.SELECTED));
         entrantList.setAdapter(entrantAdapter);
 
         lotteryStatsText = view.findViewById(R.id.lotteryOverview_lotteryStatsText);
@@ -71,7 +82,8 @@ public class LotteryOverviewFragment extends Fragment {
         statusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                EntrantStatus selectedStatus = EntrantStatus.values()[position];
+                String[] options = getResources().getStringArray(R.array.entrant_status_array);
+                EntrantStatus selectedStatus = EntrantStatus.valueOf(options[position].toUpperCase());
                 entrantAdapter.updateEntrants(filterEntrants(selectedStatus));
             }
 
@@ -133,9 +145,11 @@ public class LotteryOverviewFragment extends Fragment {
      * @return A list of entrants with the specified status.
      */
     private List<WaitingListEntrant> filterEntrants(EntrantStatus status) {
-        return event.getWaitingList().stream()
+        entrants = (ArrayList<WaitingListEntrant>) event.getWaitingList().stream()
                 .filter(e -> e.getStatus() == status)
                 .collect(Collectors.toList());
+
+        return entrants;
     }
 
     /**
