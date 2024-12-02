@@ -168,3 +168,11 @@ public class MyEventsFragment extends Fragment implements EventAdapter.OnEventCl
         navController.navigate(R.id.action_myEventsFragment_to_eventDetailsFragment, bundle);
     }
 }
+
+/*
+   Coding Sources
+   <p>
+   Stack Overflow
+   - https://stackoverflow.com/questions/60848166/cannot-resolve-method-getparentfragmentmanager
+   - https://stackoverflow.com/questions/77237163/android-how-to-share-result-from-one-fragment-to-another-with-fragment-result-a
+  */

@@ -17,7 +17,6 @@ import com.example.pickme.R;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.WaitingListEntrant;
 import com.example.pickme.repositories.EventRepository;
-import com.example.pickme.utils.WaitingListUtils;
 import com.example.pickme.views.adapters.WaitingListAdapter;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
  */
 public class EventWaitingListFragment extends Fragment implements OnMapReadyCallback {
     private Event event;
-    private WaitingListUtils waitingListUtils;
     private RecyclerView waitingListRecyclerView;
     private WaitingListAdapter waitingListAdapter;
     private ArrayList<WaitingListEntrant> entrants = new ArrayList<>();
@@ -68,8 +66,6 @@ public class EventWaitingListFragment extends Fragment implements OnMapReadyCall
                 Navigation.findNavController(requireView()).navigateUp();
                 return;
             }
-
-            waitingListUtils = new WaitingListUtils();
 
             waitingListRecyclerView = view.findViewById(R.id.waitingList_list);
             waitingListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
