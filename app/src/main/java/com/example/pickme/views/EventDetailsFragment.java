@@ -150,10 +150,8 @@ public class EventDetailsFragment extends Fragment {
         view.findViewById(R.id.eventDetails_declineInviteBtn).setVisibility(View.GONE);
         view.findViewById(R.id.eventDetails_selectedText).setVisibility(View.GONE);
 
-        Log.i("EVENT", "hasLotteryExecuted: " + event.getHasLotteryExecuted().toString());
-
         // Waitlist button and response buttons display
-        if (!event.getHasLotteryExecuted() && !isOrganizer) {
+        if (event!=null && !event.getHasLotteryExecuted() && !isOrganizer) {
             view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.VISIBLE);
             configWaitlistBtn(view);
         } else if (!isOrganizer) {
@@ -171,7 +169,7 @@ public class EventDetailsFragment extends Fragment {
             }
             else {
                 // User is not an entrant on waiting list and event has already ran lottery
-                Log.i("EVENT", "userEntrant = null");
+                Log.i("EVENT", "userEndialoggeolotrant = null");
                 TextView lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
                 lotteryResultText.setVisibility(View.VISIBLE);
                 lotteryResultText.setText("Sorry, the lottery has already been run for this event.");

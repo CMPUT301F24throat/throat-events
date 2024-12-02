@@ -49,6 +49,16 @@ public class EventTest {
 //    }
 
     @Test
+    public void testHasLotteryExecuted() {
+        // Test setting and getting GeoLocationRequired
+        event.setHasLotteryExecuted(false);
+        assertFalse(event.getHasLotteryExecuted());
+
+        event.setHasLotteryExecuted(true);
+        assertTrue(event.getHasLotteryExecuted());
+    }
+
+    @Test
     public void testInvalidEventDate() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             event.setEventDate("invalid date format");  // Invalid date
