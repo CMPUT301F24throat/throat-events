@@ -111,6 +111,7 @@ public class UserProfileEditFragment extends Fragment {
         // Save the changes
         saveButton.setOnClickListener(v -> {
             if (validateUserChanges()) {
+                saveButton.setEnabled(false);
                 saveUserData();
             }
         });
