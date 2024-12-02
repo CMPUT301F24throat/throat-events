@@ -34,7 +34,7 @@ public class WaitingList {
         this.entrants = event.getWaitingList();
         this.numEntrants = (int) this.entrants.stream().filter(e -> e.getStatus() == EntrantStatus.WAITING).count();
 
-        if (event.hasLotteryExecuted()) {
+        if (event.getHasLotteryExecuted()) {
             this.status = WaitingListStatus.CLOSED;
         } else if (this.maxEntrants!= null && this.numEntrants >= this.maxEntrants) {
             this.status = WaitingListStatus.FULL;

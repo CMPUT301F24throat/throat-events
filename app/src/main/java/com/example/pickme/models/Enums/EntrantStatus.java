@@ -20,12 +20,12 @@ public enum EntrantStatus {
     SELECTED,
 
     /**
-     * User was selected to attend the event but rejected from accepting the invite.
+     * User was not selected to attend the event.
      */
     REJECTED,
 
     /**
-     * User's spot in the waiting list was cancelled.
+     * User declined the invitation
      */
     CANCELLED,
 
