@@ -367,7 +367,6 @@ public class EventDetailsFragment extends Fragment {
                 if (task.isSuccessful()) {
                     Log.i("EVENT", "Added user to waitlist");
                     Toast.makeText(requireContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
-                    refreshFragment();
                 } else {
                     Log.i("EVENT", "Failed to add user to waitlist");
                     Toast.makeText(requireContext(), "Failed to join waitlist. Please try again.", Toast.LENGTH_SHORT).show();
@@ -401,21 +400,11 @@ public class EventDetailsFragment extends Fragment {
             if (task.isSuccessful()) {
                 Log.i("EVENT", logText);
                 Toast.makeText(requireContext(), toastText, Toast.LENGTH_SHORT).show();
-                refreshFragment();
             } else {
                 Log.i("EVENT", "Failed to update waitlist: " + logText);
                 Toast.makeText(requireContext(), "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-
-    /**
-     * Refreshes the current fragment by reloading it.
-     */
-    private void refreshFragment() {
-        Navigation.findNavController(requireView())
-                .navigate(R.id.action_eventDetailsFragment_self);
     }
 
     /**

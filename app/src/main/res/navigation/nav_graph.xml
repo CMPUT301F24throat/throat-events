@@ -123,11 +123,6 @@
         <action
             android:id="@+id/action_eventDetailsFragment_to_eventWaitingListFragment"
             app:destination="@id/eventWaitingListFragment" />
-
-        <!-- Self-navigation to refresh the fragment -->
-        <action
-            android:id="@+id/action_eventDetailsFragment_self"
-            app:destination="@id/eventDetailsFragment" />
     </fragment>
 
     <!-- Event Lottery Overview -->
