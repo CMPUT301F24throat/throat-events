@@ -251,6 +251,11 @@ public class EventDetailsFragment extends Fragment {
      * @param location The user's current location, or null if not required.
      */
     // Geolocation
+    /**
+     * Handles the waitlist logic based on the user's status and geolocation.
+     *
+     * @param location The user's current location, or null if not required.
+     */
     private void waitlistLogic(GeoPoint location) {
         if (!alreadyIn) {
             WaitingListEntrant waitingListEntrant = new WaitingListEntrant(
@@ -265,6 +270,7 @@ public class EventDetailsFragment extends Fragment {
                 if (task.isSuccessful()) {
                     Log.i("EVENT", "Added user to waitlist");
                     Toast.makeText(requireContext(), "You successfully joined the waitlist", Toast.LENGTH_SHORT).show();
+                    refreshFragment();
                 } else {
                     Log.i("EVENT", "Failed to add user to waitlist");
                     Toast.makeText(requireContext(), "Failed to join waitlist. Please try again.", Toast.LENGTH_SHORT).show();
@@ -298,11 +304,21 @@ public class EventDetailsFragment extends Fragment {
             if (task.isSuccessful()) {
                 Log.i("EVENT", logText);
                 Toast.makeText(requireContext(), toastText, Toast.LENGTH_SHORT).show();
+                refreshFragment();
             } else {
                 Log.i("EVENT", "Failed to update waitlist: " + logText);
                 Toast.makeText(requireContext(), "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+    /**
+     * Refreshes the current fragment by reloading it.
+     */
+    private void refreshFragment() {
+        Navigation.findNavController(requireView())
+                .navigate(R.id.action_eventDetailsFragment_self);
     }
 
     /**
