@@ -44,12 +44,26 @@ public class UserProfileEditFragment extends Fragment {
     private boolean isChanged = false;
     private Image img;
 
+    /**
+     * Creates the view for the user profile edit fragment.
+     *
+     * @param inflater The layout inflater
+     * @param container The view group container
+     * @param savedInstanceState The saved instance state
+     * @return The view for the user profile edit fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.user_profile_edit, container, false);
     }
 
+    /**
+     * Initializes the views and sets up the listeners.
+     *
+     * @param view The view to initialize
+     * @param savedInstanceState The saved instance state
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -342,7 +356,6 @@ public class UserProfileEditFragment extends Fragment {
         Navigation.findNavController(getView()).navigate(R.id.action_userProfileEditFragment_to_userProfileFragment);
     }
 }
-
 
 /*
    Coding Sources

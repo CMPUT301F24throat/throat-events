@@ -29,6 +29,13 @@ public class WinnerAdapter extends RecyclerView.Adapter<WinnerAdapter.WinnerView
         this.winnerList = winnerList;
     }
 
+    /**
+     * Called when the RecyclerView needs a new ViewHolder.
+     *
+     * @param parent The parent ViewGroup.
+     * @param viewType The view type of the new View.
+     * @return A new WinnerViewHolder instance.
+     */
     @NonNull
     @Override
     public WinnerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,6 +43,12 @@ public class WinnerAdapter extends RecyclerView.Adapter<WinnerAdapter.WinnerView
         return new WinnerViewHolder(view);
     }
 
+    /**
+     * Called to bind data to the ViewHolder.
+     *
+     * @param holder The ViewHolder to bind data to.
+     * @param position The position of the item in the data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull WinnerViewHolder holder, int position) {
         User user = winnerList.get(position);
@@ -47,6 +60,11 @@ public class WinnerAdapter extends RecyclerView.Adapter<WinnerAdapter.WinnerView
         holder.winnerNumber.setText(String.valueOf(position + 1));
     }
 
+    /**
+     * Returns the total number of items in the list.
+     *
+     * @return The total number of items.
+     */
     @Override
     public int getItemCount() {
         return winnerList.size();

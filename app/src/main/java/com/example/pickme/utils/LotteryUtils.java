@@ -11,7 +11,6 @@ import com.example.pickme.repositories.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,10 +21,6 @@ import java.util.stream.Collectors;
  * Utility class for running a lottery on an event's waiting list.
  */
 public class LotteryUtils {
-
-    private final WaitingListUtils waitingListUtils = new WaitingListUtils();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final EventRepository eventRepository = EventRepository.getInstance();
 
     /**
      * Runs the lottery for the specified event.
@@ -53,34 +48,70 @@ public class LotteryUtils {
     }
 
     /**
-     * Replaces the rejected entrants with new entrants from the waiting list.
+     * Replaces the entrants who declined their invitation with new entrants from the waiting list.
      *
      * @param event The event for which the lottery is to be run.
      * @param onCompleteListener The listener to be called upon completion of the lottery process.
      */
-    public void replaceRejectedEntrants(Event event, OnCompleteListener<List<String>> onCompleteListener) {
-        List<WaitingListEntrant> rejectedEntrants = event.getWaitingList().stream()
-                .filter(e -> e.getStatus() == EntrantStatus.REJECTED)
+    public void replaceCancelledEntrants(Event event, OnCompleteListener<List<String>> onCompleteListener) {
+        List<WaitingListEntrant> cancelledEntrants = event.getWaitingList().stream()
+                .filter(e -> e.getStatus() == EntrantStatus.CANCELLED)
                 .collect(Collectors.toList());
 
-        for (WaitingListEntrant entrant : rejectedEntrants) {
-            entrant.setStatus(EntrantStatus.CANCELLED);
-        }
-
-        // Create a new list with updated statuses
         ArrayList<WaitingListEntrant> updatedWaitingList = new ArrayList<>(event.getWaitingList());
-        for (WaitingListEntrant entrant : rejectedEntrants) {
-            int index = updatedWaitingList.indexOf(entrant);
-            if (index != -1) {
-                updatedWaitingList.set(index, entrant);
-            }
-        }
+        updatedWaitingList.removeAll(cancelledEntrants);  // Get rid of the cancelled entrants
 
-        // Update the event's waiting list with the modified entrants before drawing the lottery
+        // Update the event's waiting list to not include the cancelled entrants
         event.setWaitingList(updatedWaitingList);
 
-        int rejectedCount = rejectedEntrants.size();
+        // Remove eventId from each cancelled entrant's eventIDs property and update the user in Firestore
+        for (WaitingListEntrant entrant : cancelledEntrants) {
+            UserRepository userRepository = UserRepository.getInstance();
+            userRepository.getUserByDeviceId(entrant.getEntrantId(), userTask -> {
+                if (userTask.isSuccessful() && userTask.getResult() != null) {
+                    User user = userTask.getResult();
+                    if (user != null) {
+                        user.getEventIDs().remove(event.getEventId());
+                        userRepository.updateUser(user, null);
+                    }
+                }
+            });
+        }
+
+        // Draw the lottery for the event with the number of cancelled entrants
+        int rejectedCount = cancelledEntrants.size();
         drawLottery(event, rejectedCount, onCompleteListener);
+    }
+
+    /**
+     * Sets pending entrants (selected entrants who haven't accepted/declined) as cancelled.
+     *
+     * @param event The event for which the lottery is to be run.
+     * @param onCompleteListener The listener to be called upon completion of the lottery process.
+     */
+    public void cancelPendingEntrants(Event event, OnCompleteListener<Void> onCompleteListener) {
+        List<WaitingListEntrant> pendingEntrants = event.getWaitingList().stream()
+                .filter(e -> e.getStatus() == EntrantStatus.SELECTED)
+                .collect(Collectors.toList());
+
+        ArrayList<WaitingListEntrant> updatedWaitingList = new ArrayList<>(event.getWaitingList());
+        // Update status of selected entrants to cancelled
+        for (WaitingListEntrant entrant : pendingEntrants) {
+            entrant.setStatus(EntrantStatus.CANCELLED);
+            updatedWaitingList.set(updatedWaitingList.indexOf(entrant), entrant);
+        }
+
+        // Update the event's waiting list to not include the pending entrants
+        event.setWaitingList(updatedWaitingList);
+
+        // Update the event in the database with the new waiting list
+        EventRepository.getInstance().updateEvent(event, null, task -> {
+            if (task.isSuccessful()) {
+                onCompleteListener.onComplete(Tasks.forResult(null));
+            } else {
+                onCompleteListener.onComplete(Tasks.forException(task.getException()));
+            }
+        });
     }
 
     /**
@@ -94,7 +125,7 @@ public class LotteryUtils {
         if (event == null) {
             return false;
         }
-        return event.getOrganizerId().equals(currentUserDeviceId) && !eventRepository.hasEventPassed(event);
+        return event.getOrganizerId().equals(currentUserDeviceId) && !EventRepository.getInstance().hasEventPassed(event);
     }
 
     /**
@@ -143,7 +174,7 @@ public class LotteryUtils {
             event.setHasLotteryExecuted(true);
             Log.i("EVENT", "has lottery executed = true");
 
-            // don't need to update poster so keep null but we need to update waiting list w/ new entrant statys
+            // don't need to update poster so keep null but we need to update waiting list w/ new entrant status
             EventRepository.getInstance().updateEvent(event, null, task -> {
                 if (task.isSuccessful()) {
                     onCompleteListener.onComplete(Tasks.forResult(selectedUserDeviceIds));

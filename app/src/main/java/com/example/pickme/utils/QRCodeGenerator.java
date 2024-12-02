@@ -39,6 +39,11 @@ public class QRCodeGenerator {
 
     private final QrRepository qrRepository;
 
+    /**
+     * Constructor for QRCodeGenerator.
+     *
+     * @param qrRepository Repository to access QR data
+     */
     public QRCodeGenerator(QrRepository qrRepository) {
         this.qrRepository = qrRepository;
     }
@@ -138,10 +143,21 @@ public class QRCodeGenerator {
     }
 
     /**
-     * Callback interface for QR code generation and retrieval
+     * Callback interface for QR code generation and retrieval.
      */
     public interface QRCodeCallback {
+        /**
+         * Called when the QR code is ready.
+         *
+         * @param filePath Path to the QR code image file
+         */
         void onQRCodeReady(String filePath);
+
+        /**
+         * Called when there is an error generating or retrieving the QR code.
+         *
+         * @param errorMessage Error message describing the issue
+         */
         void onError(String errorMessage);
     }
 }

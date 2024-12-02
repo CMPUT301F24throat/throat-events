@@ -80,7 +80,7 @@ public class FacilityRepository {
                     usersRef.document(ownerId).get().addOnCompleteListener(userTask -> {
                         if (userTask.isSuccessful() && userTask.getResult().exists()) {
                             facilitiesRef.document(facilityId)
-                                    .update("facilityName", facilityName, "facilityLocation", facilityLocation)
+                                    .update("facilityName", facilityName, "location", facilityLocation)
                                     .addOnCompleteListener(onCompleteListener)
                                     .addOnFailureListener(e -> {
                                         // Handle the error
@@ -114,7 +114,11 @@ public class FacilityRepository {
                 });
     }
 
-    // Get facility by ownerId
+    /**
+     * Retrieves facilities by the owner's ID.
+     * @param ownerId the ID of the owner.
+     * @param onCompleteListener the listener to handle completion events.
+     */
     public void getFacilityByOwnerId(String ownerId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
         facilitiesRef.whereEqualTo("ownerId", ownerId)
                 .get()
@@ -125,7 +129,11 @@ public class FacilityRepository {
                 });
     }
 
-    // Delete a facility by its ID
+    /**
+     * Deletes a facility by its ID.
+     * @param facilityId the ID of the facility to be deleted.
+     * @param onCompleteListener the listener to handle completion events.
+     */
     public void deleteFacility(String facilityId, OnCompleteListener<Void> onCompleteListener) {
         facilitiesRef.document(facilityId)
                 .delete()

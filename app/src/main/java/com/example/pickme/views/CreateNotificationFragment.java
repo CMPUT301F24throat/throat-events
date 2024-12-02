@@ -32,7 +32,6 @@ import java.util.ArrayList;
 /**
  * This fragment handles the create/send screen for notifications
  *
- * @author Omar-Kattan-1
  * @version 1.1
  */
 public class CreateNotificationFragment extends Fragment {
@@ -47,12 +46,26 @@ public class CreateNotificationFragment extends Fragment {
     private User user;
     private Event event;
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param layoutInflater LayoutInflater to use for inflating the layout.
+     * @param container ViewGroup to which the new view will be added.
+     * @param savedInstanceState Bundle containing the saved state.
+     * @return The View for the fragment's UI.
+     */
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState){
         return layoutInflater.inflate(R.layout.notif_create_fragment, container, false);
     }
 
+    /**
+     * Called immediately after onCreateView(LayoutInflater, ViewGroup, Bundle) has returned.
+     *
+     * @param view The View returned by onCreateView(LayoutInflater, ViewGroup, Bundle).
+     * @param savedInstanceState Bundle containing the saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
@@ -164,6 +177,8 @@ public class CreateNotificationFragment extends Fragment {
 }
 
 /*
- * Sources:
- * ChatGPT: "how do I make a button behave like the android back button"
- */
+   Coding Sources
+   <p>
+   ChatGPT
+   - "how do I make a button behave like the android back button"
+  */
