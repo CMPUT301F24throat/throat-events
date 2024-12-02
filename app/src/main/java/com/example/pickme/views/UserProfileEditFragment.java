@@ -255,6 +255,11 @@ public class UserProfileEditFragment extends Fragment {
         }
     }
 
+    /**
+     * Checks whether the initials of the user have changed for profile picture generation
+     * @param user The user to check the entered fields against
+     * @return True if the initials have changed, false otherwise
+     */
     private boolean isInitialsChanged(User user) {
         String old_in = String.valueOf(user.getFirstName().charAt(0)) + user.getLastName().charAt(0);
         String new_in = String.valueOf(editProfileFirstName.getText().toString().trim().charAt(0))
@@ -262,6 +267,10 @@ public class UserProfileEditFragment extends Fragment {
         return !old_in.equalsIgnoreCase(new_in);
     }
 
+    /**
+     * Updates the user in firebase
+     * @param user The user to update
+     */
     private void pushUserToFirebase(User user) {
         // Update the user in the repository or database
         UserRepository.getInstance().updateUser(user, task -> {
@@ -274,6 +283,10 @@ public class UserProfileEditFragment extends Fragment {
         });
     }
 
+    /**
+     * Helper function to generate profile pictures based on initials
+     * @param listener The onCompleteListener for when the generation task is complete
+     */
     private void generateProfilePicture(OnCompleteListener<Image> listener) {
         // Generate a new profile picture using the user's initials (default pfp)
         String firstName = editProfileFirstName.getText().toString().trim();
