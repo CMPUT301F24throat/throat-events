@@ -97,6 +97,7 @@ public class AdminEventsArchiveFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
         loadEvents();
+        eventAdapter.filter(""); // Default query
     }
 
     /**
