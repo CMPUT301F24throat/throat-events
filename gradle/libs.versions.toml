@@ -42,6 +42,8 @@ playServicesTasks = "18.2.0"
 robolectricRobolectric = "4.8"
 textdrawable = "1.0.3"
 junitJunit = "4.12"
+navigationFragmentVersion = "2.8.4"
+navigationUiVersion = "2.8.4"
 
 [libraries]
 avatarview-coil = { module = "io.getstream:avatarview-coil", version.ref = "avatarviewCoil" }
@@ -90,6 +92,8 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.r
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
+androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragmentVersion" }
+androidx-navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUiVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

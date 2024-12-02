@@ -46,7 +46,7 @@
 
         android:ellipsize="end"
         android:scrollHorizontally="false"
-        android:maxLines="1"
+        android:maxLines="2"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

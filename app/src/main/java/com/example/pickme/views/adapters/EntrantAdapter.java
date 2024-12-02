@@ -1,5 +1,6 @@
 package com.example.pickme.views.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,6 +85,10 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.EntrantV
      */
     public void updateEntrants(List<WaitingListEntrant> newEntrants) {
         this.entrants = newEntrants;
+
+        for(WaitingListEntrant entrant : entrants){
+            Log.i("LOTTERY", "overview showing ID: " + entrant.getEntrantId());
+        }
         notifyDataSetChanged();
     }
 
