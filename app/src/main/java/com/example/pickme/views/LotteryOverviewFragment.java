@@ -161,12 +161,12 @@ public class LotteryOverviewFragment extends Fragment {
 }
 
 /*
- * Code Sources
- * <p>
- * Stack Overflow
- * https://stackoverflow.com/questions/52130338/update-ui-after-getting-data-from-firebase-database
- * https://stackoverflow.com/questions/16694786/how-to-customize-a-spinner-in-android?noredirect=1&lq=1
- * <p>
- * Medium
- * https://medium.com/vattenfall-tech/android-spinner-customizations-8b4980fb0ee3
- */
+   Coding Sources
+   <p>
+   Stack Overflow
+   - https://stackoverflow.com/questions/52130338/update-ui-after-getting-data-from-firebase-database
+   - https://stackoverflow.com/questions/16694786/how-to-customize-a-spinner-in-android?noredirect=1&lq=1
+   <p>
+   Medium
+   - https://medium.com/vattenfall-tech/android-spinner-customizations-8b4980fb0ee3
+  */

@@ -76,6 +76,12 @@ public class QRCodeViewFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Called when the fragment is created.
+     * Initializes the repositories and QR code generator.
+     *
+     * @param savedInstanceState Saved state of the fragment.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +99,17 @@ public class QRCodeViewFragment extends Fragment {
         qrCodeGenerator = new QRCodeGenerator(qrRepository);
     }
 
+    /**
+     * Called when the fragment view is created.
+     * Inflates the layout and sets up the view references.
+     * Sets up the delete button for admin users.
+     * Loads event details and displays the QR code.
+     *
+     * @param inflater           Inflater to inflate the layout.
+     * @param container          Container for the fragment view.
+     * @param savedInstanceState Saved state of the fragment.
+     * @return The fragment view.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -136,6 +153,10 @@ public class QRCodeViewFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Deletes the existing QR code and generates a new one.
+     * Displays a toast message on success or failure.
+     */
     private void deleteAndRegenerateQRCode() {
         String qrPath = "/events/" + eventID;
 
@@ -151,6 +172,10 @@ public class QRCodeViewFragment extends Fragment {
                 });
     }
 
+    /**
+     * Generates a new QR code for the event.
+     * Displays a toast message on success or failure.
+     */
     private void regenerateQRCode() {
         String newEncodedPath = "/events/" + eventID;
 
@@ -186,6 +211,10 @@ public class QRCodeViewFragment extends Fragment {
                 });
     }
 
+    /**
+     * Loads the event details from the database and displays the event title.
+     * Displays a toast message on success or failure.
+     */
     private void loadEventDetails() {
         eventRepository.getEventById(eventID, new OnCompleteListener<Event>() {
             @Override
@@ -208,6 +237,10 @@ public class QRCodeViewFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays the QR code for the event.
+     * Displays a toast message on success or failure.
+     */
     private void displayQRCode() {
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override
@@ -238,6 +271,10 @@ public class QRCodeViewFragment extends Fragment {
         });
     }
 
+    /**
+     * Shares the QR code for the event.
+     * Displays a toast message on success or failure.
+     */
     private void shareQRCode() {
         qrCodeGenerator.getQRCodeImage(requireContext(), eventID, new QRCodeGenerator.QRCodeCallback() {
             @Override

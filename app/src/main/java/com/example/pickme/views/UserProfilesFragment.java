@@ -28,13 +28,25 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserProfilesFragment extends Fragment implements UserProfilesAdapter.OnItemClickListener{
+/**
+ * Fragment to display and manage user profiles.
+ */
+public class UserProfilesFragment extends Fragment implements UserProfilesAdapter.OnItemClickListener {
 
     private UserAdminProfilesBinding binding;
     private UserRepository userRepository;
     private FacilityRepository facilityRepository;
     private List<User> usersList = new ArrayList<>();
     private UserProfilesAdapter userProfilesAdapter;
+
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return The View for the fragment's UI.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,6 +55,12 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
         return binding.getRoot();
     }
 
+    /**
+     * Called immediately after onCreateView has returned, but before any saved state has been restored in to the view.
+     *
+     * @param view               The View returned by onCreateView.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -68,6 +86,9 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
         loadEvents();
     }
 
+    /**
+     * Loads user events from the repository and updates the UI.
+     */
     private void loadEvents() {
         usersList.clear();
         userRepository.getAllUsers(query -> {
@@ -90,6 +111,12 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
         });
     }
 
+    /**
+     * Deletes a user and updates the UI.
+     *
+     * @param user The user to be deleted.
+     * @param pos  The position of the user in the list.
+     */
     private void deleteUser(User user, int pos) {
         // Create a dialog instance
         Dialog dialog = new Dialog(requireContext());
@@ -116,27 +143,35 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
         dialog.show();
     }
 
+    /**
+     * Fetches facility details for a user and displays them in a dialog.
+     *
+     * @param user The user whose facility details are to be fetched.
+     * @param pos  The position of the user in the list.
+     */
     private void facilityDetails(User user, int pos) {
-
-
         facilityRepository.getFacilityByOwnerId(user.getDeviceId(), query -> {
             if (query.isSuccessful()) {
                 for (DocumentSnapshot document : query.getResult().getDocuments()) {
                     Facility facility = document.toObject(Facility.class);
-                    if (facility!=null){
+                    if (facility != null) {
                         showFacilityDialog(facility);
-                    }else {
+                    } else {
                         Toast.makeText(requireContext(), "Facility not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-
             } else {
                 System.err.println("Failed to fetch facilities: " + query.getException().getMessage());
             }
         });
     }
 
-    private void showFacilityDialog(Facility facility){
+    /**
+     * Displays facility details in a dialog.
+     *
+     * @param facility The facility whose details are to be displayed.
+     */
+    private void showFacilityDialog(Facility facility) {
         // Create a dialog instance
         Dialog dialog = new Dialog(requireContext());
 
@@ -164,11 +199,24 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
         // Show the dialog
         dialog.show();
     }
+
+    /**
+     * Callback for when a delete button is clicked in the adapter.
+     *
+     * @param user     The user to be deleted.
+     * @param position The position of the user in the list.
+     */
     @Override
     public void onDeleteClick(User user, int position) {
         deleteUser(user, position);
     }
 
+    /**
+     * Callback for when a facility button is clicked in the adapter.
+     *
+     * @param user     The user whose facility details are to be fetched.
+     * @param position The position of the user in the list.
+     */
     @Override
     public void onFacilityClick(User user, int position) {
         facilityDetails(user, position);

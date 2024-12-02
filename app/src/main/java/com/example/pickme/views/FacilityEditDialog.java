@@ -92,10 +92,10 @@ public class FacilityEditDialog extends DialogFragment {
     }
 }
 
-/**
- * Code Sources
- * <p>
- * StackOverflow
- * https://stackoverflow.com/questions/7977392/android-dialogfragment-vs-dialog
- * https://stackoverflow.com/questions/13765127/dialogfragment-advantages-over-alertdialog?noredirect=1&lq=1
+/*
+  Coding Sources
+  <p>
+  StackOverflow:
+  - https://stackoverflow.com/questions/7977392/android-dialogfragment-vs-dialog
+  - https://stackoverflow.com/questions/13765127/dialogfragment-advantages-over-alertdialog?noredirect=1&lq=1
  */

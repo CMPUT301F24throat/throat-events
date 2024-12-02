@@ -40,7 +40,11 @@ public class LotteryRunDialog extends DialogFragment {
         this.lotteryUtils = new LotteryUtils();
     }
 
-
+    /**
+     * Called to do initial creation of a fragment.
+     *
+     * @param savedInstanceState If the fragment is being re-created from a previous saved state, this is the state.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -101,6 +105,7 @@ public class LotteryRunDialog extends DialogFragment {
         description.setText(descriptionText);
     }
 }
+
 /*
   Code Sources
   <p>
