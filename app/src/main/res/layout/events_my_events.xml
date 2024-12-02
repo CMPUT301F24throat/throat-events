@@ -13,7 +13,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="40dp"
         android:drawablePadding="8dp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="@font/inter_medium"
         android:gravity="center"
         android:paddingStart="5dp"
         android:paddingTop="5dp"
@@ -23,9 +23,8 @@
         android:textAllCaps="false"
         android:textColor="@color/text1"
         android:textSize="25sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/divider5"
