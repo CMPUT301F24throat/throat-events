@@ -164,6 +164,11 @@ public class EventDetailsFragment extends Fragment {
                 view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.GONE);
                 configResponseBtns(view, userEntrant);
             }
+            else{
+                TextView lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
+                lotteryResultText.setText("Sorry, the lottery has already been run for this event.");
+                lotteryResultText.setBackgroundResource(R.drawable.cancelled_entrant_bg);
+            }
         }
 
         configLotteryBtn(view);
