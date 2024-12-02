@@ -101,7 +101,7 @@ public class UserProfilesFragment extends Fragment implements UserProfilesAdapte
         // Set up the dialog views
         binding.firstName.setText(user.getFirstName());
         binding.lastName.setText(user.getLastName());
-        binding.idNumber.setText(pos);
+        binding.idNumber.setText(String.valueOf(pos));
         binding.delete.setOnClickListener(view -> {
             userRepository.deleteUser(user.getDeviceId());
             usersList.remove(pos);
