@@ -261,9 +261,21 @@ public class UserProfileEditFragment extends Fragment {
      * @return True if the initials have changed, false otherwise
      */
     private boolean isInitialsChanged(User user) {
-        String old_in = String.valueOf(user.getFirstName().charAt(0)) + user.getLastName().charAt(0);
-        String new_in = String.valueOf(editProfileFirstName.getText().toString().trim().charAt(0))
-                + editProfileLastName.getText().toString().trim().charAt(0);
+        String old_in;
+        String new_in;
+        if (!user.getLastName().isEmpty()) {
+            old_in = String.valueOf(user.getFirstName().charAt(0)) + user.getLastName().charAt(0);
+        } else {
+            old_in = String.valueOf(user.getFirstName().charAt(0));
+        }
+
+        if (!editProfileLastName.getText().toString().isEmpty()) {
+            new_in = String.valueOf(editProfileFirstName.getText().toString().trim().charAt(0))
+                    + editProfileLastName.getText().toString().trim().charAt(0);
+        } else {
+            new_in = String.valueOf(editProfileFirstName.getText().toString().trim().charAt(0));
+        }
+
         return !old_in.equalsIgnoreCase(new_in);
     }
 
@@ -291,7 +303,8 @@ public class UserProfileEditFragment extends Fragment {
         // Generate a new profile picture using the user's initials (default pfp)
         String firstName = editProfileFirstName.getText().toString().trim();
         String lastName = editProfileLastName.getText().toString().trim();
-        String initials = String.valueOf(firstName.charAt(0)) + lastName.charAt(0);
+        String last_initial = !lastName.isEmpty()? String.valueOf(lastName.charAt(0)) : "";
+        String initials = firstName.charAt(0) + last_initial;
         img.generate(initials, listener);
     }
 
