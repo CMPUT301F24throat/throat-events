@@ -66,7 +66,6 @@ public class QRCameraFragment extends Fragment {
         } else {
             setupScanner();
         }
-
         return view;
     }
 

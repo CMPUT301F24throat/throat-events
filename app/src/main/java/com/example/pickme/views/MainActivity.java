@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             if(isAdmin != null)
-                user.setIsAdmin(isAdmin);
+                user.setAdmin(isAdmin);
 
             User.setInstance(user);  // Set the user instance
             // Show the Admin Tools menu item if the user is an admin
