@@ -36,6 +36,7 @@ public class EventWaitingListFragment extends Fragment implements OnMapReadyCall
     private ArrayList<WaitingListEntrant> entrants = new ArrayList<>();
     private MapView mapView;
     private GoogleMap googleMap;
+    private boolean isMapReady = false;
 
     /**
      * Inflates the layout for this fragment.
@@ -69,6 +70,7 @@ public class EventWaitingListFragment extends Fragment implements OnMapReadyCall
 
             waitingListRecyclerView = view.findViewById(R.id.waitingList_list);
             waitingListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
             // Initialize MapView
             mapView = view.findViewById(R.id.waitingList_entrantMap);
             mapView.onCreate(savedInstanceState);
@@ -99,17 +101,23 @@ public class EventWaitingListFragment extends Fragment implements OnMapReadyCall
 
         EventRepository.getInstance().attachEvent(event, () -> {
             waitingListAdapter.notifyDataSetChanged();
+            updateMapMarkers();
         });
+        updateMapMarkers();
+    }
 
-        if (googleMap != null) {
-            for (WaitingListEntrant entrant : entrants) {
-                if (entrant.getGeoLocation() != null) {
-                    LatLng position = new LatLng(
-                            entrant.getGeoLocation().getLatitude(),
-                            entrant.getGeoLocation().getLongitude()
-                    );
-                    googleMap.addMarker(new MarkerOptions().position(position).title(entrant.getEntrantId()));
-                }
+    /**
+     * Updates map markers to show locations where users signed up from.
+     */
+    private void updateMapMarkers() {
+        if (!isMapReady || googleMap == null) return;
+
+        googleMap.clear();
+
+        for (WaitingListEntrant entrant : entrants) {
+            if (entrant.getGeoLocation() != null) {
+                LatLng signupLocation = new LatLng(entrant.getGeoLocation().getLatitude(), entrant.getGeoLocation().getLongitude());
+                googleMap.addMarker(new MarkerOptions().position(signupLocation).title(entrant.getEntrantId()));
             }
         }
     }
@@ -117,6 +125,8 @@ public class EventWaitingListFragment extends Fragment implements OnMapReadyCall
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
+        this.isMapReady = true;
+        updateMapMarkers();
     }
 
     @Override
