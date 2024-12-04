@@ -31,7 +31,7 @@ public class WaitingListEntrantTest {
     public void testConstructorWithArguments() {
         String entrantId = "user123";
         GeoPoint location = new GeoPoint(-33.8688, 151.2093); // Example coordinates (Sydney)
-        EntrantStatus status = EntrantStatus.PENDING;
+        EntrantStatus status = EntrantStatus.SELECTED;
 
         entrant = new WaitingListEntrant(entrantId, location, status);
 
