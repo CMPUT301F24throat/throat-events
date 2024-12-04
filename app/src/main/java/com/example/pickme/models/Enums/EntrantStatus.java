@@ -29,8 +29,6 @@ public enum EntrantStatus {
      */
     CANCELLED,
 
-    PENDING,
-    APPROVED,
     /**
      * User was selected to attend the event and accepted the invite.
      */
