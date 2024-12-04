@@ -100,23 +100,21 @@ public class EventWaitingListFragment extends Fragment implements OnMapReadyCall
         EventRepository.getInstance().attachEvent(event, () -> {
             waitingListAdapter.notifyDataSetChanged();
         });
-
-        if (googleMap != null) {
-            for (WaitingListEntrant entrant : entrants) {
-                if (entrant.getGeoLocation() != null) {
-                    LatLng position = new LatLng(
-                            entrant.getGeoLocation().getLatitude(),
-                            entrant.getGeoLocation().getLongitude()
-                    );
-                    googleMap.addMarker(new MarkerOptions().position(position).title(entrant.getEntrantId()));
-                }
-            }
-        }
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
+
+        for (WaitingListEntrant entrant : entrants) {
+            if (entrant.getGeoLocation() != null) {
+                LatLng position = new LatLng(
+                        entrant.getGeoLocation().getLatitude(),
+                        entrant.getGeoLocation().getLongitude()
+                );
+                googleMap.addMarker(new MarkerOptions().position(position).title(entrant.getEntrantId()));
+            }
+        }
     }
 
     @Override
