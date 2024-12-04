@@ -1,5 +1,6 @@
 package com.example.pickme.views;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.example.pickme.R;
+import com.example.pickme.databinding.DialogGeoLocationBinding;
 import com.example.pickme.models.Enums.EntrantStatus;
 import com.example.pickme.models.Event;
 import com.example.pickme.models.User;
@@ -148,10 +150,8 @@ public class EventDetailsFragment extends Fragment {
         view.findViewById(R.id.eventDetails_declineInviteBtn).setVisibility(View.GONE);
         view.findViewById(R.id.eventDetails_selectedText).setVisibility(View.GONE);
 
-        Log.i("EVENT", "hasLotteryExecuted: " + event.getHasLotteryExecuted().toString());
-
         // Waitlist button and response buttons display
-        if (!event.getHasLotteryExecuted() && !isOrganizer) {
+        if (event!=null && !event.getHasLotteryExecuted() && !isOrganizer) {
             view.findViewById(R.id.eventDetails_joinWaitlistBtn).setVisibility(View.VISIBLE);
             configWaitlistBtn(view);
         } else if (!isOrganizer) {
@@ -169,7 +169,7 @@ public class EventDetailsFragment extends Fragment {
             }
             else {
                 // User is not an entrant on waiting list and event has already ran lottery
-                Log.i("EVENT", "userEntrant = null");
+                Log.i("EVENT", "userEndialoggeolotrant = null");
                 TextView lotteryResultText = view.findViewById(R.id.eventDetails_selectedText);
                 lotteryResultText.setVisibility(View.VISIBLE);
                 lotteryResultText.setText("Sorry, the lottery has already been run for this event.");
@@ -315,6 +315,35 @@ public class EventDetailsFragment extends Fragment {
         // Geolocation part //
         waitlistBtn.setOnClickListener(v -> {
             if (event.isGeoLocationRequired()) {
+                if(!currentUser.isGeoLocationEnabled())
+                    dialogGeoLocation();
+                else{
+                    new GeoLocationUtils().fetchCurrentLocation(requireActivity(), (latitude, longitude) -> {
+                        GeoPoint currentUserLocation = new GeoPoint(latitude, longitude);
+                        Log.i("EVENT", "User location fetched: " + latitude + ", " + longitude);
+
+                        // Perform waitlist logic with location
+                        waitlistLogic(currentUserLocation);
+                    });
+                }
+            } else {
+                // Perform waitlist logic without requiring geolocation
+                waitlistLogic(null);
+            }
+        });
+    }
+
+    private void dialogGeoLocation(){
+        // Create a dialogue instance
+        Dialog dialogue = new Dialog(requireContext());
+
+        // Inflate the custom layout using View Binding
+        DialogGeoLocationBinding binding = DialogGeoLocationBinding.inflate(LayoutInflater.from(requireContext()));
+        dialogue.setContentView(binding.getRoot());
+
+        binding.confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 GeoLocationUtils geoLocationUtils = new GeoLocationUtils();
 
                 // Check if location permissions are granted
@@ -334,16 +363,28 @@ public class EventDetailsFragment extends Fragment {
                     GeoPoint currentUserLocation = new GeoPoint(latitude, longitude);
                     Log.i("EVENT", "User location fetched: " + latitude + ", " + longitude);
 
+                    currentUser.setGeoLocationEnabled(true);
+
+                    UserRepository.updateUser(currentUser, task -> {
+                        Log.i("EVENT", "updated user geolocation");
+                    });
                     // Perform waitlist logic with location
                     waitlistLogic(currentUserLocation);
                 });
-            } else {
-                // Perform waitlist logic without requiring geolocation
-                waitlistLogic(null);
+                dialogue.dismiss();
             }
         });
-    }
 
+        binding.cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogue.dismiss();
+                Navigation.findNavController(requireView()).navigateUp();
+            }
+        });
+
+        dialogue.show();
+    }
     /**
      * Handles the waitlist logic based on the user's status and geolocation.
      *
